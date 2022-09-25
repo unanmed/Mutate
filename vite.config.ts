@@ -1,11 +1,26 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import legacy from '@vitejs/plugin-legacy'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    legacy({ targets: ['defaults', 'not IE 11'] })
-  ]
+  ],
+  build: {
+    lib: {
+      entry: resolve(__dirname, 'lib/index.ts'),
+      formats: ['es', 'umd'],
+      name: 'Mutate'
+    },
+    rollupOptions: {
+      external: ['vue', 'less'],
+      output: {
+        globals: {
+          vue: 'Vue',
+          less: 'Less'
+        }
+      }
+    }
+  }
 })
