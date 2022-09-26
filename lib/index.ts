@@ -6,6 +6,9 @@ import * as note from './note';
 import * as path from './path';
 import * as render from './render';
 import * as timing from './timing';
+import * as base from './base';
+import * as animate from './animate';
+import * as ticker from './ticker';
 
 export {
     camera,
@@ -15,5 +18,8 @@ export {
     note,
     path,
     render,
-    timing
+    timing,
+    base,
+    animate,
+    ticker
 }

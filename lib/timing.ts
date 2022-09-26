@@ -19,14 +19,11 @@ export function linear(): TimingFn {
 }
 
 /**
- * 贝塞尔曲线变化，3、4两个参数可选
- * @param cp1x 控制点1横坐标
- * @param cp1y 控制点1纵坐标
- * @param cp2x 控制点2横坐标
- * @param cp2y 控制点2纵坐标
+ * 贝塞尔曲线变化，起点0，终点1
+ * @param cps 所有的控制点，数量需要大于1，为[x, y]数组
  * @returns 
  */
-export function bezier(cp1x: number, cp1y: number, cp2x?: number, cp2y?: number): TimingFn {
+export function bezier(...cps: [number, number][]): TimingFn {
     return (input: number) => 0;
 }
 

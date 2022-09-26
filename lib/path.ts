@@ -13,3 +13,13 @@ export type PathFn = (input: number) => [number, number]
 export function circle(r: number, timing?: TimingFn): PathFn {
     return (input: number) => [0, 0];
 }
+
+/**
+ * 贝塞尔曲线轨迹
+ * @param start 起点
+ * @param end 终点
+ * @param cps 控制点，是[x, y]数组
+ */
+export function bezier(start: number, end: number, ...cps: [number, number][]): PathFn {
+    return (input: number) => [0, 0];
+}
