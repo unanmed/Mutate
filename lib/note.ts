@@ -5,23 +5,45 @@ export type NoteType = 'tap' | 'hold' | 'drag' | 'flick'
 
 export type DetailRes = 'late' | 'early'
 
-interface NoteConfig {
+export interface NoteConfig {
     /** 音符的打击时间 */
     playTime?: number
     /** perfect判定的时间 */
     perfectTime?: number
     /** good判定的时间 */
     goodTime?: number
+    /** 音符出现时间 */
+    spwan?: number
+}
+
+export type NoteShadow = {
+    x: number
+    y: number
+    blur: number
+    color: string
 }
 
 export class BaseNote<T extends NoteType> extends AnimationBase {
-    noteType: T
-    noteTime?: number
+    readonly noteType: T
+    readonly noteTime?: number
     played: boolean = false
     /** 该音符所属的基地 */
-    base: Base
+    readonly base: Base
     /** 音符流速，每帧多少像素 */
     speed: number = 1
+    /** 生成时间，到时间后才会被绘制或被判定 */
+    readonly spwan: number = 0
+    /** 不透明度 */
+    alpha: number = 1
+    /** 滤镜 */
+    ctxFilter: string = ''
+    /** 阴影 */
+    ctxShadow: NoteShadow = {
+        x: 0,
+        y: 0,
+        blur: 0,
+        color: ''
+    }
 
     readonly perfectTime: number
     readonly goodTime: number
@@ -33,6 +55,12 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base = base;
         this.perfectTime = config?.perfectTime ?? 50;
         this.goodTime = config?.goodTime ?? 80;
+        if (typeof this.noteTime === 'number') {
+            this.spwan = Math.max(this.noteTime - 5000, 0);
+        }
+        if (typeof config?.spwan === 'number') {
+            this.spwan = config.spwan;
+        }
     }
 
     /**

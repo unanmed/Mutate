@@ -122,13 +122,6 @@ export class AnimationBase {
     }
 
     /**
-     * 等待任何一个正在执行的动画操作执行完毕
-     */
-    async race(): Promise<void> {
-        await this.n(1);
-    }
-
-    /**
      * 等待所有的正在执行的动画操作执行完毕
      */
     async all(): Promise<void> {

@@ -1,12 +1,21 @@
 import { AnimationBase } from "./animate";
 import { BaseNote, NoteType } from "./note";
 
-export class Base extends AnimationBase {
-    notes: BaseNote<NoteType>[] = []
-    bpm: number = 100
+export const bases: Base[] = [];
 
-    constructor() {
+export const baseMap: { [id: string]: Base } = {};
+
+export class Base extends AnimationBase {
+    static cnt: number = 0
+
+    bpm: number = 100
+    readonly notes: BaseNote<NoteType>[] = []
+    readonly num: number = Base.cnt++
+    readonly id: string
+
+    constructor(id: string) {
         super();
+        this.id = id;
     }
 
     /**

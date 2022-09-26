@@ -1,16 +1,66 @@
-# Vue 3 + TypeScript + Vite
+# Mutate简介
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+`Mutate`是融合了`music`和`rotate`形成的单词，意为融合了音乐和旋转
 
-## Recommended IDE Setup
+## 安装
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+使用npm:
 
-## Type Support For `.vue` Imports in TS
+```cmd
+npm i mutate
+```
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+使用pnpm:
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+```cmd
+pnpm add mutate
+```
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+## 插入到你的项目中
+
+首先，你需要一个canvas，这是mutate运行的基础，当然也只需要一个canvas，mutate就能运行。
+
+然后，你可以使用以下代码来向你的项目中插入mutate游戏
+
+```js
+import mutate from 'mutate';
+
+const canvas = document.getElementById('mutate');
+
+const game = mutate.core.create(canvas);
+game.load('your music url');
+await game.loadMTT('your mtt url'); // mtt是mutate的谱面文件，后面会有说明
+game.start(); // 开始游戏
+```
+
+## 开发
+
+如果你想开发本项目，在github上拉取后，可以按照以下步骤操作
+
+### 安装依赖包
+
+使用pnpm进行安装
+
+```cmd
+pnpm i
+```
+
+### 进入开发环境
+
+执行
+
+```cmd
+pnpm dev
+```
+
+便可进入开发环境，在这里，你可以使用vue3+ts+less进行测试开发
+
+### 打包
+
+执行
+
+```cmd
+pnpm build
+```
+
+便可进行打包，打包后的入口为`dist/mutate.js`，该项可以在`vite.config.ts`中配置
