@@ -29,8 +29,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     played: boolean = false
     /** 该音符所属的基地 */
     readonly base: Base
-    /** 音符流速，每帧多少像素 */
-    speed: number = 1
+    /** 音符流速，每秒多少像素 */
+    speed: number = 500
     /** 生成时间，到时间后才会被绘制或被判定 */
     readonly spwan: number = 0
     /** 不透明度 */

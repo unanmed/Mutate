@@ -1,6 +1,7 @@
 import { PathFn } from "./path"
 import { TimingFn } from "./timing"
 import { cloneDeep } from 'lodash'
+import { Ticker } from "./ticker"
 
 type AnimateFn = (e: AnimationBase) => void
 
@@ -37,6 +38,8 @@ export class AnimationBase {
     path: PathFn
     /** 所有的监听函数 */
     private readonly listener: { [T in AnimateHook]: AnimateFn[] } = cloneDeep(listener);
+    /** 每帧执行函数 */
+    ticker: Ticker = new Ticker()
     /** 变换时的相对模式，相对或绝对 */
     relation: 'relative' | 'absolute' = 'absolute'
     /** 渐变时间 */

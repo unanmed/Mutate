@@ -9,6 +9,7 @@ export class Base extends AnimationBase {
     static cnt: number = 0
 
     bpm: number = 100
+    radius: number = 10
     readonly notes: BaseNote<NoteType>[] = []
     readonly num: number = Base.cnt++
     readonly id: string
@@ -32,6 +33,14 @@ export class Base extends AnimationBase {
      * @param speed 设置成的速度
      */
     addSpeedNode(time: number, speed: number): void {
+
+    }
+
+    /**
+     * 设置基地的半径大小
+     * @param r 要设置成的半径
+     */
+    setRadius(r: number): void {
 
     }
 

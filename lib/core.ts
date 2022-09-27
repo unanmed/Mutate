@@ -8,12 +8,18 @@ export function create(target: HTMLCanvasElement): Mutate {
     return new Mutate(target);
 }
 
+/**
+ * 结算时的详细信息
+ */
 export type MutateDetail = {
     perfect: number
     good: number
     miss: number
 }
 
+/**
+ * 动画信息
+ */
 export type AnimateInfo = {
     startTime: number
     type: string
@@ -22,10 +28,16 @@ export type AnimateInfo = {
     args: number[]
 }
 
+/**
+ * MTT文件的动画
+ */
 export type MTTAnimate = {
     [time: number]: AnimateInfo
 }
 
+/**
+ * 摄像机信息
+ */
 export type MutateCamera = {
     to: {
         [time: number]: string
@@ -38,6 +50,9 @@ export type MutateCamera = {
     }
 }
 
+/**
+ * 基地信息
+ */
 export type BaseChart = {
     spwan: number
     id: string
@@ -47,6 +62,9 @@ export type BaseChart = {
     animate: MTTAnimate
 }
 
+/**
+ * 音符信息
+ */
 export type NoteChart = {
     type: NoteType
     spwan: number
@@ -70,6 +88,9 @@ export type NoteChart = {
     }
 }
 
+/**
+ * 读取的谱面信息
+ */
 export interface MutateChart {
     bases: { [id: string]: BaseChart }
     notes: NoteChart[]
