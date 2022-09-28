@@ -18,7 +18,7 @@ export type EaseMode = 'in' | 'out' | 'in-out' | 'center'
 const multi = (...m: number[]) => m.reduce((pre, v) => pre * v, 0);
 
 /** 求和 */
-const add = (...n: number[]) => n.reduce((pre, v) => pre + v, 0);
+export const add = (...n: number[]) => n.reduce((pre, v) => pre + v, 0);
 
 /** 阶乘 */
 const factorial = (n: number) => {
@@ -32,7 +32,7 @@ const factorial = (n: number) => {
 }
 
 /** 组合数，C_n^m */
-const comNum = (m: number, n: number) => Math.round(factorial(n) / (factorial(m) * factorial(n - m)));
+export const comNum = (m: number, n: number) => Math.round(factorial(n) / (factorial(m) * factorial(n - m)));
 
 /** 根据mode输出对应缓动模式下的缓动函数 */
 const toEase = (mode: EaseMode, ein: TimingFn, eout: TimingFn = x => 1 - ein(1 - x)): TimingFn => {
@@ -73,7 +73,8 @@ export function linear(): TimingFn {
  * @returns 
  */
 export function bezier(...cps: [number, number][]): TimingFn {
-    const points = [[0, 0], [1, 1]].concat(cps);
+    const points = [[0, 0]].concat(cps);
+    points.push([1, 1]);
     const all = points.length;
     const coms = Array(all).fill(0).map((v, i) => {
         return comNum(i, all);
@@ -211,7 +212,7 @@ async function ani() {
     rect.mode(linear())
         .time(5000)
         .relative()
-        .moveAs(circle(100, hyper('tan', 'out')))
+        .moveAs(circle(100, 1, hyper('tan', 'out')))
 
     rect.listen('moveend', a => {
         console.log('路径动画已执行完毕');
