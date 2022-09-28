@@ -12,8 +12,9 @@ export class Ticker {
      * 添加ticker函数
      * @param fn 要添加的函数
      */
-    add(fn: TickerFn): Ticker {
-        this.funcs.push(fn);
+    add(fn: TickerFn, first: boolean = false): Ticker {
+        if (!first) this.funcs.push(fn);
+        else this.funcs.unshift(fn);
         return this;
     }
 
