@@ -1,6 +1,3 @@
-import { AnimationBase } from "./animate";
-import { circle } from "./path";
-
 /**
  * 渐变函数，输入0-1之间的数，输出一个0-1之间的数，说明了动画完成度，1表示结束，0表示开始
  */
@@ -178,50 +175,4 @@ export function shake(power: number, timing: TimingFn = () => 1): TimingFn {
             return p * n;
         }
     }
-}
-
-// 样例
-async function ani() {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    const rect = new AnimationBase();
-    rect.ticker.add(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.rect(rect.x, rect.y, 100 * rect.size, 50 * rect.size);
-        ctx.fill();
-    });
-
-    // 震动 + 移动 + 旋转 + 放缩
-    rect.mode(shake(5, power(5, 'in-out')), true)
-        .time(1000)
-        .shake(0.7, 0.3)
-        .mode(hyper('tan', 'out'))
-        .time(1500)
-        .move(100, 200)
-        .mode(trigo('sec', 'in'))
-        .time(1300)
-        .rotate(90)
-        .mode(inverseTrigo('sin', 'center'))
-        .time(2000)
-        .scale(2);
-
-    // 等待任意两个动画执行完毕
-    await rect.n(2);
-    console.log('已经有两个动画执行完毕');
-    // 等待移动动画执行完毕
-    await rect.w('move');
-    console.log('移动动画已执行完毕');
-    // 等待所有动画执行完毕
-    await rect.all();
-    console.log('所有动画已执行完毕');
-
-    // 调整为相对原先位置的模式，再按照半径从0逐渐增大到100的圆形轨迹运动
-    rect.mode(linear())
-        .time(5000)
-        .relative()
-        .moveAs(circle(100, 1, hyper('tan', 'out')))
-
-    rect.listen('moveend', a => {
-        console.log('路径动画已执行完毕');
-    });
 }

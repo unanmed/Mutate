@@ -1,11 +1,22 @@
 import { AnimationBase } from "./animate";
 
-type CssKey = keyof CSSStyleDeclaration
+type ToOmittedKey = 'getPropertyPriority' | 'length' | 'parentRule'
+    | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'
+
+type CssKey = keyof Omit<CSSStyleDeclaration, ToOmittedKey> & string
+
+type CameraSaveInfo = {
+    x: number
+    y: number
+    angle: number
+    size: number
+}
 
 export class Camera extends AnimationBase {
     /** 摄像机作用的目标画布 */
     target: CanvasRenderingContext2D
     id: string
+    saveStack: CameraSaveInfo[] = []
 
     constructor(id: string, target: CanvasRenderingContext2D) {
         super();
@@ -14,16 +25,15 @@ export class Camera extends AnimationBase {
     }
 
     /**
-     * 切换成该摄像机
-     */
-    to(): Camera {
-        return this;
-    }
-
-    /**
      * 保存摄像机状态
      */
     save(): Camera {
+        this.saveStack.push({
+            x: this.ox,
+            y: this.oy,
+            angle: this.angle,
+            size: this.size
+        });
         return this;
     }
 
@@ -31,6 +41,12 @@ export class Camera extends AnimationBase {
      * 回退摄像机状态
      */
     restore(): Camera {
+        const info = this.saveStack.pop();
+        if (!info) throw new RangeError(`There is no saves to be restored.`);
+        this.ox = info.x;
+        this.oy = info.y;
+        this.size = info.size;
+        this.angle = info.angle;
         return this;
     }
 
@@ -53,6 +69,16 @@ export class Camera extends AnimationBase {
      * @param css 要设置成的css内容
      */
     css(css: string): void {
-
+        const canvas = this.target.canvas;
+        const formated = css.replaceAll('\n', ';').replace(/;*/g, ';').trim();
+        const all = formated.split(';');
+        for (const str of all) {
+            const [key, value] = str.split(/\s*:\s*/);
+            let id = key.replace(/-([a-z])/g, ($1) => `-${$1.toUpperCase()}`);
+            id = id[0].toLowerCase() + id.slice(1);
+            if (key in canvas.style) {
+                canvas.style[key as CssKey] = value;
+            }
+        }
     }
 }

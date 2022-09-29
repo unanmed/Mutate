@@ -65,8 +65,8 @@ export class AnimationBase {
     }
 
     // 无震动时的坐标
-    private ox: number = 0
-    private oy: number = 0
+    protected ox: number = 0
+    protected oy: number = 0
     // 震动时的坐标
     private sx: number = 0
     private sy: number = 0
