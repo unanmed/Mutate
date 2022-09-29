@@ -16,10 +16,10 @@ export type PathFn = (input: number) => Point
  * @param inverse 是否翻转timing函数
  */
 export function circle(r: number, n: number = 1, timing: TimingFn = x => 1, inverse: boolean = false): PathFn {
-    const per = 1 / n;
     return (input) => {
-        const cos = Math.cos(per * input);
-        const sin = Math.sqrt(1 - cos ** 2);
+        const a = n * input * Math.PI * 2;
+        const cos = Math.cos(a);
+        const sin = Math.sin(a);
         const radius = r * timing(inverse ? timing(1 - input) : timing(input));
         return [radius * cos, radius * sin];
     }
@@ -35,14 +35,14 @@ export function bezier(start: Point, end: Point, ...cps: Point[]): PathFn {
     const points = [start].concat(cps);
     points.push(end);
     const all = points.length;
-    const coms = Array(all).fill(0).map((v, i) => comNum(i, all));
+    const coms = Array(all).fill(0).map((v, i) => comNum(i, all - 1));
 
     return (input) => {
         const x = coms.map((v, i) => {
-            return v * points[i][0] * ((1 - input) ** (all - i)) * (input ** i);
+            return v * points[i][0] * ((1 - input) ** (all - i - 1)) * (input ** i);
         });
         const y = coms.map((v, i) => {
-            return v * points[i][1] * ((1 - input) ** (all - i)) * (input ** i);
+            return v * points[i][1] * ((1 - input) ** (all - i - 1)) * (input ** i);
         });
         return [add(...x), add(...y)];
     }

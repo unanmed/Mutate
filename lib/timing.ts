@@ -69,21 +69,22 @@ export function linear(): TimingFn {
 
 /**
  * 贝塞尔曲线变化，起点0，终点1
- * @param cps 所有的控制点，数量需要大于等于1，为[x, y]数组
+ * @param cps 所有的控制点纵坐标，数量需要大于等于1，范围0-1
  * @returns 
  */
-export function bezier(...cps: [number, number][]): TimingFn {
-    const points = [[0, 0]].concat(cps);
-    points.push([1, 1]);
+export function bezier(...cps: number[]): TimingFn {
+    const points = [0].concat(cps);
+    points.push(1);
+
     const all = points.length;
     const coms = Array(all).fill(0).map((v, i) => {
-        return comNum(i, all);
+        return comNum(i, all - 1);
     });
 
-    return (input: number) => {
+    return t => {
         // 公式在百度上就能查到
         const arr = coms.map((v, i) => {
-            return v * points[i][1] * ((1 - input) ** (all - i)) * (input ** i);
+            return v * points[i] * ((1 - t) ** (all - i - 1)) * (t ** i);
         })
         return add(...arr);
     };
@@ -126,16 +127,17 @@ export function power(n: number, ease: EaseMode): TimingFn {
  */
 export function hyper(mode: 'sin' | 'tan' | 'sec', ease: EaseMode): TimingFn {
     if (mode === 'sin') {
-        const ein = (input: number) => (Math.cosh(input) - 1) / (cosh2 - 1);
+        const ein = (input: number) => (Math.cosh(input * 2) - 1) / (cosh2 - 1);
         return toEase(ease, ein);
     }
     if (mode === 'tan') {
-        const ein = (input: number) => (tanh3 + Math.tanh(input)) * 1 / tanh3;
-        return toEase(ease, ein);
+        const eout = (input: number) => Math.tanh(input * 3) * 1 / tanh3;
+        const ein = (input: number) => 1 - eout(1 - input);
+        return toEase(ease, ein, eout);
     }
     if (mode === 'sec') {
         const sech = (x: number) => 1 / Math.cosh(x);
-        const ein = (input: number) => 1 - sech(input * acosh2) * 2;
+        const ein = (input: number) => 1 - (sech(input * acosh2) - 0.5) * 2;
         return toEase(ease, ein);
     }
     throw new TypeError(`Unexpected parameters are delivered in hyper timing function.`)
@@ -168,8 +170,13 @@ export function shake(power: number, timing: TimingFn = () => 1): TimingFn {
     let n = -1;
     return (input) => {
         n *= -1;
-        const p = power * timing(input);
-        return p * n;
+        if (input < 0.5) {
+            const p = power * timing(input * 2);
+            return p * n;
+        } else {
+            const p = power * timing((1 - input) * 2);
+            return p * n;
+        }
     }
 }
 
@@ -218,4 +225,3 @@ async function ani() {
         console.log('路径动画已执行完毕');
     });
 }
-

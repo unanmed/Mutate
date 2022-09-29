@@ -49,10 +49,23 @@ export class AnimationBase {
     relation: 'relative' | 'absolute' = 'absolute'
     /** 渐变时间 */
     easeTime: number = 0
-    x: number = 0
-    y: number = 0
     size: number = 0
     angle: number = 0
+
+    get x(): number {
+        return this.ox + this.sx;
+    }
+
+    get y(): number {
+        return this.oy + this.sy;
+    }
+
+    // 无震动时的坐标
+    private ox: number = 0
+    private oy: number = 0
+    // 震动时的坐标
+    private sx: number = 0
+    private sy: number = 0
 
     /** 正在执行的动画 */
     animating: { [x: string]: boolean } = {};
@@ -115,8 +128,8 @@ export class AnimationBase {
      * 移动
      */
     move(x: number, y: number): AnimationBase {
-        this.applySys('x', x, 'move');
-        this.applySys('y', y, 'move');
+        this.applySys('ox', x, 'move');
+        this.applySys('oy', y, 'move');
         return this;
     }
 
@@ -147,25 +160,22 @@ export class AnimationBase {
         if (this.animating.shake === true) this.error(`shake is executed twice.`);
         const { easeTime: time, shakeTiming: timing } = this;
         const start = Date.now();
-        this.hook('shakestart');
-
-        let last = 0;
+        this.hook('start', 'shakestart');
 
         const fn = () => {
             const now = Date.now();
             const delta = now - start;
-            this.x -= last * x;
-            this.y -= last * y;
             if (delta > time) {
                 this.ticker.remove(fn);
                 this.animating.shake = false;
+                this.sx = 0;
+                this.sy = 0;
                 this.hook('end', 'shakeend');
             }
             const rate = delta / time;
             const p = timing(rate);
-            last = p;
-            this.x += p * x;
-            this.y += p * y;
+            this.sx = p * x;
+            this.sy = p * y;
         }
         this.ticker.add(fn);
         return this;
@@ -198,19 +208,19 @@ export class AnimationBase {
             if (delta > time) {
                 this.ticker.remove(fn);
                 this.animating.move = false;
-                this.x = tx;
-                this.y = ty;
+                this.ox = tx;
+                this.oy = ty;
                 this.hook('end', 'moveend');
                 return;
             }
             const rate = delta / time;
             const [x, y] = path(rate);
             if (relation === 'absolute') {
-                this.x = x;
-                this.y = y;
+                this.ox = x;
+                this.oy = y;
             } else {
-                this.x = ox + x;
-                this.y = oy + y;
+                this.ox = ox + x;
+                this.oy = oy + y;
             }
         }
         this.ticker.add(fn, true);
@@ -350,8 +360,8 @@ export class AnimationBase {
      * @param key 系统动画id
      * @param n 最终值
      */
-    private applySys(key: 'x' | 'y' | 'angle' | 'size', n: number, type: AnimateType): void {
-        if (key !== 'x' && this.animating[type] === true) this.error(`${type} is executed twice.`);
+    private applySys(key: 'ox' | 'oy' | 'angle' | 'size', n: number, type: AnimateType): void {
+        if (key !== 'ox' && this.animating[type] === true) this.error(`${type} is executed twice.`);
 
         this.animating[type] = true;
         const origin = this[key];
@@ -371,13 +381,13 @@ export class AnimationBase {
                 this.ticker.remove(fn);
                 this.animating[type] = false;
                 this[key] = n;
-                if (key !== 'x') this.hook('end', `${type}end`);
+                if (key !== 'ox') this.hook('end', `${type}end`);
                 return;
             }
             const rate = delta / time;
             const per = timing(rate);
             this[key] = origin + d * per;
-            if (key !== 'x') this.hook(`${type}`);
+            if (key !== 'ox') this.hook(`${type}`);
         }
         this.ticker.add(fn, true);
     }
