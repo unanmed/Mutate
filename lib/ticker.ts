@@ -25,7 +25,7 @@ export class Ticker {
     remove(fn: TickerFn): Ticker {
         const index = this.funcs.findIndex(v => v === fn);
         if (index === -1) throw new ReferenceError(`You are going to remove nonexistent ticker function.`);
-        this.funcs.splice(index);
+        this.funcs.splice(index, 1);
         return this;
     }
 

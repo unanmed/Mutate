@@ -32,6 +32,10 @@ const listener = {
     'animating': []
 }
 
+export async function sleep(time: number) {
+    await new Promise(res => setTimeout(res, time));
+}
+
 export class AnimationBase {
     /** 渐变函数 */
     timing: TimingFn
@@ -49,7 +53,7 @@ export class AnimationBase {
     relation: 'relative' | 'absolute' = 'absolute'
     /** 渐变时间 */
     easeTime: number = 0
-    size: number = 0
+    size: number = 1
     angle: number = 0
 
     get x(): number {
@@ -147,7 +151,7 @@ export class AnimationBase {
      * @param scale 缩放比例
      */
     scale(scale: number): AnimationBase {
-        this.applySys('size', scale, 'rotate');
+        this.applySys('size', scale, 'resize');
         return this;
     }
 
@@ -158,6 +162,8 @@ export class AnimationBase {
      */
     shake(x: number, y: number): AnimationBase {
         if (this.animating.shake === true) this.error(`shake is executed twice.`);
+
+        this.animating.shake = true;
         const { easeTime: time, shakeTiming: timing } = this;
         const start = Date.now();
         this.hook('start', 'shakestart');
@@ -190,7 +196,7 @@ export class AnimationBase {
 
         this.animating.move = true;
         this.path = path;
-        const { easeTime: time, relation } = this;
+        const { easeTime: time, relation, timing } = this;
         const start = Date.now();
         const [ox, oy] = [this.x, this.y];
         const [tx, ty] = (() => {
@@ -214,7 +220,7 @@ export class AnimationBase {
                 return;
             }
             const rate = delta / time;
-            const [x, y] = path(rate);
+            const [x, y] = path(timing(rate));
             if (relation === 'absolute') {
                 this.ox = x;
                 this.oy = y;
@@ -237,7 +243,7 @@ export class AnimationBase {
         }
         await new Promise((res) => {
             const fn = () => {
-                if (Object.values(this.animating).every(v => v === true)) {
+                if (Object.values(this.animating).every(v => v === false)) {
                     this.unlisten('end', fn);
                     res('all animated.');
                 }
@@ -304,18 +310,19 @@ export class AnimationBase {
     unlisten(type: AnimateHook, fn: AnimateFn): void {
         const index = this.listener[type].findIndex(v => v === fn);
         if (index === -1) return this.error('You are trying to remove a nonexistent listener.');
-        this.listener[type].splice(index);
+        this.listener[type].splice(index, 1);
     }
 
     /**
      * 注册一个可用于动画的属性
      * @param key 要注册的属性的名称
+     * @param n 初始值
      */
-    register(key: string): void {
+    register(key: string, n: number): void {
         if (typeof this.custom[key] === 'number') {
             return this.error(`Property ${key} has been regietered twice.`, 'reregister');
         }
-        this.custom[key] = 0;
+        this.custom[key] = n;
         this.animating[key] = false;
     }
 
@@ -361,7 +368,7 @@ export class AnimationBase {
      * @param n 最终值
      */
     private applySys(key: 'ox' | 'oy' | 'angle' | 'size', n: number, type: AnimateType): void {
-        if (key !== 'ox' && this.animating[type] === true) this.error(`${type} is executed twice.`);
+        if (key !== 'oy' && this.animating[type] === true) this.error(`${type} is executed twice.`);
 
         this.animating[type] = true;
         const origin = this[key];
@@ -380,14 +387,14 @@ export class AnimationBase {
                 // 避免move执行多次
                 this.ticker.remove(fn);
                 this.animating[type] = false;
-                this[key] = n;
-                if (key !== 'ox') this.hook('end', `${type}end`);
+                this[key] = origin + d;
+                if (key !== 'oy') this.hook('end', `${type}end`);
                 return;
             }
             const rate = delta / time;
             const per = timing(rate);
             this[key] = origin + d * per;
-            if (key !== 'ox') this.hook(`${type}`);
+            if (key !== 'oy') this.hook(`${type}`);
         }
         this.ticker.add(fn, true);
     }
