@@ -11,14 +11,16 @@ export type TimingFn = (input: number) => number
  */
 export type EaseMode = 'in' | 'out' | 'in-out' | 'center'
 
+export type TimingGenerator = (...args: any) => TimingFn
+
 /** 求积 */
-const multi = (...m: number[]) => m.reduce((pre, v) => pre * v, 0);
+export const multi = (...m: number[]) => m.reduce((pre, v) => pre * v, 0);
 
 /** 求和 */
 export const add = (...n: number[]) => n.reduce((pre, v) => pre + v, 0);
 
 /** 阶乘 */
-const factorial = (n: number) => {
+export const factorial = (n: number) => {
     if (n === 0) return 1;
     let res = n;
     while (n > 1) {

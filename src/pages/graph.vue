@@ -69,7 +69,7 @@ onMounted(() => {
             drawGraph(canvas, bezier(0.9, 0.2, 0.3, 0.7));
             span.innerHTML = 'bezier(0.9, 0.2, 0.3, 0.7)'
         } else if (i === 45) {
-            drawGraph(canvas, bezier(0.9, 0.9, 0.9, 0.1, 0.1));
+            drawGraph(canvas, bezier(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
             span.innerHTML = 'bezier(0.9, 0.9, 0.9, 0.1, 0.1)'
         } else if (i === 46) {
             drawShake(canvas, shake(20, hyper('tan', 'in-out')))

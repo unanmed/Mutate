@@ -3,16 +3,16 @@ import { TimingFn } from "./timing"
 import { cloneDeep } from 'lodash'
 import { Ticker } from "./ticker"
 
-type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void
+export type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void
 
-type AnimateType = 'move' | 'rotate' | 'resize' | 'shake'
+export type AnimateType = 'move' | 'rotate' | 'resize' | 'shake'
 
-type AnimateTime = 'start' | 'end'
+export type AnimateTime = 'start' | 'end'
 
 /**
  * 动画生命周期钩子
  */
-type AnimateHook = `${AnimateType}${AnimateTime}` | AnimateType | 'animating' | AnimateTime
+export type AnimateHook = `${AnimateType}${AnimateTime}` | AnimateType | 'animating' | AnimateTime
 
 const listener = {
     'move': [],

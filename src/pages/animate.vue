@@ -7,8 +7,8 @@
 
 <script setup lang="ts">
 import { AnimationBase, sleep } from '../../lib/animate';
-import { circle } from '../../lib/path';
-import { hyper, linear, power, shake } from '../../lib/timing';
+import { bezier as bezierPath, circle } from '../../lib/path';
+import { hyper, linear, power, shake, bezier } from '../../lib/timing';
 
 // 一个动画就能测试全部的内容了
 async function play() {
@@ -19,47 +19,68 @@ async function play() {
 async function ani() {
     const canvas = document.getElementById('animate-canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    const rect = new AnimationBase();
-    rect.register('opacity', 1);
-    ctx.save();
-    const draw = () => {
-        ctx.restore();
-        ctx.save();
-        ctx.clearRect(0, 0, 800, 800);
-        ctx.translate(rect.x, rect.y);
-        ctx.rotate(rect.angle * Math.PI / 180);
-        ctx.globalAlpha = rect.custom.opacity;
-        ctx.fillRect(-30 * rect.size, -30 * rect.size, 60 * rect.size, 60 * rect.size);
+    const animates = Array(20).fill(0).map(() => new AnimationBase());
+
+    animates.forEach((v, i) => {
+        v.time(0)
+            .move(400 + 200 * Math.cos(Math.PI / 10 * i), 400 + 200 * Math.sin(Math.PI / 10 * i))
+        v.register('r', 0);
+        v.register('g', 0);
+        v.register('b', 0);
+        v.register('opacity', 0.2);
+    });
+
+    await sleep(1000);
+
+    for (let i = 0; i < 20; i++) {
+        const a = animates[i];
+        if (i === 0) a.ticker.add(() => {
+            ctx.clearRect(0, 0, 800, 800);
+        });
+
+        const draw = () => {
+            ctx.globalAlpha = a.custom.opacity;
+            ctx.fillStyle = `rgb(${a.custom.r * 255}, ${a.custom.g * 255}, ${a.custom.b * 255})`;
+            ctx.moveTo(a.x, a.y);
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, 5, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+        a.ticker.add(draw);
+
+        a.mode(power(3, 'in'))
+            .time(2000)
+            .absolute()
+            .moveAs(bezierPath(
+                [a.x, a.y],
+                [400, 400],
+                [400 + 100 * Math.cos(Math.PI / 10 * (i + 4)), 400 + 100 * Math.sin(Math.PI / 10 * (i + 4))]
+            ))
+            .apply('g', 0.8)
+            .apply('b', 0.4)
+            .apply('opacity', 1)
+            .mode(shake(10, power(2, 'in')), true)
+            .time(3000)
+            .shake(1, 0)
     }
-    rect.ticker.add(draw);
-    rect.mode(linear())
-        .time(1000)
-        .move(400, 400)
-        .mode(power(4, 'in-out'))
-        .time(2000)
-        .rotate(3600);
-    await rect.w('move');
-    rect.time(5000)
-        .relative()
-        .mode(hyper('sin', 'in-out'))
-        .moveAs(circle(200, 5, linear()))
-        .mode(shake(5, hyper('tan', 'in')), true)
-        .shake(1, 0)
-    await rect.all();
-    await sleep(200);
-    rect.mode(power(2, 'out'))
-        .time(500)
-        .absolute()
-        .move(100, 400)
-        .relative()
-        .rotate(-180)
-        .time(200)
-        .scale(2)
-    await rect.n(1);
-    rect.absolute()
-        .scale(1)
-        .time(1000)
-        .apply('opacity', 0.3)
+
+    await sleep(4000);
+
+    for (let i = 0; i < 20; i++) {
+        const a = animates[i];
+        a.mode(bezier(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+            .time(10000)
+            .move(400 + 400 * Math.cos(Math.PI / 10 * i), 400 + 400 * Math.sin(Math.PI / 10 * i))
+            .time(3000)
+            .apply('r', 1)
+            .apply('g', 0)
+            .apply('b', 0)
+            .time(5000)
+            .mode(power(2, 'out'))
+            .absolute()
+            .apply('opacity', 0)
+    }
 }
 
 </script>

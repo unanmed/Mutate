@@ -16,6 +16,7 @@ export class Camera extends AnimationBase {
     /** 摄像机作用的目标画布 */
     target: CanvasRenderingContext2D
     id: string
+    /** 存档栈 */
     saveStack: CameraSaveInfo[] = []
 
     constructor(id: string, target: CanvasRenderingContext2D) {
