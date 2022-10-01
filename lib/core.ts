@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { Chart, MutateChart } from "./chart";
 import { Renderer } from "./render";
+import { Ticker } from "./ticker";
 import { has } from "./utils";
 
 /**
@@ -34,7 +35,6 @@ export class Mutate {
     status: MutateStatus = 'pre'
     /** 音乐时间 */
     time: number = 0
-
     /** 谱面物量 */
     length: number = 0
 
@@ -45,9 +45,11 @@ export class Mutate {
     /** 音频处理模块 */
     readonly ac: AudioContext = new AudioContext()
     /** 谱面信息 */
-    readonly chart: Chart = new Chart()
+    readonly chart: Chart = new Chart(this)
     /** 渲染器 */
     readonly renderer: Renderer = new Renderer()
+    /** 核心ticker，用于计算音乐时间等 */
+    readonly ticker: Ticker = new Ticker()
 
     constructor(target: HTMLCanvasElement) {
         this.target = target;

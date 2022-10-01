@@ -12,8 +12,6 @@ export interface NoteConfig {
     perfectTime?: number
     /** good判定的时间 */
     goodTime?: number
-    /** 音符出现时间 */
-    spwan?: number
 }
 
 export type NoteShadow = {
@@ -24,15 +22,11 @@ export type NoteShadow = {
 }
 
 export class BaseNote<T extends NoteType> extends AnimationBase {
-    readonly noteType: T
-    readonly noteTime?: number
+    static cnt: number = 0
+
     played: boolean = false
-    /** 该音符所属的基地 */
-    readonly base: Base
     /** 音符流速，每秒多少像素 */
     speed: number = 500
-    /** 生成时间，到时间后才会被绘制或被判定 */
-    readonly spwan: number = 0
     /** 不透明度 */
     alpha: number = 1
     /** 滤镜 */
@@ -45,8 +39,14 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         color: ''
     }
 
+    readonly num: number = BaseNote.cnt++
+    readonly noteType: T
+    readonly noteTime?: number
+    /** 该音符所属的基地 */
+    readonly base: Base
     readonly perfectTime: number
     readonly goodTime: number
+    readonly timeNodes: [number, number][] = []
 
     constructor(type: T, base: Base, config?: NoteConfig) {
         super();
@@ -55,12 +55,6 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base = base;
         this.perfectTime = config?.perfectTime ?? 50;
         this.goodTime = config?.goodTime ?? 80;
-        if (typeof this.noteTime === 'number') {
-            this.spwan = Math.max(this.noteTime - 5000, 0);
-        }
-        if (typeof config?.spwan === 'number') {
-            this.spwan = config.spwan;
-        }
     }
 
     /**
