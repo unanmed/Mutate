@@ -1,6 +1,5 @@
 import * as camera from './camera';
 import * as extract from './chart';
-import * as fix from './fix';
 import * as note from './note';
 import * as path from './path';
 import * as render from './render';
@@ -14,7 +13,6 @@ import * as keycode from './keycode';
 export {
     camera,
     extract,
-    fix,
     note,
     path,
     render,

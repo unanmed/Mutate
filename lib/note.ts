@@ -103,14 +103,6 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     }
 
     /**
-     * 渲染这个note
-     * @param target 目标画布
-     */
-    render(target: CanvasRenderingContext2D): void {
-        // To be extended?
-    }
-
-    /**
      * 设置这个note的滤镜
      * @param data 滤镜信息，类型与CanvasRenderingContext2d.filter相同
      */
@@ -131,5 +123,12 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      */
     shadow(x: number, y: number, blur: number, color: string): BaseNote<T> {
         return this;
+    }
+
+    /**
+     * 摧毁这个音符
+     */
+    destroy(): void {
+
     }
 }

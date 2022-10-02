@@ -52,16 +52,9 @@ export class Camera extends AnimationBase {
     }
 
     /**
-     * 渲染画布
+     * 设置画布的全局特效
      */
-    render(): void {
-
-    }
-
-    /**
-     * 添加每帧绘制函数
-     */
-    private addTicker(): void {
+    effect(): void {
 
     }
 

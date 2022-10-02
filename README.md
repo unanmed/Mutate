@@ -28,8 +28,7 @@ import mutate from 'mutate';
 const canvas = document.getElementById('mutate');
 
 const game = mutate.core.create(canvas);
-game.load('your music url');
-await game.loadMTT('your mtt url'); // mtt是mutate的谱面文件，后面会有说明
+await game.load('your music url', 'your mtt url');
 game.start(); // 开始游戏
 ```
 

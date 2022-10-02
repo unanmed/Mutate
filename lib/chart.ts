@@ -143,7 +143,10 @@ export type ExtractedMTTAnimate<Path extends boolean, T extends string> = {
 }
 
 export class Chart {
+    /** 摄像机实例 */
     camera!: Camera
+    /** 解析结束后的回调函数 */
+    onExtracted: (chart: Chart) => void = () => { }
 
     /** 所有的音符 */
     readonly notes: { [num: number]: BaseNote<NoteType> } = {}
@@ -152,7 +155,7 @@ export class Chart {
     /** 按id区分的基地 */
     readonly basesDict: { [id: string]: Base } = {}
     /** 游戏实例 */
-    readonly mutate: Mutate
+    readonly game: Mutate
 
     /** 已注册的动画类型 */
     private readonly animate: AnimateDeclare = {
@@ -162,7 +165,7 @@ export class Chart {
     }
 
     constructor(mutate: Mutate) {
-        this.mutate = mutate;
+        this.game = mutate;
     }
 
     /**
@@ -176,7 +179,7 @@ export class Chart {
             // 基地
             for (const id in bases) {
                 const data = bases[id];
-                const base = new Base(id, this.mutate);
+                const base = new Base(id, this.game);
                 this.bases[base.num] = base;
                 this.basesDict[id] = base;
                 this.executeSpeedChange('base', base.num, data.bpm);
@@ -193,11 +196,13 @@ export class Chart {
             }
 
             // 摄像机
-            const c = new Camera(camera.id, this.mutate.ctx);
+            const c = new Camera(camera.id, this.game.ctx);
             this.camera = c;
             this.executeAnimate('camera', camera.animate);
             res('extract success.');
-        })
+        });
+
+        this.onExtracted(this);
     }
 
     /**
@@ -211,13 +216,6 @@ export class Chart {
     }
 
     /**
-     * 渲染所有内容
-     */
-    render(): void {
-
-    }
-
-    /**
      * 解析MTT文件的动画信息
      * @param data 动画信息
      */
@@ -225,6 +223,7 @@ export class Chart {
         // 主要目标是解析函数
         const extract = <T extends keyof TimingMode>(fn: string, type: T, args: any[]): TimingFn | PathFn => {
             const res = args.map(v => {
+                // 如果参数是个函数...
                 if (isMTTFn(v)) return extract(v.fn, v.fnType, v.args);
                 else return v;
             });
@@ -276,7 +275,7 @@ export class Chart {
         const fn = () => {
             const a = data[last + 1];
             const time = a.start;
-            if (this.mutate.time < time) return;
+            if (this.game.time < time) return;
 
             obj.mode(a.fn, a.shake)
                 .time(a.time)
@@ -292,7 +291,7 @@ export class Chart {
             else if (a.type === 'shake') obj.shake(a.x as number, a.y as number);
         }
 
-        this.mutate.ticker.add(fn);
+        this.game.ticker.add(fn);
     }
 
     /**
@@ -314,9 +313,9 @@ export class Chart {
         // 每帧函数
         const fn = () => {
             const time = sorted[last + 1];
-            if (this.mutate.time < time) return;
+            if (this.game.time < time) return;
             base.setSpeed(data[time]);
         }
-        this.mutate.ticker.add(fn, true);
+        this.game.ticker.add(fn);
     }
 }

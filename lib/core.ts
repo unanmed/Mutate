@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AudioExtractor } from "./audio";
 import { Chart, MutateChart } from "./chart";
 import { Renderer } from "./render";
 import { Ticker } from "./ticker";
@@ -42,14 +43,14 @@ export class Mutate {
     readonly target: HTMLCanvasElement
     /** 目标的context */
     readonly ctx: CanvasRenderingContext2D
+    /** 核心ticker，用于计算音乐时间等 */
+    readonly ticker: Ticker = new Ticker()
     /** 音频处理模块 */
-    readonly ac: AudioContext = new AudioContext()
+    readonly ac: AudioExtractor = new AudioExtractor(this)
     /** 谱面信息 */
     readonly chart: Chart = new Chart(this)
     /** 渲染器 */
-    readonly renderer: Renderer = new Renderer()
-    /** 核心ticker，用于计算音乐时间等 */
-    readonly ticker: Ticker = new Ticker()
+    readonly renderer: Renderer = new Renderer(this)
 
     constructor(target: HTMLCanvasElement) {
         this.target = target;
@@ -155,7 +156,7 @@ export class Mutate {
     private async loadMusic(url: string): Promise<void> {
         const data = await this.post(url, 'arraybuffer');
         if (data.status !== 200) return this.fail(`Fail to load url [${url}]`, data.status);
-        const audio = await this.ac.decodeAudioData(data.data);
+        const audio = await this.ac.extract(data.data);
         this.audio = audio;
     }
 
