@@ -29,7 +29,6 @@ export class Judger {
 
     constructor(chart: Chart) {
         this.chart = chart;
-        if (chart.game.isMobile) this.mobileDrag();
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);
     }
@@ -122,6 +121,17 @@ export class Judger {
     }
 
     /**
+     * 手机端的drag判定
+     */
+    mobileDrag(): void {
+        this.chart.game.ticker.add(() => {
+            if (this.chart.game.status === 'playing' && this.touching > 0) {
+                this.judge(void 0, true);
+            }
+        });
+    }
+
+    /**
      * 获取下一个或几个需要判定的音符
      */
     private next(): void {
@@ -130,17 +140,6 @@ export class Judger {
         const i = all.findIndex(v => has(v.noteTime) && v.noteTime > (start?.noteTime as number));
         const to = all.splice(0, i - 1);
         this.toJudge = to;
-    }
-
-    /**
-     * 手机端的drag判定
-     */
-    private mobileDrag(): void {
-        this.chart.game.ticker.add(() => {
-            if (this.chart.game.status === 'playing' && this.touching > 0) {
-                this.judge(void 0, true);
-            }
-        });
     }
 
     /**

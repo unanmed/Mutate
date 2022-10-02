@@ -196,6 +196,7 @@ export class Chart {
 
     constructor(mutate: Mutate) {
         this.game = mutate;
+        if (mutate.isMobile) this.judger.mobileDrag();
     }
 
     /**

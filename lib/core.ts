@@ -42,6 +42,8 @@ export class Mutate {
     /** 谱面物量 */
     length: number = 0
 
+    /** 是否是移动设备 */
+    readonly isMobile: boolean = window.innerWidth < window.innerHeight
     /** 游戏渲染目标 */
     readonly target: HTMLCanvasElement
     /** 目标的context */
@@ -54,8 +56,6 @@ export class Mutate {
     readonly chart: Chart = new Chart(this)
     /** 渲染器 */
     readonly renderer: Renderer = new Renderer(this)
-    /** 是否是移动设备 */
-    readonly isMobile: boolean = window.innerWidth < window.innerHeight
 
     constructor(target: HTMLCanvasElement) {
         this.target = target;
