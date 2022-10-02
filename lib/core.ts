@@ -1,8 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { AudioExtractor } from "./audio";
 import { Chart, MutateChart } from "./chart";
+import { NoteShadow } from "./note";
+import { circle, bezier as bezierPath } from "./path";
 import { Renderer } from "./render";
 import { Ticker } from "./ticker";
+import { bezier, hyper, inverseTrigo, linear, power, shake, trigo } from "./timing";
 import { has } from "./utils";
 
 /**
@@ -55,6 +58,25 @@ export class Mutate {
     constructor(target: HTMLCanvasElement) {
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
+        // 注册系统动画类型
+        this.chart.register('generator', 'linear', linear);
+        this.chart.register('generator', 'bezier', bezier);
+        this.chart.register('generator', 'trigo', trigo);
+        this.chart.register('generator', 'power', power);
+        this.chart.register('generator', 'hyper', hyper);
+        this.chart.register('generator', 'inverseTrigo', inverseTrigo);
+        this.chart.register('generator', 'shake', shake);
+        this.chart.register('pathG', 'circle', circle);
+        this.chart.register('pathG', 'bezier', bezierPath);
+        // 注册系统预执行函数
+        this.chart.registerExecute('base', 'r', (v: number, t) => t.setRadius(v));
+        this.chart.registerExecute('base', 'bpm', (v: number, t) => t.setSpeed(v));
+        this.chart.registerExecute('base', 'rgba', (v: number[], t) => t.rgba(...v));
+        this.chart.registerExecute('note', 'speed', (v: number, t) => t.setSpeed(v));
+        this.chart.registerExecute('note', 'filter', (v: string, t) => t.filter(v));
+        this.chart.registerExecute('note', 'shadow', (v: NoteShadow, t) => t.shadow(v.x, v.y, v.blur, v.color));
+        this.chart.registerExecute('note', 'opacity', (v: number, t) => t.opacity(v));
+        this.chart.registerExecute('camera', 'css', (v: string, t) => t.css(v));
     }
 
     /**
@@ -73,21 +95,27 @@ export class Mutate {
      * 开始游戏
      */
     start(): void {
-
+        if (this.status !== 'pre') throw new TypeError(`The game has already started.`);
+        this.renderer.start();
+        this.ac.play();
     }
 
     /**
      * 暂停
      */
     pause(): void {
-
+        if (this.status === 'pause') throw new TypeError(`The game has already paused.`);
+        this.renderer.pause();
+        this.ac.pause();
     }
 
     /**
      * 恢复游戏的进行
      */
     resume(): void {
-
+        if (this.status === 'playing') throw new TypeError(`The game has already resumed.`);
+        this.renderer.resume();
+        this.ac.resume();
     }
 
     /**
@@ -167,7 +195,9 @@ export class Mutate {
     private async loadMTT(url: string): Promise<void> {
         const data = await this.post(url, 'json');
         if (data.status !== 200) return this.fail(`Fail to load url [${url}]`, data.status);
+        console.log(data.data);
         this.mtt = data.data;
+        this.chart.extract(this.mtt);
     }
 
     /**

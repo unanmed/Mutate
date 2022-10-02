@@ -8,6 +8,8 @@ type Point = [x: number, y: number]
  */
 export type PathFn = (input: number) => Point
 
+export type PathG = (...args: any) => PathFn
+
 /**
  * 圆形轨迹
  * @param r 半径大小

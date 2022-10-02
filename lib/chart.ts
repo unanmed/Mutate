@@ -2,12 +2,24 @@ import { AnimationBase } from "./animate";
 import { Base } from "./base";
 import { Camera } from "./camera";
 import { Mutate } from "./core";
-import { BaseNote, NoteConfig, NoteType } from "./note";
-import { PathFn } from "./path";
+import { BaseNote, NoteConfig, NoteShadow, NoteType } from "./note";
+import { PathFn, PathG } from "./path";
 import { TimingFn, TimingGenerator } from "./timing";
-import { isMTTFn, isReturnType } from "./utils";
+import { has, isMTTFn } from "./utils";
 
 export type SystemAnimate = 'move' | 'moveAs' | 'rotate' | 'resize'
+
+export interface ChartDataMap {
+    note: NoteChart
+    base: BaseChart
+    camera: MutateCamera
+}
+
+export interface ChartMap {
+    note: BaseNote<NoteType>
+    base: Base
+    camera: Camera
+}
 
 export type MTTMode<T extends string> = {
     fnType: keyof TimingMode
@@ -47,6 +59,9 @@ export type MTTAnimate = {
 export type MutateCamera = {
     id: string
     animate: MTTAnimate
+    css: {
+        [time: number]: string
+    }
 }
 
 /**
@@ -54,8 +69,16 @@ export type MutateCamera = {
  */
 export type BaseChart = {
     id: string
+    x: number
+    y: number
+    r: {
+        [time: number]: number
+    }
     bpm: {
         [time: number]: number
+    }
+    rgba: {
+        [time: number]: [number, number, number, number]
     }
     animate: MTTAnimate
 }
@@ -75,12 +98,7 @@ export type NoteChart = {
         [time: number]: string
     }
     shadow: {
-        [time: number]: {
-            x: number
-            y: number
-            blur: number
-            color: string
-        }
+        [time: number]: NoteShadow
     }
     opacity: {
         [time: number]: number
@@ -103,6 +121,7 @@ export type TimingMode = {
     timing: TimingFn
     generator: TimingGenerator
     path: PathFn
+    pathG: PathG
 }
 
 /**
@@ -142,6 +161,14 @@ export type ExtractedMTTAnimate<Path extends boolean, T extends string> = {
     y?: number
 }
 
+export type Executer<T extends keyof ChartDataMap> = (value: any, target: ChartMap[T]) => void
+
+export type ExecuteDeclare = {
+    note: { [key: string]: Executer<'note'> }
+    base: { [key: string]: Executer<'base'> }
+    camera: { [key: string]: Executer<'camera'> }
+}
+
 export class Chart {
     /** 摄像机实例 */
     camera!: Camera
@@ -161,7 +188,15 @@ export class Chart {
     private readonly animate: AnimateDeclare = {
         timing: {},
         generator: {},
-        path: {}
+        path: {},
+        pathG: {}
+    }
+
+    /** 所有需要预执行的类型 */
+    private readonly attrSet: ExecuteDeclare = {
+        note: {},
+        base: {},
+        camera: {}
     }
 
     constructor(mutate: Mutate) {
@@ -179,10 +214,10 @@ export class Chart {
             // 基地
             for (const id in bases) {
                 const data = bases[id];
-                const base = new Base(id, this.game);
+                const base = new Base(id, this.game, data.x, data.y);
                 this.bases[base.num] = base;
                 this.basesDict[id] = base;
-                this.executeSpeedChange('base', base.num, data.bpm);
+                this.execute('base', data, base);
                 this.executeAnimate('base', data.animate, base.num);
             }
 
@@ -191,7 +226,7 @@ export class Chart {
                 const base = this.basesDict[n.base];
                 const note = new BaseNote(n.type, base, n.config);
                 this.notes[note.num] = note;
-                this.executeSpeedChange('note', note.num, n.speed);
+                this.execute('note', n, note)
                 this.executeAnimate('note', n.animate, note.num);
             }
 
@@ -199,6 +234,7 @@ export class Chart {
             const c = new Camera(camera.id, this.game.ctx);
             this.camera = c;
             this.executeAnimate('camera', camera.animate);
+            this.execute('camera', camera, c);
             res('extract success.');
         });
 
@@ -216,6 +252,21 @@ export class Chart {
     }
 
     /**
+     * 注册一个预执行函数
+     * @param type 注册的类型
+     * @param fn 执行的函数
+     */
+    registerExecute<T extends keyof ExecuteDeclare>(type: T, key: string, fn: Executer<T>): void {
+        (this.attrSet[type] as { [key: string]: Executer<T> })[key] = fn;
+    }
+
+    private sortMTT(data: { [time: number]: any }): number[] {
+        return Object.keys(data)
+            .map(v => parseFloat(v))
+            .sort((a, b) => a - b)
+    }
+
+    /**
      * 解析MTT文件的动画信息
      * @param data 动画信息
      */
@@ -228,7 +279,7 @@ export class Chart {
                 else return v;
             });
             const func = this.animate[type][fn] as TimingMode[T];
-            if (isReturnType(func, 'number', 0)) return func as TimingFn;
+            if (type === 'timing') return func as TimingFn;
             // @ts-ignore
             else return func.apply(this, res) as TimingFn | PathFn;
         }
@@ -264,9 +315,7 @@ export class Chart {
         else if (target === 'note') obj = this.notes[num as number];
         else obj = this.camera;
 
-        const data = Object.keys(ani)
-            .map(v => parseFloat(v))
-            .sort((a, b) => a - b)
+        const data = this.sortMTT(ani)
             .map(v => this.extractMTTAnimate(ani[v]));
 
         let last = -1;
@@ -274,9 +323,10 @@ export class Chart {
         // 每帧执行的函数
         const fn = () => {
             const a = data[last + 1];
+            if (!has(a)) return this.game.ticker.remove(fn);
             const time = a.start;
             if (this.game.time < time) return;
-
+            last++;
             obj.mode(a.fn, a.shake)
                 .time(a.time)
             if (a.relation === 'absolute') obj.absolute();
@@ -295,27 +345,30 @@ export class Chart {
     }
 
     /**
-     * 解析并执行基地或音符的速度更改
+     * 执行某个种类的预执行操作
      */
-    private executeSpeedChange(type: 'base' | 'note', num: number, data: BaseChart['bpm']): void {
-        const base = type === 'base' ? this.bases[num] : this.notes[num];
-        let last = -1;
+    private execute<T extends keyof ChartDataMap>(type: T, data: ChartDataMap[T], target: ChartMap[T]): void {
+        const all = this.attrSet[type];
 
-        const sorted = Object.keys(data)
-            .map(v => parseFloat(v))
-            .sort((a, b) => a - b);
+        const f = (key: keyof ChartDataMap[T]) => {
+            let last = -1;
+            const d = data[key];
+            const sorted = this.sortMTT(d as { [time: number]: any });
+            const exe = all[key as string];
 
-        base.timeNodes.push(
-            ...Object.entries(data)
-                .map(v => [parseFloat(v[0]), v[1]]) as [number, number][]
-        );
-
-        // 每帧函数
-        const fn = () => {
-            const time = sorted[last + 1];
-            if (this.game.time < time) return;
-            base.setSpeed(data[time]);
+            const fn = () => {
+                const time = sorted[last + 1];
+                if (!has(time)) return this.game.ticker.remove(fn);
+                if (this.game.time < time) return;
+                last++;
+                // @ts-ignore
+                exe(data[key][time], target);
+            }
+            this.game.ticker.add(fn);
         }
-        this.game.ticker.add(fn);
+
+        for (const key in all) {
+            f(key as keyof ChartDataMap[T]);
+        }
     }
 }

@@ -18,7 +18,7 @@ export class Base extends AnimationBase {
     readonly id: string
     readonly timeNodes: [number, number][] = [];
 
-    constructor(id: string, game: Mutate) {
+    constructor(id: string, game: Mutate, x: number, y: number) {
         super();
         this.id = id;
         this.game = game;
@@ -27,6 +27,7 @@ export class Base extends AnimationBase {
         this.register('r', 0);
         this.register('g', 0);
         this.register('b', 0);
+        this.register('a', 0);
     }
 
     /**
@@ -75,13 +76,5 @@ export class Base extends AnimationBase {
      */
     setSpeed(speed: number): void {
         this.bpm = speed;
-    }
-
-    /**
-     * 渲染这个基地
-     * @param target 目标画布
-     */
-    render(target: CanvasRenderingContext2D): void {
-
     }
 }

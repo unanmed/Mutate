@@ -20,14 +20,38 @@ export class Renderer {
 
     /** 游戏实例 */
     readonly game: Mutate
+    /** 渲染目标 */
+    readonly target: CanvasRenderingContext2D
 
     constructor(game: Mutate) {
         this.game = game;
+        this.target = game.ctx;
         this.game.chart.onExtracted = (chart) => {
             this.notes = chart.notes;
             this.bases = chart.bases;
             this.baseDict = chart.basesDict;
         }
+    }
+
+    /**
+     * 开始绘制谱面
+     */
+    start(): void {
+
+    }
+
+    /**
+     * 暂停绘制
+     */
+    pause(): void {
+
+    }
+
+    /**
+     * 继续绘制
+     */
+    resume(): void {
+
     }
 
     /**

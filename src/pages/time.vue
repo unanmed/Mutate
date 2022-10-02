@@ -24,7 +24,7 @@ onMounted(async () => {
 })
 
 function start() {
-    game.ac.play();
+    game.start();
 }
 
 function pause() {
