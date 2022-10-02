@@ -27,7 +27,7 @@
                     "n": 0,
                     "x": 960,
                     "y": 540,
-                    "relative": "absolute",
+                    "relation": "absolute",
                     "mode": {
                         "fnType": "generator",
                         "fn": "hyper",

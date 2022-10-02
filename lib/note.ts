@@ -1,7 +1,7 @@
 import { AnimationBase } from "./animate";
 import { Base } from "./base";
 
-export type NoteType = 'tap' | 'hold' | 'drag' | 'flick'
+export type NoteType = 'tap' | 'hold' | 'drag'
 
 export type DetailRes = 'late' | 'early'
 
@@ -12,6 +12,8 @@ export interface NoteConfig {
     perfectTime?: number
     /** good判定的时间 */
     goodTime?: number
+    /** miss判定的时间 */
+    missTime?: number
 }
 
 export type NoteShadow = {
@@ -38,6 +40,10 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         blur: 0,
         color: ''
     }
+    /** 按这个长按的键 */
+    key: number = 0
+    /** 是否按住 */
+    holding: boolean = false
 
     readonly num: number = BaseNote.cnt++
     readonly noteType: T
@@ -46,7 +52,10 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     readonly base: Base
     readonly perfectTime: number
     readonly goodTime: number
+    readonly missTime: number
     readonly timeNodes: [number, number][] = []
+    /** 音符进入时的方向 */
+    readonly dir: [number, number]
 
     constructor(type: T, base: Base, config?: NoteConfig) {
         super();
@@ -55,22 +64,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base = base;
         this.perfectTime = config?.perfectTime ?? 50;
         this.goodTime = config?.goodTime ?? 80;
-    }
-
-    /**
-     * 计算音符进入基地时的方向
-     * @returns 音符进入的方向，为[cos, sin]形式
-     */
-    calDir(): [number, number] {
-        return [0, 0];
-    }
-
-    /**
-     * 计算音符的绝对坐标，为应当在的坐标+animate的坐标
-     * @returns 音符相对于左上角的位置
-     */
-    calPosition(): [number, number] {
-        return [0, 0];
+        this.missTime = config?.goodTime ?? 120;
+        this.dir = this.calDir();
     }
 
     /**
@@ -78,6 +73,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param speed 要设置成的音符流速
      */
     setSpeed(speed: number): BaseNote<T> {
+        this.speed = speed;
         return this;
     }
 
@@ -100,6 +96,11 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      */
     miss(detail: DetailRes): BaseNote<T> {
         return this;
+    }
+
+    hold(): void {
+        if (this.noteType !== 'hold') throw new TypeError(`You are trying to hold non-hold note.`);
+        this.holding = true;
     }
 
     /**
@@ -130,5 +131,13 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      */
     destroy(): void {
 
+    }
+
+    /**
+     * 计算音符进入基地时的方向
+     * @returns 音符进入的方向，为[cos, sin]形式
+     */
+    private calDir(): [number, number] {
+        return [0, 0];
     }
 }

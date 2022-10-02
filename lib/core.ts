@@ -54,10 +54,15 @@ export class Mutate {
     readonly chart: Chart = new Chart(this)
     /** 渲染器 */
     readonly renderer: Renderer = new Renderer(this)
+    /** 是否是移动设备 */
+    readonly isMobile: boolean = window.innerWidth < window.innerHeight
 
     constructor(target: HTMLCanvasElement) {
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
+        // 监听触摸事件
+        target.addEventListener('touchstart', this.chart.judger.touchstart);
+        target.addEventListener('touchend', this.chart.judger.touchend);
         // 注册系统动画类型
         this.chart.register('generator', 'linear', linear);
         this.chart.register('generator', 'bezier', bezier);

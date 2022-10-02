@@ -2,6 +2,7 @@ import { AnimationBase } from "./animate";
 import { Base } from "./base";
 import { Camera } from "./camera";
 import { Mutate } from "./core";
+import { Judger } from "./judge";
 import { BaseNote, NoteConfig, NoteShadow, NoteType } from "./note";
 import { PathFn, PathG } from "./path";
 import { TimingFn, TimingGenerator } from "./timing";
@@ -39,7 +40,7 @@ export type AnimateInfo<T extends string> = {
     time: number
     n: number
     mode: MTTMode<T>
-    relative: 'absolute' | 'relative'
+    relation: 'absolute' | 'relative'
     first?: boolean
     shake?: boolean
     x?: number
@@ -149,17 +150,7 @@ export type TimingAnimateFn = TimingFn | TimingGenerator | PathFn
 export type ExtractedMTTAnimate<Path extends boolean, T extends string> = {
     fn: TimingFn
     path: Path extends true ? PathFn : void
-    time: number
-    start: number
-    type: string
-    n: number
-    custom: T extends SystemAnimate ? false : true
-    relation: 'absolute' | 'relative'
-    first?: boolean
-    shake?: boolean
-    x?: number
-    y?: number
-}
+} & AnimateInfo<T>
 
 export type Executer<T extends keyof ChartDataMap> = (value: any, target: ChartMap[T]) => void
 
@@ -183,6 +174,10 @@ export class Chart {
     readonly basesDict: { [id: string]: Base } = {}
     /** 游戏实例 */
     readonly game: Mutate
+    /** 判定模块 */
+    readonly judger: Judger = new Judger(this)
+    /** 音符数组 */
+    readonly notesArr: BaseNote<NoteType>[] = []
 
     /** 已注册的动画类型 */
     private readonly animate: AnimateDeclare = {
@@ -226,6 +221,7 @@ export class Chart {
                 const base = this.basesDict[n.base];
                 const note = new BaseNote(n.type, base, n.config);
                 this.notes[note.num] = note;
+                this.notesArr.push(note);
                 this.execute('note', n, note)
                 this.executeAnimate('note', n.animate, note.num);
             }
@@ -260,6 +256,9 @@ export class Chart {
         (this.attrSet[type] as { [key: string]: Executer<T> })[key] = fn;
     }
 
+    /**
+     * 给mtt文件的时间相关的属性排序
+     */
     private sortMTT(data: { [time: number]: any }): number[] {
         return Object.keys(data)
             .map(v => parseFloat(v))
@@ -294,13 +293,7 @@ export class Chart {
             fn,
             // @ts-ignore
             path,
-            time: data.time,
-            start: data.start,
-            type: data.type,
-            custom: data.custom,
-            n: data.n,
-            first: data.first,
-            shake: data.shake
+            ...data,
         }
     }
 
@@ -350,12 +343,14 @@ export class Chart {
     private execute<T extends keyof ChartDataMap>(type: T, data: ChartDataMap[T], target: ChartMap[T]): void {
         const all = this.attrSet[type];
 
+        // 执行某个类型的预执行函数
         const f = (key: keyof ChartDataMap[T]) => {
             let last = -1;
             const d = data[key];
             const sorted = this.sortMTT(d as { [time: number]: any });
             const exe = all[key as string];
 
+            // 每帧执行的函数
             const fn = () => {
                 const time = sorted[last + 1];
                 if (!has(time)) return this.game.ticker.remove(fn);

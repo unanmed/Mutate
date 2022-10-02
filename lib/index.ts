@@ -8,7 +8,8 @@ import * as base from './base';
 import * as animate from './animate';
 import * as ticker from './ticker';
 import * as core from './core';
-import * as keycode from './keycode';
+import * as audio from './audio';
+import * as judge from './judge';
 
 export {
     camera,
@@ -20,6 +21,7 @@ export {
     base,
     animate,
     ticker,
-    keycode,
-    core
+    core,
+    audio,
+    judge
 }
