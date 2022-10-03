@@ -72,6 +72,7 @@ export type BaseChart = {
     id: string
     x: number
     y: number
+    angle: number
     r: {
         [time: number]: number
     }
@@ -106,10 +107,15 @@ export type NoteChart = {
     }
 }
 
+export type ChartOption = {
+    background?: string
+}
+
 /**
  * 读取的谱面信息
  */
 export interface MutateChart {
+    option: ChartOption
     bases: { [id: string]: BaseChart }
     notes: NoteChart[]
     camera: MutateCamera
@@ -176,7 +182,7 @@ export class Chart {
     readonly game: Mutate
     /** 判定模块 */
     readonly judger: Judger = new Judger(this)
-    /** 音符数组 */
+    /** 剩余的音符数组 */
     readonly notesArr: BaseNote<NoteType>[] = []
 
     /** 已注册的动画类型 */
@@ -204,15 +210,20 @@ export class Chart {
      */
     async extract(mtt: MutateChart): Promise<void> {
         // 主要是创建实例和预执行方法
-        const { bases, notes, camera } = mtt;
+        const { bases, notes, camera, option } = mtt;
 
         await new Promise(res => {
             // 基地
             for (const id in bases) {
                 const data = bases[id];
-                const base = new Base(id, this.game, data.x, data.y);
+                const base = new Base(id, this.game, data.x, data.y, Object.values(data.r)[0], data.angle);
                 this.bases[base.num] = base;
                 this.basesDict[id] = base;
+                base.timeNodes.push(
+                    ...Object.entries(data.bpm)
+                        .map(v => [parseFloat(v[0]), v[1]]) as [number, number][]
+                );
+                base.sort();
                 this.execute('base', data, base);
                 this.executeAnimate('base', data.animate, base.num);
             }
@@ -223,7 +234,12 @@ export class Chart {
                 const note = new BaseNote(n.type, base, n.config);
                 this.notes[note.num] = note;
                 this.notesArr.push(note);
-                this.execute('note', n, note)
+                note.timeNodes.push(
+                    ...Object.entries(n.speed)
+                        .map(v => [parseFloat(v[0]), v[1]]) as [number, number][]
+                );
+                note.sort();
+                this.execute('note', n, note);
                 this.executeAnimate('note', n.animate, note.num);
             }
 
@@ -232,10 +248,15 @@ export class Chart {
             this.camera = c;
             this.executeAnimate('camera', camera.animate);
             this.execute('camera', camera, c);
+
+            // 配置
+            this.game.target.style.background = option.background ?? 'black';
             res('extract success.');
         });
 
         this.onExtracted(this);
+        this.game.length = this.notesArr.length;
+        this.judger.judgeMiss();
     }
 
     /**

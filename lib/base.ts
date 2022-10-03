@@ -10,24 +10,41 @@ export const baseMap: { [id: string]: Base } = {};
 export class Base extends AnimationBase {
     static cnt: number = 0
 
+    /** 基地旋转速度，一拍一圈 */
     bpm: number = 100
-    radius: number = 10
-    readonly game: Mutate
-    readonly notes: BaseNote<NoteType>[] = []
-    readonly num: number = Base.cnt++
-    readonly id: string
-    readonly timeNodes: [number, number][] = [];
+    /** 上一个时间节点 */
+    lastNode: number = 0
+    /** 上一个时间节点时的角度 */
+    lastAngle: number = 0
+    /** 当前旋转弧度，不计算动画旋转的角度 */
+    rad: number = 0;
 
-    constructor(id: string, game: Mutate, x: number, y: number) {
+    /** 游戏实例 */
+    readonly game: Mutate
+    /** 在这个基地上的音符 */
+    readonly notes: BaseNote<NoteType>[] = []
+    /** 专属id */
+    readonly num: number = Base.cnt++
+    /** 字符串id */
+    readonly id: string
+    /** 速度节点 */
+    readonly timeNodes: [number, number][] = [];
+    /** 初始角度 */
+    readonly initAngle: number
+
+    constructor(id: string, game: Mutate, x: number, y: number, r: number, a: number) {
         super();
         this.id = id;
         this.game = game;
         // 注册动画属性
-        this.register('radius', 10);
-        this.register('r', 0);
-        this.register('g', 0);
-        this.register('b', 0);
-        this.register('a', 0);
+        this.register('radius', r);
+        this.register('r', 255);
+        this.register('g', 180);
+        this.register('b', 32);
+        this.register('a', 1);
+        this.ox = x;
+        this.oy = y;
+        this.initAngle = a;
     }
 
     /**
@@ -76,5 +93,44 @@ export class Base extends AnimationBase {
      */
     setSpeed(speed: number): void {
         this.bpm = speed;
+    }
+
+    /**
+     * 计算旋转的弧度
+     */
+    calRad(): number {
+        this.checkNode();
+        const [time, speed] = this.timeNodes[this.lastNode];
+
+        return this.rad = this.lastAngle +
+            (this.game.time - time) * speed / 30000 * Math.PI +
+            this.initAngle * Math.PI / 180;
+    }
+
+    /**
+     * 检查速度节点
+     */
+    private checkNode(): void {
+        const now = this.game.time;
+        let needCal = false;
+        // 检查是否需要更新节点
+        for (let i = this.lastNode; i < this.timeNodes.length; i++) {
+            const [time] = this.timeNodes[i];
+            if (time < now) {
+                this.lastNode = i;
+                needCal = true;
+            }
+        }
+
+        // 然后计算弧度
+        if (needCal) {
+            let res = 0;
+            for (let i = 0; i < this.lastNode; i++) {
+                const [time, speed] = this.timeNodes[i];
+                const last = this.timeNodes[i - 1]?.[0] ?? 0;
+                res += (time - last) * speed / 30000 * Math.PI;
+            }
+            this.lastAngle = res;
+        }
     }
 }

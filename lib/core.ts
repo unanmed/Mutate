@@ -28,6 +28,16 @@ export type MutateDetail = {
     perfect: number
     good: number
     miss: number
+    early: number
+    late: number
+}
+
+export interface MutateOption {
+    noteScale: number
+    noteWidth: number
+    perfect: number
+    good: number
+    miss: number
 }
 
 export class Mutate {
@@ -37,7 +47,7 @@ export class Mutate {
     mtt!: MutateChart
     /** 游戏状态 */
     status: MutateStatus = 'pre'
-    /** 音乐时间 */
+    /** 音乐时间，秒数 */
     time: number = 0
     /** 谱面物量 */
     length: number = 0
@@ -56,10 +66,64 @@ export class Mutate {
     readonly chart: Chart = new Chart(this)
     /** 渲染器 */
     readonly renderer: Renderer = new Renderer(this)
+    /** 游戏宽度 */
+    readonly width: number
+    /** 游戏高度 */
+    readonly height: number
+    /** 放缩比例 */
+    readonly scale: number
+    /** 音符放缩比例 */
+    readonly noteScale: number = 1
+    /** 音符的长度 */
+    readonly noteWidth: number = this.isMobile ? 300 : 150
+    /** 音符的绘制比例 */
+    readonly drawScale: number
+    /** 音符的宽度 */
+    readonly drawWidth: number
+    /** 音符宽度的一半 */
+    readonly halfWidth: number
+    /** 音符高度 */
+    readonly drawHeight: number
+    /** 音符高度的一半 */
+    readonly halfHeight: number
+    /** 音符的上部宽度 */
+    readonly topWidth: number
+    /** 音符上宽的一半 */
+    readonly halfTopWidth: number
+    /** 默认的音符描边样式 */
+    readonly defaultStroke: CanvasGradient
+    /** 完美判定区间 */
+    readonly perfect: number = 50
+    /** 好的判定区间 */
+    readonly good: number = 80
+    /** miss的判定区间 */
+    readonly miss: number = 120
 
-    constructor(target: HTMLCanvasElement) {
+    constructor(target: HTMLCanvasElement, option?: Partial<MutateOption>) {
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
+        this.ctx.save();
+        this.width = target.width;
+        this.height = target.height;
+        this.scale = Math.min(this.width / 1920, this.height / 1080);
+        // 配置信息
+        this.noteScale = option?.noteScale ?? 1;
+        this.noteWidth = option?.noteWidth ?? this.noteWidth;
+        this.perfect = option?.perfect ?? 50;
+        this.good = option?.good ?? 80;
+        this.miss = option?.miss ?? 120;
+        // 计算默认属性
+        this.drawScale = this.scale * this.noteScale;
+        this.drawWidth = this.noteWidth * this.drawScale;
+        this.halfWidth = this.drawWidth / 2;
+        this.drawHeight = this.drawWidth / 10;
+        this.halfHeight = this.drawHeight / 2;
+        this.topWidth = this.drawWidth - this.halfHeight * 2;
+        this.halfTopWidth = this.topWidth / 2;
+        this.defaultStroke = this.ctx.createLinearGradient(0, -this.halfHeight, 0, this.halfHeight);
+        this.defaultStroke.addColorStop(0, '#fff');
+        this.defaultStroke.addColorStop(0.5, '#fef267');
+        this.defaultStroke.addColorStop(1, '#fff');
         // 监听触摸事件
         target.addEventListener('touchstart', this.chart.judger.touchstart);
         target.addEventListener('touchend', this.chart.judger.touchend);
@@ -94,6 +158,7 @@ export class Mutate {
             throw new TypeError(`The game's music or chart has already been loaded.`);
         const task = [this.loadMusic(music), this.loadMTT(mtt)];
         await Promise.all(task);
+
     }
 
     /**
@@ -101,6 +166,7 @@ export class Mutate {
      */
     start(): void {
         if (this.status !== 'pre') throw new TypeError(`The game has already started.`);
+        this.status = 'playing';
         this.renderer.start();
         this.ac.play();
     }
@@ -110,7 +176,7 @@ export class Mutate {
      */
     pause(): void {
         if (this.status === 'pause') throw new TypeError(`The game has already paused.`);
-        this.renderer.pause();
+        this.status = 'pause';
         this.ac.pause();
     }
 
@@ -119,7 +185,7 @@ export class Mutate {
      */
     resume(): void {
         if (this.status === 'playing') throw new TypeError(`The game has already resumed.`);
-        this.renderer.resume();
+        this.status = 'playing'
         this.ac.resume();
     }
 
@@ -155,18 +221,18 @@ export class Mutate {
      * 获取分数
      */
     getScore(): number {
-        return 1000000;
+        const per = 900000 / this.length;
+        const judger = this.chart.judger;
+        const combo = judger.maxCombo / this.length * 100000;
+        return Math.round(per * judger.perfect + per * 0.5 * judger.good + combo);
     }
 
     /**
      * 获取结算的详细信息
      */
     getDetail(): MutateDetail {
-        return {
-            perfect: 0,
-            good: 0,
-            miss: 0
-        }
+        const { perfect, good, miss, early, late } = this.chart.judger;
+        return { perfect, good, miss, early, late };
     }
 
     /**
@@ -218,6 +284,6 @@ export class Mutate {
  * 创建一个mutate游戏
  * @param target 目标画布
  */
-export function create(target: HTMLCanvasElement): Mutate {
-    return new Mutate(target);
+export function create(target: HTMLCanvasElement, option?: MutateOption): Mutate {
+    return new Mutate(target, option);
 }

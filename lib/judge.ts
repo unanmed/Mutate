@@ -21,8 +21,14 @@ export class Judger {
     combo: number = 0
     /** 最大连击数 */
     maxCombo: number = 0
+    /** 提前的个数 */
+    early: number = 0
+    /** 过晚的个数 */
+    late: number = 0
     /** 按住的手指数 */
     touching: number = 0
+    /** 自动播放 */
+    auto: boolean = false
 
     /** 谱面实例 */
     readonly chart: Chart
@@ -69,11 +75,15 @@ export class Judger {
             this.perfect++;
             this.combo++;
         } else if (judge(note.goodTime)) {
-            note.good(time > note.goodTime ? 'late' : 'early');
+            const t = time > note.goodTime ? 'late' : 'early'
+            note.good(t);
+            this[t]++;
             this.good++;
             this.combo++;
         } else if (time > noteTime - note.missTime) {
-            note.miss(time > noteTime ? 'late' : 'early');
+            const t = time > note.goodTime ? 'late' : 'early'
+            note.miss(t);
+            this[t]++;
             this.combo = 0;
         }
 
@@ -121,6 +131,36 @@ export class Judger {
     }
 
     /**
+     * 判定miss
+     */
+    judgeMiss(): void {
+        // 每帧都要判定
+        const fn = () => {
+            const all = this.toJudge;
+            if (all.length === 0) this.next();
+            this.toJudge = this.toJudge.filter(v => {
+                if (!v.noteTime) throw new TypeError(`The note to be judge doesn't have property noteTime.`);
+                if (!this.auto) {
+                    if (this.chart.game.time > v.noteTime + v.missTime) {
+                        v.miss('late');
+                        this.late++;
+                        return false;
+                    }
+                    return true;
+                } else {
+                    if (this.chart.game.time > v.noteTime) {
+                        v.perfect();
+                        return false;
+                    }
+                    return true;
+                }
+            });
+        }
+
+        this.chart.game.ticker.add(fn);
+    }
+
+    /**
      * 手机端的drag判定
      */
     mobileDrag(): void {
@@ -137,9 +177,10 @@ export class Judger {
     private next(): void {
         const all = this.chart.notesArr;
         const start = all.find(v => has(v.noteTime));
-        const i = all.findIndex(v => has(v.noteTime) && v.noteTime > (start?.noteTime as number));
+        let i = all.findIndex(v => has(v.noteTime) && v.noteTime > (start?.noteTime as number));
+        if (i === -1) i = all.length + 1;
         const to = all.splice(0, i - 1);
-        this.toJudge = to;
+        this.toJudge = to.filter(v => has(v.noteTime));
     }
 
     /**

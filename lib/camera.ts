@@ -15,6 +15,7 @@ type CameraSaveInfo = {
 export class Camera extends AnimationBase {
     /** 摄像机作用的目标画布 */
     target: CanvasRenderingContext2D
+    /** 摄像机id */
     id: string
     /** 存档栈 */
     saveStack: CameraSaveInfo[] = []
@@ -64,11 +65,13 @@ export class Camera extends AnimationBase {
      */
     css(css: string): void {
         const canvas = this.target.canvas;
-        const formated = css.replaceAll('\n', ';').replace(/;*/g, ';').trim();
+        const formated = css.replaceAll('\n', ';').replace(/;;*/g, ';').trim();
         const all = formated.split(';');
+
         for (const str of all) {
             const [key, value] = str.split(/\s*:\s*/);
             let id = key.replace(/-([a-z])/g, ($1) => `-${$1.toUpperCase()}`);
+            if (id.length === 0) continue;
             id = id[0].toLowerCase() + id.slice(1);
             if (key in canvas.style) {
                 canvas.style[key as CssKey] = value;

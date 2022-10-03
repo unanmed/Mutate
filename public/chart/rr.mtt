@@ -1,11 +1,15 @@
 {
+    "option": {
+        "background": "#555"
+    },
     "bases": {
         "main": {
             "id": "main",
             "x": 960,
             "y": -200,
+            "angle": 180,
             "r": {
-                "0": 50
+                "0": 100
             },
             "bpm": {
                 "0": 95
@@ -19,9 +23,9 @@
                 ]
             },
             "animate": {
-                "0": {
+                "1000": {
                     "custom": false,
-                    "start": 0,
+                    "start": 1000,
                     "type": "move",
                     "time": 1000,
                     "n": 0,
@@ -40,7 +44,22 @@
             }
         }
     },
-    "notes": [],
+    "notes": [
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 6500
+            },
+            "speed": {
+                "0": 500
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        }
+    ],
     "camera": {
         "id": "main",
         "animate": {
@@ -62,7 +81,7 @@
             }
         },
         "css": {
-            "1000": "filter: drop-shadow(0px 0px 2px black);"
+            "1000": "filter: drop-shadow(0px 0px 20px white);"
         }
     }
 }

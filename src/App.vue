@@ -9,6 +9,7 @@
         <Graph v-if="mode === 'graph'"></Graph>
         <Animate v-if="mode === 'animate'"></Animate>
         <Time v-if="mode === 'time'"></Time>
+        <Game v-if="mode === 'game'"></Game>
     </main>
 </template>
 
@@ -17,9 +18,10 @@ import { ref } from 'vue';
 import Graph from './pages/graph.vue';
 import Animate from './pages/animate.vue';
 import Time from './pages/time.vue';
+import Game from './pages/game.vue';
 
-const modes = ['graph', 'animate', 'time'];
-const mode = ref('graph');
+const modes = ['graph', 'animate', 'time', 'game'];
+const mode = ref('game');
 
 </script>
 

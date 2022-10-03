@@ -1,5 +1,7 @@
 import { AnimationBase } from "./animate";
 import { Base } from "./base";
+import { ToDrawEffect } from "./render";
+import { has } from "./utils";
 
 export type NoteType = 'tap' | 'hold' | 'drag'
 
@@ -14,6 +16,8 @@ export interface NoteConfig {
     goodTime?: number
     /** miss判定的时间 */
     missTime?: number
+    /** 长按的时间 */
+    time?: number
 }
 
 export type NoteShadow = {
@@ -23,9 +27,16 @@ export type NoteShadow = {
     color: string
 }
 
+export type PlayedEffect = {
+    perfect: (note: ToDrawEffect) => void
+    good: (note: ToDrawEffect) => void
+    miss: (note: ToDrawEffect) => void
+}
+
 export class BaseNote<T extends NoteType> extends AnimationBase {
     static cnt: number = 0
 
+    /** 是否已经打击过 */
     played: boolean = false
     /** 音符流速，每秒多少像素 */
     speed: number = 500
@@ -44,60 +55,111 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     key: number = 0
     /** 是否按住 */
     holding: boolean = false
+    /** 是否已经被销毁 */
+    destroyed: boolean = false
+    /** 是完美还是好还是miss */
+    res: 'pre' | 'perfect' | 'good' | 'miss' = 'pre'
+    /** 是提前还是过晚 */
+    detail: DetailRes = 'early'
+    /** 上一个音符速度节点 */
+    lastNode: number = -1
+    /** 上一个速度节点时该音符距离基地的距离 */
+    lastD: number = 0
 
+    /** 音符的专属id */
     readonly num: number = BaseNote.cnt++
+    /** 音符种类 */
     readonly noteType: T
-    readonly noteTime?: number
     /** 该音符所属的基地 */
     readonly base: Base
+    /** 长按时间 */
+    readonly holdTime?: number
+    /** 打击时间 */
+    readonly noteTime?: number
+    /** 完美的判定区间 */
     readonly perfectTime: number
+    /** 好的判定区间 */
     readonly goodTime: number
+    /** miss的判定区间 */
     readonly missTime: number
+    /** 速度节点 */
     readonly timeNodes: [number, number][] = []
     /** 音符进入时的方向 */
-    readonly dir: [number, number]
+    readonly dir: [number, number] = [0, 0]
+    /** 音符的旋转弧度 */
+    readonly rad: number = 0
 
     constructor(type: T, base: Base, config?: NoteConfig) {
         super();
         this.noteType = type;
         this.noteTime = config?.playTime;
         this.base = base;
-        this.perfectTime = config?.perfectTime ?? 50;
-        this.goodTime = config?.goodTime ?? 80;
-        this.missTime = config?.goodTime ?? 120;
-        this.dir = this.calDir();
+        this.perfectTime = config?.perfectTime ?? base.game.perfect;
+        this.goodTime = config?.goodTime ?? base.game.good;
+        this.missTime = config?.goodTime ?? base.game.miss;
+        this.holdTime = config?.time;
+        if (has(this.noteTime)) {
+            this.dir = this.calDir();
+            this.rad = Math.atan(this.dir[1] / this.dir[0]);
+        }
+        this.register('opacity', 1);
     }
 
     /**
      * 设置音符流速
      * @param speed 要设置成的音符流速
      */
-    setSpeed(speed: number): BaseNote<T> {
+    setSpeed(speed: number): void {
         this.speed = speed;
-        return this;
     }
 
     /**
      * 判定该note为完美
      */
-    perfect(): BaseNote<T> {
-        return this;
+    perfect(): void {
+        this.res = 'perfect';
+        this.played = true;
+        this.destroy();
+        this.base.game.renderer.effects.push({
+            note: this,
+            start: this.base.game.time,
+            res: 'perfect'
+        })
     }
 
     /**
      * 判定该note为好
      */
-    good(detail: DetailRes): BaseNote<T> {
-        return this;
+    good(detail: DetailRes): void {
+        this.res = 'good';
+        this.detail = detail;
+        this.played = true;
+        this.destroy();
+        this.base.game.renderer.effects.push({
+            note: this,
+            start: this.base.game.time,
+            res: 'good'
+        })
     }
 
     /**
      * 判定该note为miss
      */
-    miss(detail: DetailRes): BaseNote<T> {
-        return this;
+    miss(detail: DetailRes): void {
+        this.res = 'miss';
+        this.detail = detail;
+        this.played = true;
+        this.destroy();
+        this.base.game.renderer.effects.push({
+            note: this,
+            start: this.base.game.time,
+            res: 'miss'
+        })
     }
 
+    /**
+     * 按住这个长按
+     */
     hold(): void {
         if (this.noteType !== 'hold') throw new TypeError(`You are trying to hold non-hold note.`);
         this.holding = true;
@@ -108,6 +170,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param data 滤镜信息，类型与CanvasRenderingContext2d.filter相同
      */
     filter(data: string): BaseNote<T> {
+        this.ctxFilter = data;
         return this;
     }
 
@@ -116,6 +179,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param num 要设置成的不透明度
      */
     opacity(num: number): BaseNote<T> {
+        this.apply('opacity', num);
         return this;
     }
 
@@ -123,6 +187,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 设置音符阴影
      */
     shadow(x: number, y: number, blur: number, color: string): BaseNote<T> {
+        this.ctxShadow = { x, y, blur, color };
         return this;
     }
 
@@ -130,7 +195,23 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 摧毁这个音符
      */
     destroy(): void {
+        this.destroyed = true;
+    }
 
+    /** 
+     * 排序速度节点
+     */
+    sort(): void {
+        this.timeNodes.sort(([a], [b]) => a - b);
+    }
+
+    /**
+     * 计算音符与基地的距离
+     */
+    calDistance(): number {
+        this.checkNode();
+
+        return -(this.base.game.time - this.timeNodes[this.lastNode][0]) * this.speed / 1000 + this.lastD;
     }
 
     /**
@@ -138,6 +219,42 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @returns 音符进入的方向，为[cos, sin]形式
      */
     private calDir(): [number, number] {
-        return [0, 0];
+        const speeds = this.base.timeNodes;
+        let res = this.base.initAngle * Math.PI / 180;
+        for (let i = 0; i < speeds.length; i++) {
+            const [time, speed] = speeds[i];
+            const nextTime = speeds[i + 1]?.[0] ?? this.noteTime;
+            res += (nextTime - time) * speed / 30000 * Math.PI;
+        }
+
+        return [Math.cos(res), Math.sin(res)];
+    }
+
+    /**
+     * 检查速度节点
+     */
+    private checkNode(): void {
+        const now = this.base.game.time;
+        let needCal = false;
+
+        // 检查是否需要更新节点
+        for (let i = this.lastNode + 1; i < this.timeNodes.length; i++) {
+            const [time] = this.timeNodes[i];
+            if (time < now) {
+                this.lastNode = i;
+                needCal = true;
+            }
+        }
+
+        // 然后计算位置
+        if (needCal) {
+            let res = 0;
+            for (let i = this.timeNodes.length - 1; i >= this.lastNode; i--) {
+                const [time, speed] = this.timeNodes[i];
+                const lastTime = this.timeNodes[i + 1]?.[0] ?? this.noteTime;
+                res += (lastTime - time) * speed / 1000;
+            }
+            this.lastD = res;
+        }
     }
 }

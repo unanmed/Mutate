@@ -70,7 +70,7 @@ export class AudioExtractor {
         const fn = () => {
             const time = this.ac.currentTime;
             if (this.status === 'pre') this.startTime = time;
-            this.game.time = time - this.startTime;
+            this.game.time = (time - this.startTime) * 1000;
         }
         this.game.ticker.add(fn, true);
     }
