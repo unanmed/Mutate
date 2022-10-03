@@ -1,3 +1,4 @@
+import axios from "axios";
 import { AnimationBase } from "./animate";
 import { Base } from "./base";
 import { ToDrawEffect } from "./render";
@@ -85,9 +86,9 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     /** 速度节点 */
     readonly timeNodes: [number, number][] = []
     /** 音符进入时的方向 */
-    readonly dir: [number, number] = [0, 0]
+    dir: [number, number] = [0, 0]
     /** 音符的旋转弧度 */
-    readonly rad: number = 0
+    rad: number = 0
 
     constructor(type: T, base: Base, config?: NoteConfig) {
         super();
@@ -117,6 +118,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 判定该note为完美
      */
     perfect(): void {
+        this.playSound();
         this.res = 'perfect';
         this.played = true;
         this.destroy();
@@ -124,13 +126,14 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             note: this,
             start: this.base.game.time,
             res: 'perfect'
-        })
+        });
     }
 
     /**
      * 判定该note为好
      */
     good(detail: DetailRes): void {
+        this.playSound();
         this.res = 'good';
         this.detail = detail;
         this.played = true;
@@ -139,7 +142,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             note: this,
             start: this.base.game.time,
             res: 'good'
-        })
+        });
     }
 
     /**
@@ -209,9 +212,17 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 计算音符与基地的距离
      */
     calDistance(): number {
+        if (!has(this.noteTime)) return 0;
         this.checkNode();
 
         return -(this.base.game.time - this.timeNodes[this.lastNode][0]) * this.speed / 1000 + this.lastD;
+    }
+
+    /**
+     * 播放打击音效
+     */
+    private playSound(): void {
+        // this.base.game.ac.playSound(this.noteType);
     }
 
     /**
@@ -219,11 +230,17 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @returns 音符进入的方向，为[cos, sin]形式
      */
     private calDir(): [number, number] {
+        if (!has(this.noteTime)) throw new TypeError(`The note doesn't have noteTime.`);
         const speeds = this.base.timeNodes;
         let res = this.base.initAngle * Math.PI / 180;
+
         for (let i = 0; i < speeds.length; i++) {
             const [time, speed] = speeds[i];
             const nextTime = speeds[i + 1]?.[0] ?? this.noteTime;
+            if (nextTime > this.noteTime) {
+                res += (this.noteTime - time) * speed / 30000 * Math.PI;
+                break;
+            }
             res += (nextTime - time) * speed / 30000 * Math.PI;
         }
 

@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { AudioExtractor } from "./audio";
 import { Chart, MutateChart } from "./chart";
-import { NoteShadow } from "./note";
+import { NoteShadow, NoteType } from "./note";
 import { circle, bezier as bezierPath } from "./path";
 import { Renderer } from "./render";
 import { Ticker } from "./ticker";
@@ -236,6 +236,14 @@ export class Mutate {
     }
 
     /**
+     * 设置音符的打击音效
+     */
+    async setSound(type: NoteType, url: string): Promise<void> {
+        const buffer = await this.post(url, 'arraybuffer');
+        this.ac.addSound(type, buffer.data);
+    }
+
+    /**
      * 进行一次请求
      * @param url 请求地址
      * @param type 接收的数据类型
@@ -266,7 +274,6 @@ export class Mutate {
     private async loadMTT(url: string): Promise<void> {
         const data = await this.post(url, 'json');
         if (data.status !== 200) return this.fail(`Fail to load url [${url}]`, data.status);
-        console.log(data.data);
         this.mtt = data.data;
         this.chart.extract(this.mtt);
     }

@@ -7,12 +7,14 @@
             "id": "main",
             "x": 960,
             "y": -200,
-            "angle": 180,
+            "angle": 0,
             "r": {
                 "0": 100
             },
             "bpm": {
-                "0": 95
+                "0": 95,
+                "6500": 31.4,
+                "6900": 0
             },
             "rgba": {
                 "0": [
@@ -20,12 +22,18 @@
                     197,
                     255,
                     1
+                ],
+                "12300": [
+                    32,
+                    197,
+                    255,
+                    0
                 ]
             },
             "animate": {
-                "1000": {
+                "1500": {
                     "custom": false,
-                    "start": 1000,
+                    "start": 1500,
                     "type": "move",
                     "time": 1000,
                     "n": 0,
@@ -40,6 +48,400 @@
                             "out"
                         ]
                     }
+                },
+                "4000": {
+                    "custom": false,
+                    "start": 4000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": 1080,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                },
+                "6500": {
+                    "custom": false,
+                    "start": 6500,
+                    "type": "move",
+                    "time": 200,
+                    "n": 0,
+                    "x": 1140,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "6900": {
+                    "custom": false,
+                    "start": 6900,
+                    "type": "move",
+                    "time": 200,
+                    "n": 0,
+                    "x": 1200,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7300": {
+                    "custom": false,
+                    "start": 7300,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 1260,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7500": {
+                    "custom": false,
+                    "start": 7500,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 1320,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7700": {
+                    "custom": false,
+                    "start": 7700,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 1380,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "11300": {
+                    "custom": false,
+                    "start": 11300,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": 1600,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                },
+                "11400": {
+                    "custom": false,
+                    "start": 11400,
+                    "type": "rotate",
+                    "time": 50,
+                    "n": 0,
+                    "relation": "relative",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "12500": {
+                    "custom": false,
+                    "start": 12500,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 1500,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            }
+        },
+        "base2": {
+            "id": "base2",
+            "x": -200,
+            "y": 540,
+            "angle": 180,
+            "r": {
+                "0": 100
+            },
+            "bpm": {
+                "0": 95,
+                "6500": 31.4,
+                "6900": 0
+            },
+            "rgba": {
+                "0": [
+                    32,
+                    197,
+                    75,
+                    1
+                ]
+            },
+            "animate": {
+                "4000": {
+                    "custom": false,
+                    "start": 4000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": 840,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                },
+                "6500": {
+                    "custom": false,
+                    "start": 6500,
+                    "type": "move",
+                    "time": 200,
+                    "n": 0,
+                    "x": 780,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "6900": {
+                    "custom": false,
+                    "start": 6900,
+                    "type": "move",
+                    "time": 200,
+                    "n": 0,
+                    "x": 720,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7300": {
+                    "custom": false,
+                    "start": 7300,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 660,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7500": {
+                    "custom": false,
+                    "start": 7500,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 600,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "7700": {
+                    "custom": false,
+                    "start": 7700,
+                    "type": "move",
+                    "time": 100,
+                    "n": 0,
+                    "x": 540,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                },
+                "10000": {
+                    "custom": false,
+                    "start": 10000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": 320,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            }
+        },
+        "show1": {
+            "id": "show1",
+            "x": 1900,
+            "y": 540,
+            "angle": 0,
+            "r": {
+                "0": 100
+            },
+            "bpm": {
+                "0": 0
+            },
+            "rgba": {
+                "0": [
+                    32,
+                    197,
+                    75,
+                    0
+                ]
+            },
+            "animate": {
+                "13000": {
+                    "custom": false,
+                    "start": 13000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": -1000,
+                    "y": 540,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            }
+        },
+        "show2": {
+            "id": "show2",
+            "x": 1900,
+            "y": 840,
+            "angle": 0,
+            "r": {
+                "0": 100
+            },
+            "bpm": {
+                "0": 0
+            },
+            "rgba": {
+                "0": [
+                    32,
+                    197,
+                    75,
+                    0
+                ]
+            },
+            "animate": {
+                "13000": {
+                    "custom": false,
+                    "start": 13000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": -1000,
+                    "y": 840,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            }
+        },
+        "show3": {
+            "id": "show3",
+            "x": 1900,
+            "y": 240,
+            "angle": 0,
+            "r": {
+                "0": 100
+            },
+            "bpm": {
+                "0": 0
+            },
+            "rgba": {
+                "0": [
+                    32,
+                    197,
+                    75,
+                    0
+                ]
+            },
+            "animate": {
+                "13000": {
+                    "custom": false,
+                    "start": 13000,
+                    "type": "move",
+                    "time": 1000,
+                    "n": 0,
+                    "x": -1000,
+                    "y": 240,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
                 }
             }
         }
@@ -52,9 +454,893 @@
                 "playTime": 6500
             },
             "speed": {
-                "0": 500
+                "0": 1000
             },
             "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 6500
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 6900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 6900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 7300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 7300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 7500
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 7500
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 7700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 7700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8000
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8000
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8600
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8600
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8800
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8800
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 8900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 8900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 9300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 9300
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 9700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 9700
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 9800
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 9800
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 9900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 9900
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "main",
+            "type": "tap",
+            "config": {
+                "playTime": 10000
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 10000
+            },
+            "speed": {
+                "0": 1000
+            },
+            "animate": {},
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show1",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 100,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show2",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 100,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show3",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 100,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show1",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 300,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show2",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 300,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show3",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 300,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show1",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 500,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show2",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 500,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show3",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 500,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show1",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 700,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show2",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 700,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show3",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 700,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show1",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 900,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show2",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 900,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
+            "filter": {},
+            "shadow": {},
+            "opacity": {}
+        },
+        {
+            "base": "show3",
+            "type": "tap",
+            "speed": {
+                "0": 0
+            },
+            "animate": {
+                "0": {
+                    "custom": false,
+                    "start": 0,
+                    "type": "move",
+                    "time": 50,
+                    "n": 0,
+                    "x": 900,
+                    "y": 0,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "in"
+                        ]
+                    }
+                }
+            },
             "filter": {},
             "shadow": {},
             "opacity": {}
@@ -63,25 +1349,153 @@
     "camera": {
         "id": "main",
         "animate": {
-            "1000": {
+            "8600": {
                 "custom": false,
-                "start": 0,
+                "start": 8600,
                 "type": "rotate",
-                "time": 1000,
-                "n": 90,
-                "relative": "absolute",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
                 "mode": {
                     "fnType": "generator",
-                    "fn": "hyper",
+                    "fn": "bezier",
                     "args": [
-                        "sin",
-                        "out"
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "8700": {
+                "custom": false,
+                "start": 8700,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "8800": {
+                "custom": false,
+                "start": 8800,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "8900": {
+                "custom": false,
+                "start": 8900,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "9300": {
+                "custom": false,
+                "start": 9300,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "9700": {
+                "custom": false,
+                "start": 9700,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "9800": {
+                "custom": false,
+                "start": 9800,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "9900": {
+                "custom": false,
+                "start": 9900,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
+                    ]
+                }
+            },
+            "10000": {
+                "custom": false,
+                "start": 10000,
+                "type": "rotate",
+                "time": 60,
+                "n": 10,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "bezier",
+                    "args": [
+                        0.6,
+                        1.2
                     ]
                 }
             }
         },
         "css": {
-            "1000": "filter: drop-shadow(0px 0px 20px white);"
+            "0": "filter: drop-shadow(0px 0px 5px black);"
         }
     }
 }

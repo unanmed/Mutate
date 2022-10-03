@@ -178,8 +178,9 @@ export class Judger {
         const all = this.chart.notesArr;
         const start = all.find(v => has(v.noteTime));
         let i = all.findIndex(v => has(v.noteTime) && v.noteTime > (start?.noteTime as number));
+
         if (i === -1) i = all.length + 1;
-        const to = all.splice(0, i - 1);
+        const to = all.splice(0, i);
         this.toJudge = to.filter(v => has(v.noteTime));
     }
 

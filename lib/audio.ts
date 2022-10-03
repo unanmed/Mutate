@@ -1,4 +1,5 @@
 import { Mutate, MutateStatus } from "./core";
+import { has } from "./utils";
 
 export class AudioExtractor {
 
@@ -13,6 +14,8 @@ export class AudioExtractor {
     readonly game: Mutate
     /** 音频处理模块 */
     readonly ac: AudioContext = new AudioContext()
+    /** 音效 */
+    readonly sounds: { [key: string]: AudioBuffer } = {}
 
     constructor(game: Mutate) {
         this.game = game;
@@ -61,6 +64,28 @@ export class AudioExtractor {
         if (this.status !== 'pause') throw new TypeError(`You are trying to resume an already playing music.`);
         await this.ac.resume();
         this.status = 'playing';
+    }
+
+    /**
+     * 添加音效
+     */
+    async addSound(key: string, buffer: ArrayBuffer): Promise<void> {
+        const data = await this.ac.decodeAudioData(buffer);
+        this.sounds[key] = data;
+    }
+
+    /**
+     * 播放音效
+     */
+    playSound(key: string): void {
+        if (!has(this.sounds[key])) return;
+        const gain = this.ac.createGain();
+        const source = this.ac.createBufferSource();
+        gain.gain.value = 0.5;
+        source.buffer = this.sounds[key];
+        source.connect(gain);
+        gain.connect(this.ac.destination);
+        source.start();
     }
 
     /**

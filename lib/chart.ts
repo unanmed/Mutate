@@ -244,7 +244,7 @@ export class Chart {
             }
 
             // 摄像机
-            const c = new Camera(camera.id, this.game.ctx);
+            const c = new Camera(this.game, camera.id, this.game.ctx);
             this.camera = c;
             this.executeAnimate('camera', camera.animate);
             this.execute('camera', camera, c);

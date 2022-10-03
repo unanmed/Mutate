@@ -78,6 +78,9 @@ export class Renderer {
         ctx.restore();
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
+
+        this.game.chart.camera.effect();
+
         // 基地
         const bases = this.game.chart.bases;
         for (const num in bases) {

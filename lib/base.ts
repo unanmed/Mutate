@@ -13,7 +13,7 @@ export class Base extends AnimationBase {
     /** 基地旋转速度，一拍一圈 */
     bpm: number = 100
     /** 上一个时间节点 */
-    lastNode: number = 0
+    lastNode: number = -1
     /** 上一个时间节点时的角度 */
     lastAngle: number = 0
     /** 当前旋转弧度，不计算动画旋转的角度 */
@@ -114,8 +114,9 @@ export class Base extends AnimationBase {
         const now = this.game.time;
         let needCal = false;
         // 检查是否需要更新节点
-        for (let i = this.lastNode; i < this.timeNodes.length; i++) {
+        for (let i = this.lastNode + 1; i < this.timeNodes.length; i++) {
             const [time] = this.timeNodes[i];
+
             if (time < now) {
                 this.lastNode = i;
                 needCal = true;
@@ -127,8 +128,8 @@ export class Base extends AnimationBase {
             let res = 0;
             for (let i = 0; i < this.lastNode; i++) {
                 const [time, speed] = this.timeNodes[i];
-                const last = this.timeNodes[i - 1]?.[0] ?? 0;
-                res += (time - last) * speed / 30000 * Math.PI;
+                const next = this.timeNodes[i + 1]?.[0] ?? 0;
+                res += (next - time) * speed / 30000 * Math.PI;
             }
             this.lastAngle = res;
         }

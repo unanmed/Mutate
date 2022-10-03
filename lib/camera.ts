@@ -1,4 +1,5 @@
 import { AnimationBase } from "./animate";
+import { Mutate } from "./core";
 
 type ToOmittedKey = 'getPropertyPriority' | 'length' | 'parentRule'
     | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'
@@ -13,17 +14,21 @@ type CameraSaveInfo = {
 }
 
 export class Camera extends AnimationBase {
-    /** 摄像机作用的目标画布 */
-    target: CanvasRenderingContext2D
-    /** 摄像机id */
-    id: string
     /** 存档栈 */
     saveStack: CameraSaveInfo[] = []
 
-    constructor(id: string, target: CanvasRenderingContext2D) {
+    /** 摄像机作用的目标画布 */
+    readonly target: CanvasRenderingContext2D
+    /** 摄像机id */
+    readonly id: string
+    /** 游戏实例 */
+    readonly game: Mutate
+
+    constructor(game: Mutate, id: string, target: CanvasRenderingContext2D) {
         super();
         this.target = target;
         this.id = id;
+        this.game = game;
     }
 
     /**
@@ -56,7 +61,16 @@ export class Camera extends AnimationBase {
      * 设置画布的全局特效
      */
     effect(): void {
-
+        const ctx = this.target;
+        const scale = this.game.drawScale;
+        const dx = 960 * scale;
+        const dy = 540 * scale;
+        const x = this.x * scale;
+        const y = this.y * scale;
+        ctx.translate(dx, dy);
+        ctx.rotate(this.angle * Math.PI / 180);
+        ctx.translate(-dx, -dy);
+        ctx.translate(x, y);
     }
 
     /**
@@ -65,7 +79,7 @@ export class Camera extends AnimationBase {
      */
     css(css: string): void {
         const canvas = this.target.canvas;
-        const formated = css.replaceAll('\n', ';').replace(/;;*/g, ';').trim();
+        const formated = css.replaceAll('\n', ';').replace(/;+/g, ';').trim();
         const all = formated.split(';');
 
         for (const str of all) {
