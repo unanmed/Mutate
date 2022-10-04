@@ -202,7 +202,6 @@ export class Chart {
 
     constructor(mutate: Mutate) {
         this.game = mutate;
-        if (mutate.isMobile) this.judger.mobileDrag();
     }
 
     /**
@@ -260,7 +259,7 @@ export class Chart {
 
         this.onExtracted(this);
         this.game.length = this.notesArr.filter(v => has(v.noteTime)).length;
-        this.judger.judgeMiss();
+        this.judger.judgeMissAndDrag();
     }
 
     /**

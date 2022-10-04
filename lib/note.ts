@@ -69,6 +69,10 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     lastD: number = 0
     /** 是否是多压 */
     multi: boolean = false
+    /** 绝对横坐标 */
+    px: number = 0
+    /** 绝对纵坐标 */
+    py: number = 0
 
     /** 音符的专属id */
     readonly num: number = BaseNote.cnt++
@@ -128,7 +132,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base.game.renderer.effects.push({
             note: this,
             start: this.base.game.time,
-            res: 'perfect'
+            res: 'perfect',
+            end: false
         });
     }
 
@@ -144,7 +149,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base.game.renderer.effects.push({
             note: this,
             start: this.base.game.time,
-            res: 'good'
+            res: 'good',
+            end: false
         });
     }
 
@@ -159,7 +165,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.base.game.renderer.effects.push({
             note: this,
             start: this.base.game.time,
-            res: 'miss'
+            res: 'miss',
+            end: false
         })
     }
 
@@ -221,6 +228,23 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.checkNode();
 
         return -(this.base.game.time - this.timeNodes[this.lastNode][0]) * this.speed / 1000 + this.lastD;
+    }
+
+    /**
+     * 计算音符的绝对坐标
+     */
+    calPosition(): [number, number, number] {
+        if (this.destroyed) return [this.px, this.py, NaN];
+        const distance = this.calDistance() + this.base.custom.radius;
+        if (distance < 0) return [NaN, NaN, NaN];
+        const dx = distance * this.dir[0] + this.x,
+            dy = distance * this.dir[1] + this.y;
+        const x = dx + this.base.x,
+            y = dy + this.base.y;
+
+        this.px = x;
+        this.py = y;
+        return [x, y, distance];
     }
 
     /**

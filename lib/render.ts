@@ -20,6 +20,7 @@ export type ToDrawEffect = {
     start: number
     res: 'perfect' | 'good' | 'miss'
     note: BaseNote<NoteType>
+    end: boolean
 }
 
 export class Renderer {
@@ -31,6 +32,8 @@ export class Renderer {
     bases: Chart['bases'] = {}
     /** 按id区分的基地 */
     baseDict: Chart['basesDict'] = {}
+    /** 是否有打击特效完成了 */
+    effectEnd: boolean = false
 
     /** 游戏实例 */
     readonly game: Mutate
@@ -47,7 +50,8 @@ export class Renderer {
         good: this.goodEffect,
         miss: this.missEffect
     }
-    readonly effects: ToDrawEffect[] = []
+    /** 需要绘制的打击特效 */
+    effects: ToDrawEffect[] = []
 
     constructor(game: Mutate) {
         this.game = game;
@@ -96,6 +100,10 @@ export class Renderer {
             if (note.noteType === 'tap') this.renderer.tap.call(this, note as BaseNote<'tap'>);
             if (note.noteType === 'hold') this.renderer.hold.call(this, note as BaseNote<'hold'>);
             if (note.noteType === 'drag') this.renderer.drag.call(this, note as BaseNote<'drag'>);
+        }
+
+        if (this.effectEnd === true) {
+            this.effects = this.effects.filter(v => v.end === false);
         }
 
         // 特效
@@ -162,16 +170,10 @@ export class Renderer {
      */
     private renderNonHold(note: BaseNote<Exclude<NoteType, 'hold'>>, fillColor: string) {
         if (has(note.noteTime) && this.game.time > note.noteTime + note.missTime) return;
+        if (note.played) return;
 
-        let distance = note.calDistance();
-
-        if (distance <= -note.base.custom.radius) return;
-
-        distance += note.base.custom.radius;
-        const dx = distance * note.dir[0] + note.x,
-            dy = distance * note.dir[1] + note.y;
-        const x = dx + note.base.x,
-            y = dy + note.base.y;
+        const [x, y, d] = note.calPosition();
+        if (isNaN(x)) return;
         if (!this.inGame(x, y)) return;
 
         const rad = note.rad + note.angle * Math.PI / 180;
@@ -191,6 +193,9 @@ export class Renderer {
         if (note.multi) {
             ctx.shadowColor = 'gold';
             ctx.strokeStyle = style;
+        }
+        if (d < note.base.custom.radius) {
+            ctx.globalAlpha = d / note.base.custom.radius;
         }
         ctx.beginPath();
         ctx.moveTo(-hw, 0);
@@ -241,23 +246,46 @@ export class Renderer {
     }
 
     /**
+     * 播放perfect和good的打击特效
+     */
+    private playEffect(note: ToDrawEffect, color: string) {
+        const time = this.game.time - note.start;
+        if (time > 500) return this.effectEnd = true;
+        const [x, y] = note.note.calPosition();
+        const r = time / 4;
+        const ctx = this.game.ctx;
+        const scale = this.game.drawScale;
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = color;
+        ctx.globalAlpha = 2 - time / 250;
+        ctx.beginPath();
+        ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    /**
      * 完美的打击特效
      */
     private perfectEffect(note: ToDrawEffect) {
-
+        this.playEffect(note, 'gold');
     }
 
     /**
      * 好的打击特效
      */
     private goodEffect(note: ToDrawEffect) {
-
+        this.playEffect(note, '#19aff0');
     }
 
     /**
      * miss的打击特效
      */
     private missEffect(note: ToDrawEffect) {
-
+        this.playEffect(note, '#8f0067');
     }
 }

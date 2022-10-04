@@ -18,7 +18,11 @@ async function start() {
     mutate.start();
     mutate.chart.judger.auto = true;
     mutate.ticker.add(() => {
-        span.innerHTML = `物量：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}`;
+        span.innerHTML = `打击数：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连击数：${mutate.chart.judger.combo}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perfect：${mutate.chart.judger.perfect}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;good：${mutate.chart.judger.good}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;miss：${mutate.chart.judger.miss}`;
     })
 }
 </script>

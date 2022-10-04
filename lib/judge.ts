@@ -49,10 +49,9 @@ export class Judger {
     /**
      * 判定音符
      */
-    judge(key?: number, drag: boolean = false): void {
-        if (drag === true) return this.judgeDrag();
-        const note = this.toJudge.shift() as BaseNote<NoteType>;
-        if (!note) return;
+    judge(key?: number): void {
+        const note = this.toJudge.slice(0, 1)[0] as BaseNote<NoteType>;
+        if (!has(note)) return;
         if (this.toJudge.length === 0) this.next();
 
         // 如果时hold
@@ -66,25 +65,29 @@ export class Judger {
 
         // 判定函数
         const judge = (t: number) => {
-            return time > noteTime - t && time > noteTime + t;
+            return time > noteTime - t && time < noteTime + t;
         }
 
         // 判断perfect good miss
         if (judge(note.perfectTime)) {
+            this.toJudge.shift();
             note.perfect();
             this.perfect++;
             this.combo++;
         } else if (judge(note.goodTime)) {
+            this.toJudge.shift();
             const t = time > note.goodTime ? 'late' : 'early'
             note.good(t);
             this[t]++;
             this.good++;
             this.combo++;
         } else if (time > noteTime - note.missTime) {
+            this.toJudge.shift();
             const t = time > note.goodTime ? 'late' : 'early'
             note.miss(t);
             this[t]++;
             this.combo = 0;
+            this.miss++;
         }
 
         // 最大连击
@@ -118,32 +121,30 @@ export class Judger {
     }
 
     /**
-     * 判定drag音符
+     * 判定miss drag，以及autoplay
      */
-    judgeDrag(): void {
-        // drag不存在good or miss
-        this.toJudge = this.toJudge.filter(v => {
-            if (v.noteType === 'drag') {
-                v.perfect();
-                return false;
-            } else return true;
-        })
-    }
-
-    /**
-     * 判定miss
-     */
-    judgeMiss(): void {
+    judgeMissAndDrag(): void {
         // 每帧都要判定
         const fn = () => {
             const all = this.toJudge;
             if (all.length === 0) this.next();
             this.toJudge = this.toJudge.filter(v => {
-                if (!v.noteTime) throw new TypeError(`The note to be judge doesn't have property noteTime.`);
+                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have property noteTime.`);
                 if (!this.auto) {
+                    if (v.noteType === 'drag') {
+                        if (this.chart.game.time > v.noteTime) {
+                            if (this.holdingKeys.length > 0 || this.touching > 0) {
+                                v.perfect();
+                                this.perfect++;
+                                this.combo++;
+                                return false;
+                            }
+                        }
+                    }
                     if (this.chart.game.time > v.noteTime + v.missTime) {
                         v.miss('late');
                         this.late++;
+                        this.miss++;
                         return false;
                     }
                     return true;
@@ -151,6 +152,7 @@ export class Judger {
                     if (this.chart.game.time > v.noteTime) {
                         v.perfect();
                         this.perfect++;
+                        this.combo++;
                         return false;
                     }
                     return true;
@@ -159,17 +161,6 @@ export class Judger {
         }
 
         this.chart.game.ticker.add(fn);
-    }
-
-    /**
-     * 手机端的drag判定
-     */
-    mobileDrag(): void {
-        this.chart.game.ticker.add(() => {
-            if (this.chart.game.status === 'playing' && this.touching > 0) {
-                this.judge(void 0, true);
-            }
-        });
     }
 
     /**
@@ -209,8 +200,6 @@ export class Judger {
             this.holdingKeys.push(e.keyCode);
             this.judge(e.keyCode);
         }
-        // 还有drag不能忘
-        this.judge(e.keyCode, true);
     }
 
     /**
