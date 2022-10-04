@@ -1,18 +1,22 @@
 <template>
     <div>
         <button id="start" @click="start">开始游戏</button>
+        <button id="restart" @click="restart">重开</button>
         <span id="length"></span>
     </div>
     <canvas id="game" width="1440" height="810"></canvas>
 </template>
 
 <script setup lang="ts">
-import { create } from '../../lib/core';
+import { create, Mutate } from '../../lib/core';
+
+let game: Mutate
 
 async function start() {
     const span = document.getElementById('length') as HTMLSpanElement;
     const canvas = document.getElementById('game') as HTMLCanvasElement;
     const mutate = create(canvas);
+    game = mutate;
     await mutate.load('/music/rr.mp3', '/chart/rr.mtt');
     await mutate.setSound('tap', '/se/tap.wav');
     mutate.start();
@@ -28,6 +32,10 @@ async function start() {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;early：${mutate.chart.judger.early}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分数：${mutate.getScore()}`;
     })
+}
+
+async function restart() {
+    await game.restart();
 }
 </script>
 

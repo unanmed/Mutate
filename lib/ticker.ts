@@ -32,7 +32,7 @@ export class Ticker {
     }
 
     /**
-     * 摧毁这个ticker
+     * 摧毁这个ticker...的所有ticker函数
      */
     destroy(): void {
         this.funcs = [];

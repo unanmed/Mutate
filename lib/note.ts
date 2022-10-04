@@ -286,7 +286,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         // 检查是否需要更新节点
         for (let i = this.lastNode + 1; i < this.timeNodes.length; i++) {
             const [time] = this.timeNodes[i];
-            if (time < now) {
+            if (time <= now) {
                 this.lastNode = i;
                 needCal = true;
             }

@@ -272,6 +272,8 @@ export class Chart {
         this.bases = {};
         this.notesArr = [];
         this.basesDict = {};
+        BaseNote.cnt = 0;
+        Base.cnt = 0;
         await this.extract(this.game.mtt);
     }
 

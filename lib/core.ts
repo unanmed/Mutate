@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { sleep } from "./animate";
 import { AudioExtractor } from "./audio";
 import { Chart, MutateChart } from "./chart";
 import { NoteShadow, NoteType } from "./note";
@@ -182,8 +183,8 @@ export class Mutate {
     start(): void {
         if (this.status !== 'pre') throw new TypeError(`The game has already started.`);
         this.status = 'playing';
-        this.renderer.start();
         this.ac.play();
+        this.renderer.start();
     }
 
     /**
@@ -208,9 +209,15 @@ export class Mutate {
      * 重新开始游戏
      */
     async restart(): Promise<void> {
+        this.ticker.destroy();
+        this.ctx.restore();
+        this.ctx.clearRect(0, 0, this.target.width, this.target.height);
+        this.renderer.effects = [];
+        this.status = 'pre';
         this.chart.judger.toJudge = [];
-        await this.chart.restart();
         this.ac.restart();
+        await this.chart.restart();
+        this.start();
     }
 
     /**

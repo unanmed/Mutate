@@ -52,7 +52,9 @@ export class AudioExtractor {
      * 播放音频
      */
     play(): void {
-        if (this.status !== 'pre') throw new TypeError(`The game music is playing now.`);
+        if (this.status === 'playing') throw new TypeError(`The game music is playing now.`);
+        this.startTime = this.ac.currentTime;
+        this.game.time = (this.ac.currentTime - this.startTime) * 1000;
         const gain = this.ac.createGain();
         const source = this.ac.createBufferSource();
         this.musicNode = source;
@@ -113,9 +115,9 @@ export class AudioExtractor {
      * 重新播放音频
      */
     restart(): void {
+        this.status = 'pre';
         this.musicNode.stop();
-        if (this.status === 'pause') this.resume();
-        this.play();
+        this.syncTime();
     }
 
     /**
@@ -124,7 +126,9 @@ export class AudioExtractor {
     private syncTime(): void {
         const fn = () => {
             const time = this.ac.currentTime;
-            if (this.status === 'pre') this.startTime = time;
+            if (this.status === 'pre') {
+                this.startTime = time;
+            }
             this.game.time = (time - this.startTime) * 1000;
         }
         this.game.ticker.add(fn, true);

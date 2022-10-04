@@ -26,12 +26,6 @@ export type ToDrawEffect = {
 export class Renderer {
     /** 当前音乐时间 */
     time: number = 0
-    /** 所有的音符 */
-    notes: Chart['notes'] = {}
-    /** 所有的基地 */
-    bases: Chart['bases'] = {}
-    /** 按id区分的基地 */
-    baseDict: Chart['basesDict'] = {}
     /** 是否有打击特效完成了 */
     effectEnd: boolean = false
 
@@ -55,11 +49,6 @@ export class Renderer {
 
     constructor(game: Mutate) {
         this.game = game;
-        this.game.chart.onExtracted = (chart) => {
-            this.notes = chart.notes;
-            this.bases = chart.bases;
-            this.baseDict = chart.basesDict;
-        }
     }
 
     /**
@@ -87,6 +76,7 @@ export class Renderer {
 
         // 基地
         const bases = this.game.chart.bases;
+
         for (const num in bases) {
             const base = bases[num];
             this.renderer.base.call(this, base);
@@ -217,6 +207,7 @@ export class Renderer {
     private renderBases(base: Base): void {
         if (!this.inGame(base.x, base.y)) return;
         const rad = base.calRad() + base.angle * Math.PI / 180;
+
         const ctx = this.game.ctx;
         // 基地比较好画
         const scale = this.game.drawScale;
