@@ -2,6 +2,7 @@ import axios from "axios";
 import { AnimationBase } from "./animate";
 import { Base } from "./base";
 import { ToDrawEffect } from "./render";
+import { linear } from "./timing";
 import { has } from "./utils";
 
 export type NoteType = 'tap' | 'hold' | 'drag'
@@ -66,6 +67,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     lastNode: number = -1
     /** 上一个速度节点时该音符距离基地的距离 */
     lastD: number = 0
+    /** 是否是多压 */
+    multi: boolean = false
 
     /** 音符的专属id */
     readonly num: number = BaseNote.cnt++
@@ -182,7 +185,9 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param num 要设置成的不透明度
      */
     opacity(num: number): BaseNote<T> {
-        this.apply('opacity', num);
+        this.mode(linear())
+            .time(20)
+            .apply('opacity', num);
         return this;
     }
 
@@ -222,7 +227,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 播放打击音效
      */
     private playSound(): void {
-        // this.base.game.ac.playSound(this.noteType);
+        this.base.game.ac.playSound(this.noteType);
     }
 
     /**

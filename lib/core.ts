@@ -158,7 +158,6 @@ export class Mutate {
             throw new TypeError(`The game's music or chart has already been loaded.`);
         const task = [this.loadMusic(music), this.loadMTT(mtt)];
         await Promise.all(task);
-
     }
 
     /**

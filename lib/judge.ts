@@ -150,6 +150,7 @@ export class Judger {
                 } else {
                     if (this.chart.game.time > v.noteTime) {
                         v.perfect();
+                        this.perfect++;
                         return false;
                     }
                     return true;
@@ -169,6 +170,22 @@ export class Judger {
                 this.judge(void 0, true);
             }
         });
+    }
+
+    /**
+     * 判断是否多压
+     */
+    isMulti(note: BaseNote<NoteType>): boolean {
+        if (!has(note.noteTime)) return false;
+        const num = note.num;
+
+        const l = this.chart.notes[num - 1];
+        if (has(l) && has(l.noteTime) && l.noteTime === note.noteTime) return true;
+
+        const n = this.chart.notes[num + 1];
+        if (has(n) && has(n.noteTime) && n.noteTime === note.noteTime) return true;
+
+        return false;
     }
 
     /**

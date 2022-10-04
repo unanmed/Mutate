@@ -71,6 +71,9 @@ export class Camera extends AnimationBase {
         ctx.rotate(this.angle * Math.PI / 180);
         ctx.translate(-dx, -dy);
         ctx.translate(x, y);
+
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = 'black'
     }
 
     /**

@@ -36,13 +36,13 @@ export class AudioExtractor {
      */
     play(): void {
         if (this.status !== 'pre') throw new TypeError(`The game music is playing now.`);
-        this.status = 'playing';
         const gain = this.ac.createGain();
         const source = this.ac.createBufferSource();
         source.buffer = this.audio;
         source.connect(gain);
         gain.connect(this.ac.destination);
         source.start();
+        this.status = 'playing';
         source.addEventListener('ended', e => {
             this.status = 'exit';
         });

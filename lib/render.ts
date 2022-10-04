@@ -97,6 +97,14 @@ export class Renderer {
             if (note.noteType === 'hold') this.renderer.hold.call(this, note as BaseNote<'hold'>);
             if (note.noteType === 'drag') this.renderer.drag.call(this, note as BaseNote<'drag'>);
         }
+
+        // 特效
+        const effect = this.effects;
+        for (const data of effect) {
+            if (data.res === 'perfect') this.effect.perfect.call(this, data);
+            if (data.res === 'good') this.effect.good.call(this, data);
+            if (data.res === 'miss') this.effect.miss.call(this, data);
+        }
     }
 
     /**
@@ -177,6 +185,13 @@ export class Renderer {
         ctx.translate(x * this.game.drawScale, y * this.game.drawScale);
         ctx.rotate(rad + Math.PI / 2);
         // 绘制
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = fillColor;
+        ctx.lineWidth = 4 * this.game.drawScale;
+        if (note.multi) {
+            ctx.shadowColor = 'gold';
+            ctx.strokeStyle = style;
+        }
         ctx.beginPath();
         ctx.moveTo(-hw, 0);
         ctx.lineTo(-htw, -hh);
@@ -185,9 +200,6 @@ export class Renderer {
         ctx.lineTo(htw, hh);
         ctx.lineTo(-htw, hh);
         ctx.closePath();
-        ctx.strokeStyle = style;
-        ctx.fillStyle = fillColor;
-        ctx.lineWidth = 4 * this.game.drawScale;
         ctx.fill();
         ctx.stroke();
         // 恢复画布属性
@@ -213,18 +225,18 @@ export class Renderer {
         ctx.translate(x, y);
         ctx.rotate(rad + Math.PI);
         ctx.moveTo(0, 0);
+        ctx.fillStyle = ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+        ctx.fillRect(-radius, -radius * 0.06, radius, radius * 0.12);
         ctx.beginPath();
         ctx.arc(0, 0, radius * 2 / 5, 0, Math.PI * 2);
         ctx.closePath();
         ctx.lineWidth = radius / 10 * scale;
-        ctx.fillStyle = ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
         ctx.fill();
         ctx.beginPath();
-        ctx.lineCap = 'round'
+        ctx.lineCap = 'round';
         ctx.arc(0, 0, radius * 0.6, -Math.PI / 8, +Math.PI / 8);
         ctx.stroke();
         ctx.closePath();
-        ctx.fillRect(-radius, -radius * 0.06, radius, radius * 0.12);
         ctx.restore();
     }
 

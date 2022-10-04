@@ -1,6 +1,7 @@
 import { AnimationBase } from "./animate";
 import { Mutate } from "./core";
 import { BaseNote, NoteType } from "./note";
+import { linear } from "./timing";
 import { has } from "./utils";
 
 export const bases: Base[] = [];
@@ -72,7 +73,9 @@ export class Base extends AnimationBase {
      * @param r 要设置成的半径
      */
     setRadius(r: number): Base {
-        this.apply('radius', r);
+        this.mode(linear())
+            .time(20)
+            .apply('radius', r);
         return this;
     }
 
@@ -80,6 +83,9 @@ export class Base extends AnimationBase {
      * 设置基地颜色
      */
     rgba(r?: number, g?: number, b?: number, a?: number): Base {
+        this.mode(linear())
+            .time(20);
+
         has(r) && this.apply('r', r);
         has(g) && this.apply('g', g);
         has(b) && this.apply('b', b);

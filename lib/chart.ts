@@ -243,6 +243,10 @@ export class Chart {
                 this.executeAnimate('note', n.animate, note.num);
             }
 
+            this.notesArr.forEach(v => {
+                v.multi = this.judger.isMulti(v);
+            })
+
             // 摄像机
             const c = new Camera(this.game, camera.id, this.game.ctx);
             this.camera = c;
@@ -255,7 +259,7 @@ export class Chart {
         });
 
         this.onExtracted(this);
-        this.game.length = this.notesArr.length;
+        this.game.length = this.notesArr.filter(v => has(v.noteTime)).length;
         this.judger.judgeMiss();
     }
 
