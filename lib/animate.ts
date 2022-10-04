@@ -53,7 +53,9 @@ export class AnimationBase {
     relation: 'relative' | 'absolute' = 'absolute'
     /** 渐变时间 */
     easeTime: number = 0
+    /** 放缩的大小 */
     size: number = 1
+    /** 角度 */
     angle: number = 0
 
     get x(): number {

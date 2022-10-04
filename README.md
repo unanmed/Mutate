@@ -25,9 +25,11 @@ pnpm add mutate
 ```js
 import mutate from 'mutate';
 
+// 这里要求画布的长宽比为16:9，如果不是的话会自动调整
 const canvas = document.getElementById('mutate');
 
 const game = mutate.core.create(canvas);
+// 加载游戏内容
 await game.load('your music url', 'your mtt url');
 game.start(); // 开始游戏
 ```

@@ -51,6 +51,8 @@ export class Mutate {
     time: number = 0
     /** 谱面物量 */
     length: number = 0
+    /** 是否已经结束游戏 */
+    ended: boolean = false
 
     /** 是否是移动设备 */
     readonly isMobile: boolean = window.innerWidth < window.innerHeight
@@ -106,6 +108,20 @@ export class Mutate {
         this.width = target.width;
         this.height = target.height;
         this.scale = Math.min(this.width / 1920, this.height / 1080);
+        // 如果画布不是16:9，那么自动调整
+        if (target.width / target.height !== parseFloat((16 / 9).toFixed(7))) {
+            const ws = this.width / 1920;
+            const hs = this.height / 1080;
+            if (ws < hs) {
+                const height = target.width * 9 / 16
+                target.height = height;
+                target.style.height = `${height}px`;
+            } else {
+                const width = target.height * 16 / 9;
+                target.width = width;
+                target.style.width = `${width}px`;
+            }
+        }
         // 配置信息
         this.noteScale = option?.noteScale ?? 1;
         this.noteWidth = option?.noteWidth ?? this.noteWidth;
@@ -191,29 +207,24 @@ export class Mutate {
     /**
      * 重新开始游戏
      */
-    restart(): void {
-
-    }
-
-    /**
-     * 结算本局游戏
-     */
-    settle(): void {
-
-    }
-
-    /**
-     * 退出本局游戏
-     */
-    exit(): void {
-
+    async restart(): Promise<void> {
+        this.chart.judger.toJudge = [];
+        await this.chart.restart();
+        this.ac.restart();
     }
 
     /**
      * 结束本局游戏，取消与canvas的绑定
      */
     end(): void {
-
+        this.ticker.destroy();
+        this.ac.pause();
+        this.ended = true;
+        this.chart.camera.ticker.destroy();
+        const bases = this.chart.bases;
+        Object.values(bases).forEach(v => v.ticker.destroy());
+        const notes = this.chart.notes;
+        Object.values(notes).forEach(v => v.ticker.destroy());
     }
 
     /**

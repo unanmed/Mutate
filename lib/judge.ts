@@ -17,8 +17,6 @@ export class Judger {
     good: number = 0
     /** miss的个数 */
     miss: number = 0
-    /** 当前连击数 */
-    combo: number = 0
     /** 最大连击数 */
     maxCombo: number = 0
     /** 提前的个数 */
@@ -32,6 +30,18 @@ export class Judger {
 
     /** 谱面实例 */
     readonly chart: Chart
+
+    /** 连击数 */
+    private c: number = 0
+
+    set combo(v: number) {
+        this.c = v;
+        if (v > this.maxCombo) this.maxCombo = v;
+    }
+
+    get combo(): number {
+        return this.c;
+    }
 
     constructor(chart: Chart) {
         this.chart = chart;
@@ -89,9 +99,6 @@ export class Judger {
             this.combo = 0;
             this.miss++;
         }
-
-        // 最大连击
-        if (this.combo > this.maxCombo) this.maxCombo = this.combo;
     }
 
     /**

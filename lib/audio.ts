@@ -9,6 +9,18 @@ export class AudioExtractor {
     status: MutateStatus = 'pre'
     /** 开始播放时的时间，用于计算音乐时间 */
     startTime: number = 0
+    /** 音效的音量 */
+    seVolume: number = 0.5
+    /** 音乐的音量 */
+    musicVolume: number = 1
+
+    set volume(v: number) {
+        this.mainGain.gain.value = v;
+    }
+
+    get volume(): number {
+        return this.mainGain.gain.value
+    }
 
     /** 游戏实例 */
     readonly game: Mutate
@@ -16,6 +28,11 @@ export class AudioExtractor {
     readonly ac: AudioContext = new AudioContext()
     /** 音效 */
     readonly sounds: { [key: string]: AudioBuffer } = {}
+    /** 全局音量控制器 */
+    readonly mainGain = this.ac.createGain()
+
+    /** 当前音乐资源节点 */
+    private musicNode!: AudioBufferSourceNode
 
     constructor(game: Mutate) {
         this.game = game;
@@ -38,9 +55,12 @@ export class AudioExtractor {
         if (this.status !== 'pre') throw new TypeError(`The game music is playing now.`);
         const gain = this.ac.createGain();
         const source = this.ac.createBufferSource();
+        this.musicNode = source;
         source.buffer = this.audio;
         source.connect(gain);
-        gain.connect(this.ac.destination);
+        gain.gain.value = this.musicVolume;
+        gain.connect(this.mainGain);
+        this.mainGain.connect(this.ac.destination);
         source.start();
         this.status = 'playing';
         source.addEventListener('ended', e => {
@@ -81,11 +101,21 @@ export class AudioExtractor {
         if (!has(this.sounds[key])) return;
         const gain = this.ac.createGain();
         const source = this.ac.createBufferSource();
-        gain.gain.value = 0.5;
+        gain.gain.value = this.seVolume;
         source.buffer = this.sounds[key];
         source.connect(gain);
-        gain.connect(this.ac.destination);
+        gain.connect(this.mainGain);
+        this.mainGain.connect(this.ac.destination);
         source.start();
+    }
+
+    /**
+     * 重新播放音频
+     */
+    restart(): void {
+        this.musicNode.stop();
+        if (this.status === 'pause') this.resume();
+        this.play();
     }
 
     /**

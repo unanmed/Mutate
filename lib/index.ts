@@ -10,6 +10,7 @@ import * as ticker from './ticker';
 import * as core from './core';
 import * as audio from './audio';
 import * as judge from './judge';
+import * as utils from './utils';
 
 export {
     camera,
@@ -23,5 +24,6 @@ export {
     ticker,
     core,
     audio,
-    judge
+    judge,
+    utils
 }

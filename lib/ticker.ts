@@ -1,7 +1,9 @@
 export type TickerFn = (time?: number) => void
 
 export class Ticker {
+    /** 所有的ticker函数 */
     funcs: TickerFn[] = []
+    /** 当前ticker的状态 */
     status: 'stop' | 'running' = 'stop'
 
     constructor() {
@@ -27,6 +29,13 @@ export class Ticker {
         if (index === -1) throw new ReferenceError(`You are going to remove nonexistent ticker function.`);
         this.funcs.splice(index, 1);
         return this;
+    }
+
+    /**
+     * 摧毁这个ticker
+     */
+    destroy(): void {
+        this.funcs = [];
     }
 
     /**

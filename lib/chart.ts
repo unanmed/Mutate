@@ -173,17 +173,17 @@ export class Chart {
     onExtracted: (chart: Chart) => void = () => { }
 
     /** 所有的音符 */
-    readonly notes: { [num: number]: BaseNote<NoteType> } = {}
+    notes: { [num: number]: BaseNote<NoteType> } = {}
     /** 所有的基地 */
-    readonly bases: { [num: number]: Base } = {}
+    bases: { [num: number]: Base } = {}
     /** 按id区分的基地 */
-    readonly basesDict: { [id: string]: Base } = {}
+    basesDict: { [id: string]: Base } = {}
+    /** 剩余的音符数组 */
+    notesArr: BaseNote<NoteType>[] = []
     /** 游戏实例 */
     readonly game: Mutate
     /** 判定模块 */
     readonly judger: Judger = new Judger(this)
-    /** 剩余的音符数组 */
-    readonly notesArr: BaseNote<NoteType>[] = []
 
     /** 已注册的动画类型 */
     private readonly animate: AnimateDeclare = {
@@ -260,6 +260,19 @@ export class Chart {
         this.onExtracted(this);
         this.game.length = this.notesArr.filter(v => has(v.noteTime)).length;
         this.judger.judgeMissAndDrag();
+    }
+
+    /**
+     * 重新开始
+     */
+    async restart(): Promise<void> {
+        Object.values(this.notes).forEach(v => v.ticker.destroy());
+        Object.values(this.bases).forEach(v => v.ticker.destroy());
+        this.notes = {};
+        this.bases = {};
+        this.notesArr = [];
+        this.basesDict = {};
+        await this.extract(this.game.mtt);
     }
 
     /**
