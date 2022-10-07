@@ -12,7 +12,7 @@ import * as audio from './audio';
 import * as judge from './judge';
 import * as utils from './utils';
 
-export {
+export default {
     camera,
     extract,
     note,
