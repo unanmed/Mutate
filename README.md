@@ -27,7 +27,7 @@ script标签引入，使用本地文件
 使用cdn
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/unanmed/Mutate/dist/mutate.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mutate-game/dist/mutate.iife.js"></script>
 ```
 
 ## 插入到你的项目中
