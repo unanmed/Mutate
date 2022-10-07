@@ -2,6 +2,8 @@
 
 `Mutate`是融合了`music`和`rotate`形成的单词，意为融合了音乐和旋转
 
+这里展现了一些最基础的用法，详细用法请查看[详细使用文档](https://github.com/unanmed/Mutate/blob/master/docs/index.md)
+
 ## 安装
 
 使用npm:
@@ -14,6 +16,18 @@ npm i mutate
 
 ```cmd
 pnpm add mutate
+```
+
+script标签引入，使用本地文件
+
+```html
+<script src="your mutate.js path"></script>
+```
+
+使用cdn
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/unanmed/Mutate/dist/mutate.iife.js"></script>
 ```
 
 ## 插入到你的项目中

@@ -48,7 +48,7 @@ export class Mutate {
     mtt!: MutateChart
     /** 游戏状态 */
     status: MutateStatus = 'pre'
-    /** 音乐时间，秒数 */
+    /** 音乐时间，毫秒数 */
     time: number = 0
     /** 谱面物量 */
     length: number = 0
@@ -78,7 +78,7 @@ export class Mutate {
     /** 音符放缩比例 */
     readonly noteScale: number = 1
     /** 音符的长度 */
-    readonly noteWidth: number = this.isMobile ? 300 : 150
+    readonly noteWidth: number = this.isMobile ? 200 : 150
     /** 音符的绘制比例 */
     readonly drawScale: number
     /** 音符的宽度 */
@@ -94,7 +94,7 @@ export class Mutate {
     /** 音符上宽的一半 */
     readonly halfTopWidth: number
     /** 默认的音符描边样式 */
-    readonly defaultStroke: CanvasGradient
+    readonly multiStroke: CanvasGradient
     /** 完美判定区间 */
     readonly perfect: number = 50
     /** 好的判定区间 */
@@ -137,10 +137,10 @@ export class Mutate {
         this.halfHeight = this.drawHeight / 2;
         this.topWidth = this.drawWidth - this.halfHeight * 2;
         this.halfTopWidth = this.topWidth / 2;
-        this.defaultStroke = this.ctx.createLinearGradient(0, -this.halfHeight, 0, this.halfHeight);
-        this.defaultStroke.addColorStop(0, '#fff');
-        this.defaultStroke.addColorStop(0.5, '#fef267');
-        this.defaultStroke.addColorStop(1, '#fff');
+        this.multiStroke = this.ctx.createLinearGradient(0, -this.halfHeight, 0, this.halfHeight);
+        this.multiStroke.addColorStop(0, '#fff');
+        this.multiStroke.addColorStop(0.5, '#fef267');
+        this.multiStroke.addColorStop(1, '#fff');
         // 监听触摸事件
         target.addEventListener('touchstart', this.chart.judger.touchstart);
         target.addEventListener('touchend', this.chart.judger.touchend);
@@ -181,7 +181,7 @@ export class Mutate {
      * 开始游戏
      */
     start(): void {
-        if (this.status !== 'pre') throw new TypeError(`The game has already started.`);
+        if (this.status !== 'pre') throw new TypeError(`The game has already started or ended.`);
         this.status = 'playing';
         this.ac.play();
         this.renderer.start();
@@ -227,6 +227,7 @@ export class Mutate {
         this.ticker.destroy();
         this.ac.pause();
         this.ended = true;
+        this.status = 'exit';
         this.chart.camera.ticker.destroy();
         const bases = this.chart.bases;
         Object.values(bases).forEach(v => v.ticker.destroy());

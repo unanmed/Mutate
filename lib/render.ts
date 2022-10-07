@@ -92,6 +92,7 @@ export class Renderer {
             if (note.noteType === 'drag') this.renderer.drag.call(this, note as BaseNote<'drag'>);
         }
 
+        // 过滤掉已经完成的特效
         if (this.effectEnd === true) {
             this.effects = this.effects.filter(v => v.end === false);
         }
@@ -117,6 +118,13 @@ export class Renderer {
      */
     setNote<T extends NoteType>(type: T, fn: (e: BaseNote<T>) => void): void {
         (this.renderer[type] as (e: BaseNote<T>) => void) = fn;
+    }
+
+    /**
+     * 设置打击特效
+     */
+    setEffect(type: 'perfect' | 'good' | 'miss', fn: (e: ToDrawEffect) => void): void {
+        this.effect[type] = fn;
     }
 
     /**
@@ -164,18 +172,19 @@ export class Renderer {
 
         const [x, y, d] = note.calPosition();
         if (isNaN(x)) return;
-        if (!this.inGame(x, y)) return;
+        if (!this.inGame(x, y, this.game.drawWidth / 2)) return;
 
         const rad = note.rad + note.angle * Math.PI / 180;
         const ctx = this.game.ctx;
         const hw = this.game.halfWidth;
         const htw = this.game.halfTopWidth;
         const hh = this.game.halfHeight;
-        const style = this.game.defaultStroke;
+        const style = this.game.multiStroke;
 
         ctx.save();
         ctx.translate(x * this.game.drawScale, y * this.game.drawScale);
         ctx.rotate(rad + Math.PI / 2);
+        ctx.filter = note.ctxFilter;
         // 绘制
         ctx.strokeStyle = '#fff';
         ctx.fillStyle = fillColor;
@@ -233,15 +242,24 @@ export class Renderer {
         ctx.arc(0, 0, radius * 0.6, -Math.PI / 8, +Math.PI / 8);
         ctx.stroke();
         ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.lineWidth = 2 * scale;
+        ctx.globalAlpha = 0.6;
+        ctx.stroke();
+        ctx.closePath();
         ctx.restore();
     }
 
     /**
      * 播放perfect和good的打击特效
      */
-    private playEffect(note: ToDrawEffect, color: string) {
+    private playEffect(note: ToDrawEffect, color: string): void {
         const time = this.game.time - note.start;
-        if (time > 500) return this.effectEnd = true;
+        if (time > 500) {
+            note.end = true;
+            return;
+        }
         const [x, y] = note.note.calPosition();
         const r = time / 4;
         const ctx = this.game.ctx;

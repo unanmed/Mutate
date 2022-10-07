@@ -74,7 +74,7 @@ export class Base extends AnimationBase {
      */
     setRadius(r: number): Base {
         this.mode(linear())
-            .time(20)
+            .time(1)
             .apply('radius', r);
         return this;
     }
@@ -84,7 +84,7 @@ export class Base extends AnimationBase {
      */
     rgba(r?: number, g?: number, b?: number, a?: number): Base {
         this.mode(linear())
-            .time(20);
+            .time(1);
 
         has(r) && this.apply('r', r);
         has(g) && this.apply('g', g);

@@ -136,7 +136,7 @@ export class Judger {
             const all = this.toJudge;
             if (all.length === 0) this.next();
             this.toJudge = this.toJudge.filter(v => {
-                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have property noteTime.`);
+                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
                 if (!this.auto) {
                     if (v.noteType === 'drag') {
                         if (this.chart.game.time > v.noteTime) {
@@ -192,7 +192,11 @@ export class Judger {
     private next(): void {
         const all = this.chart.notesArr;
         const start = all.find(v => has(v.noteTime));
-        let i = all.findIndex(v => has(v.noteTime) && v.noteTime > (start?.noteTime as number));
+        let i = all.findIndex(v => {
+            return has(v.noteTime) && (v.noteTime > (start?.noteTime as number) ||
+                // 如果有间距极短的drag（一般是超过1s 60个的），就需要单独判定打击时间了
+                (v.noteType === 'drag' && v.noteTime < this.chart.game.time));
+        });
 
         if (i === -1) i = all.length + 1;
         const to = all.splice(0, i);

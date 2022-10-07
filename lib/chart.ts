@@ -95,7 +95,6 @@ export type NoteChart = {
     speed: {
         [time: number]: number
     }
-    animate: MTTAnimate
     filter: {
         [time: number]: string
     }
@@ -105,6 +104,7 @@ export type NoteChart = {
     opacity: {
         [time: number]: number
     }
+    animate: MTTAnimate
 }
 
 export type ChartOption = {

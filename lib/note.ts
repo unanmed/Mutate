@@ -171,6 +171,26 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     }
 
     /**
+     * 添加打击特效
+     */
+    pushEffect(data: ToDrawEffect): void {
+        const handler = {
+            set: (target: ToDrawEffect, key: keyof ToDrawEffect, v: any) => {
+                // @ts-ignore
+                target[key] = v;
+                if (key === 'end') {
+                    this.base.game.renderer.effectEnd = true;
+                }
+                return true;
+            }
+        }
+
+        const proxy = new Proxy(data, handler);
+
+        this.base.game.renderer.effects.push(proxy);
+    }
+
+    /**
      * 按住这个长按
      */
     hold(): void {
@@ -193,7 +213,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      */
     opacity(num: number): BaseNote<T> {
         this.mode(linear())
-            .time(20)
+            .time(1)
             .apply('opacity', num);
         return this;
     }

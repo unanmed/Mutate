@@ -8,5 +8,3 @@ if (!AudioContext) {
 }
 
 createApp(App).mount('#app')
-// @ts-ignore
-window.mutate = mutate;
