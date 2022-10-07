@@ -9,13 +9,13 @@
 使用npm:
 
 ```cmd
-npm i mutate
+npm i mutate-game
 ```
 
 使用pnpm:
 
 ```cmd
-pnpm add mutate
+pnpm add mutate-game
 ```
 
 script标签引入，使用本地文件
