@@ -180,8 +180,9 @@ export class Mutate {
     /**
      * 开始游戏
      */
-    start(): void {
+    async start(time: number = 1000): Promise<void> {
         if (this.status !== 'pre') throw new TypeError(`The game has already started or ended.`);
+        await sleep(time);
         this.status = 'playing';
         this.ac.play();
         this.renderer.start();

@@ -60,6 +60,7 @@ export class Judger {
      * 判定音符
      */
     judge(key?: number): void {
+        if (this.auto) return;
         const note = this.toJudge.slice(0, 1)[0] as BaseNote<NoteType>;
         if (!has(note)) return;
         if (this.toJudge.length === 0) this.next();
@@ -107,6 +108,7 @@ export class Judger {
     judgeHold(first: boolean): void
     judgeHold(first: boolean, note: BaseNote<'hold'>, key: number): void
     judgeHold(first: boolean, note?: BaseNote<'hold'>, key?: number): void {
+        if (this.auto) return;
         // 第一次按下
         if (first) {
             if (has(note)) {

@@ -17,8 +17,8 @@ async function start() {
     const canvas = document.getElementById('game') as HTMLCanvasElement;
     const mutate = create(canvas);
     game = mutate;
-    await mutate.load('/music/rr.mp3', '/chart/rr.mtt');
-    await mutate.setSound('tap', '/se/tap.wav');
+    await mutate.load('/src/test/music/rr.mp3', '/src/test/chart/rr.mtt');
+    await mutate.setSound('tap', '/src/test/se/tap.wav');
     mutate.start();
     mutate.chart.judger.auto = true;
     mutate.ticker.add(() => {
