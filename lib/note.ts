@@ -127,16 +127,30 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 判定该note为完美
      */
     perfect(): void {
-        this.playSound();
-        this.res = 'perfect';
-        this.played = true;
-        this.destroy();
-        this.base.game.renderer.effects.push({
-            note: this,
-            start: this.base.game.time,
-            res: 'perfect',
-            end: false
-        });
+        const p = () => {
+            this.playSound();
+            this.res = 'perfect';
+            this.played = true;
+            this.destroy();
+            this.base.game.renderer.effects.push({
+                note: this,
+                start: this.base.game.time,
+                res: 'perfect',
+                end: false
+            });
+        }
+
+        // 如果是drag的话需要单独判定，要等到drag到了判定点再判定
+        const fn = () => {
+            if (this.base.game.time >= (this.noteTime as number)) {
+                p();
+                this.ticker.remove(fn);
+            }
+        }
+
+        if (this.noteType === 'drag') {
+            this.ticker.add(fn);
+        } else p();
     }
 
     /**

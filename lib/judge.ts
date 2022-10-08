@@ -70,6 +70,8 @@ export class Judger {
             return this.judgeHold(true, note as BaseNote<'hold'>, key ?? -10);
         }
 
+        if (note.noteType === 'drag') return;
+
         const time = this.chart.game.time;
         const noteTime = note.noteTime;
         if (!has(noteTime)) return;
@@ -141,11 +143,9 @@ export class Judger {
                 if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
                 if (!this.auto) {
                     if (v.noteType === 'drag') {
-                        if (this.chart.game.time > v.noteTime) {
+                        if (this.chart.game.time > v.noteTime - v.perfectTime) {
                             if (this.holdingKeys.length > 0 || this.touching > 0) {
                                 v.perfect();
-                                this.perfect++;
-                                this.combo++;
                                 return false;
                             }
                         }
