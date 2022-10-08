@@ -237,6 +237,14 @@ export class Mutate {
     }
 
     /**
+     * 设置谱面偏差，正，谱面将会提前，负，谱面将会延后
+     */
+    setOffset(time: number): void {
+        if (this.status !== 'pre') throw new TypeError(`Offset can only be set before the game starts.`);
+        this.ac.offset = time;
+    }
+
+    /**
      * 获取分数
      */
     getScore(): number {

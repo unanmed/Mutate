@@ -20,9 +20,14 @@ async function start() {
     const span = document.getElementById('length') as HTMLSpanElement;
     const canvas = document.getElementById('game') as HTMLCanvasElement;
     const mutate = create(canvas, config);
+    mutate.setOffset(-70);
     game = mutate;
-    await mutate.load('/src/test/music/one forgotten night.mp3', '/src/test/chart/ofn.mtt');
-    await mutate.setSound('tap', '/src/test/se/tap.wav');
+    const tasks = [
+        mutate.load('/src/test/music/one forgotten night.mp3', '/src/test/chart/ofn.mtt'),
+        mutate.setSound('tap', '/src/test/se/tap.wav'),
+        mutate.setSound('drag', '/src/test/se/drag.wav')
+    ]
+    await Promise.all(tasks);
     mutate.start(0);
     mutate.chart.judger.auto = true;
     mutate.ticker.add(() => {

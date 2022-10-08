@@ -1,5 +1,4 @@
 import { Base } from "./base";
-import { Chart } from "./chart";
 import { Mutate } from "./core";
 import { BaseNote, NoteType, PlayedEffect } from "./note";
 import { has } from "./utils";
@@ -56,7 +55,7 @@ export class Renderer {
      */
     start(): void {
         const fn = () => {
-            if (this.game.status !== 'playing') return;
+            if (this.game.status !== 'playing' || this.game.time <= 0) return;
             this.render();
         }
 

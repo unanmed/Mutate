@@ -276,7 +276,7 @@ game.chart.camera.css(`
 4. `note.opacity(a: number)`，用1帧的时间将不透明度设置为目标值。如果想要动画，就用`note.apply()`，毕竟音符也是`AnimationBase`的继承
 5. `note.shadow(x: number, y: number, blur: number, color: string)`设置音符的阴影。注意在系统默认的渲染函数下是无效的
 6. `note.calDistance(): number`获得note距离基地的距离，当然不计算由于动画产生的距离
-7. `note.calPosition(): [number, number]`获得note的绝对位置，不计算动画产生的位移，当然摄像机旋转之后就不一定相对左上角了
+7. `note.calPosition(): [number, number, number]`获得note的绝对位置，不计算动画产生的位移，当然摄像机旋转之后就不一定相对左上角了，第三项是距离，当距离小于0时三者都是`NaN`，当音符没有打击时间时，距离为`NaN`
 
 note也有不少常用属性
 

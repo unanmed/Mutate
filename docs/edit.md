@@ -4,9 +4,9 @@
 
 ```ts
 // 谱面文件的动画类型
-type MTTAnimate = Array<{ // 这个索引是开始时间
+type MTTAnimate = Array<{
     custom: boolean // 是否是自定义
-    start: number // 开始时间，应当与索引的时间相等
+    start: number // 开始时间
     type: string // 动画的名称，如果不是自定义，就是'move' 'rotate' 'resize' 'moveAs' 'shake'的其中一个，如果是，一般就是属性名
     time: number // 执行时长
     n: number // 目标值，在不是'move' 'moveAs'的前提下
@@ -31,7 +31,7 @@ type MTT = {
         background?: string // 背景色
     }
     bases: Array<{ // 所有的基地
-        id: string // 基地的id，应当与索引名相同
+        id: string // 基地的id
         x: number // 初始横坐标
         y: number // 初始纵坐标
         angle: number // 初始旋转角度

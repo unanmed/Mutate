@@ -13,13 +13,15 @@ export class AudioExtractor {
     seVolume: number = 0.5
     /** 音乐的音量 */
     musicVolume: number = 1
+    /** 谱面误差 */
+    offset: number = -100
 
     set volume(v: number) {
         this.mainGain.gain.value = v;
     }
 
     get volume(): number {
-        return this.mainGain.gain.value
+        return this.mainGain.gain.value;
     }
 
     /** 游戏实例 */
@@ -129,7 +131,7 @@ export class AudioExtractor {
             if (this.status === 'pre') {
                 this.startTime = time;
             }
-            this.game.time = (time - this.startTime) * 1000;
+            this.game.time = (time - this.startTime) * 1000 + this.offset;
         }
         this.game.ticker.add(fn, true);
     }

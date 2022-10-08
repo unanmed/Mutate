@@ -87,14 +87,14 @@ export class Judger {
             this.combo++;
         } else if (judge(note.goodTime)) {
             this.toJudge.shift();
-            const t = time > note.goodTime ? 'late' : 'early'
+            const t = time > note.goodTime ? 'late' : 'early';
             note.good(t);
             this[t]++;
             this.good++;
             this.combo++;
         } else if (time > noteTime - note.missTime) {
             this.toJudge.shift();
-            const t = time > note.goodTime ? 'late' : 'early'
+            const t = time > note.goodTime ? 'late' : 'early';
             note.miss(t);
             this[t]++;
             this.combo = 0;
