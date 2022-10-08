@@ -16,6 +16,8 @@ type CameraSaveInfo = {
 export class Camera extends AnimationBase {
     /** 存档栈 */
     saveStack: CameraSaveInfo[] = []
+    /** 第0毫秒的动画是否执行完毕 */
+    inited: boolean = false
 
     /** 摄像机作用的目标画布 */
     readonly target: CanvasRenderingContext2D

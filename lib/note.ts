@@ -73,6 +73,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     px: number = 0
     /** 绝对纵坐标 */
     py: number = 0
+    /** 第0毫秒的动画是否执行完毕 */
+    inited: boolean = false
 
     /** 音符的专属id */
     readonly num: number = BaseNote.cnt++

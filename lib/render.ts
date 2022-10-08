@@ -131,13 +131,14 @@ export class Renderer {
      */
     inGame(x: number, y: number, r: number = 10): boolean {
         const camera = this.game.chart.camera;
-        const left = camera.x,
-            top = camera.y;
+        const size = camera.size;
+        const left = camera.x / size,
+            top = camera.y / size;
 
         return x >= -r - 50 + left &&
-            x <= 1920 + r + 50 + left &&
+            x <= 1920 / size + r + 50 + left &&
             y >= -r - 50 + top &&
-            y <= 1080 + r + 50 + top;
+            y <= 1080 / size + r + 50 + top;
     }
 
     /**
@@ -168,6 +169,7 @@ export class Renderer {
     private renderNonHold(note: BaseNote<Exclude<NoteType, 'hold'>>, fillColor: string) {
         if (has(note.noteTime) && this.game.time > note.noteTime + note.missTime) return;
         if (note.played) return;
+        if (!note.inited) return;
 
         const [x, y, d] = note.calPosition();
         if (isNaN(x)) return;
@@ -216,6 +218,7 @@ export class Renderer {
      */
     private renderBases(base: Base): void {
         if (!this.inGame(base.x, base.y)) return;
+        if (!base.inited) return;
         const rad = base.calRad() + base.angle * Math.PI / 180;
 
         const ctx = this.game.ctx;

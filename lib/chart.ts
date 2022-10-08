@@ -222,6 +222,16 @@ export class Chart {
                 this.executeAnimate('base', data.animate, base.num);
             }
 
+            notes.sort((a, b) => {
+                const aa = has(a.config) && has(a.config.playTime);
+                const bb = has(b.config) && has(b.config.playTime);
+                // @ts-ignore
+                if (aa && bb) return a.config?.playTime - b.config?.playTime;
+                if (aa && !bb) return -1;
+                if (!aa && bb) return 1;
+                return 0;
+            })
+
             // 音符
             for (const n of notes) {
                 const base = this.basesDict[n.base];
@@ -389,6 +399,7 @@ export class Chart {
                 const time = sorted[last + 1];
                 if (!has(time)) return this.game.ticker.remove(fn);
                 if (this.game.time < time) return;
+                if (time === 0) requestAnimationFrame(() => target.inited = true);
                 last++;
                 // @ts-ignore
                 exe(data[key][time], target);

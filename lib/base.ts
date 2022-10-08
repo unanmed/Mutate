@@ -19,6 +19,8 @@ export class Base extends AnimationBase {
     lastAngle: number = 0
     /** 当前旋转弧度，不计算动画旋转的角度 */
     rad: number = 0;
+    /** 第0毫秒的动画是否执行完毕 */
+    inited: boolean = false
 
     /** 游戏实例 */
     readonly game: Mutate

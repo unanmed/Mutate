@@ -38,35 +38,13 @@
                             "out"
                         ]
                     }
-                }
-            ]
-        },
-        {
-            "id": "base2",
-            "x": 1920,
-            "y": 540,
-            "angle": 90,
-            "r": {
-                "0": 50
-            },
-            "bpm": {
-                "0": 0
-            },
-            "rgba": {
-                "0": [
-                    251,
-                    215,
-                    80,
-                    0
-                ]
-            },
-            "animate": [
+                },
                 {
                     "custom": true,
                     "start": 23580,
                     "type": "a",
-                    "time": 300,
-                    "n": 1,
+                    "time": 6000,
+                    "n": 0,
                     "relation": "absolute",
                     "mode": {
                         "fnType": "generator",
@@ -81,11 +59,73 @@
                     "custom": false,
                     "start": 23580,
                     "type": "move",
-                    "time": 20000,
+                    "time": 6000,
                     "n": 0,
-                    "x": -400,
+                    "x": -600,
                     "y": 0,
                     "relation": "relative",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ]
+        },
+        {
+            "id": "base2",
+            "x": 1920,
+            "y": 540,
+            "angle": 150,
+            "r": {
+                "0": 50
+            },
+            "bpm": {
+                "0": 0,
+                "23580": 1,
+                "24580": 2,
+                "25580": 4,
+                "26580": 8,
+                "27080": 16,
+                "27280": 24,
+                "27480": 32,
+                "27680": 40,
+                "27880": 43.25
+            },
+            "rgba": {
+                "0": [
+                    251,
+                    215,
+                    80,
+                    0
+                ]
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 22580,
+                    "type": "a",
+                    "time": 1300,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "power",
+                        "args": [
+                            2,
+                            "in"
+                        ]
+                    }
+                },
+                {
+                    "custom": false,
+                    "start": 23580,
+                    "type": "move",
+                    "time": 20000,
+                    "n": 0,
+                    "x": 960,
+                    "y": 540,
+                    "relation": "absolute",
                     "mode": {
                         "fnType": "generator",
                         "fn": "hyper",
@@ -93,6 +133,19 @@
                             "sin",
                             "out"
                         ]
+                    }
+                },
+                {
+                    "custom": true,
+                    "start": 23580,
+                    "type": "radius",
+                    "time": 20000,
+                    "n": 100,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
                     }
                 }
             ]
@@ -2433,6 +2486,657 @@
                             "sin",
                             "out"
                         ]
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 23580
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 23750
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 23930
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24100
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24270
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24450
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24620
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24790
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24880
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 24970
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 25140
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 25310
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 25490
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 25660
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 25830
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "tap",
+            "config": {
+                "playTime": 26010
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "drag",
+            "config": {
+                "playTime": 26182
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "drag",
+            "config": {
+                "playTime": 26224
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "drag",
+            "config": {
+                "playTime": 26266
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "drag",
+            "config": {
+                "playTime": 26308
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base2",
+            "type": "drag",
+            "config": {
+                "playTime": 26350
+            },
+            "speed": {
+                "0": 0,
+                "21580": 600
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 21080,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "linear",
+                        "args": []
                     }
                 }
             ],

@@ -20,7 +20,7 @@ async function start() {
     const span = document.getElementById('length') as HTMLSpanElement;
     const canvas = document.getElementById('game') as HTMLCanvasElement;
     const mutate = create(canvas, config);
-    mutate.setOffset(-70);
+    mutate.setOffset(-90);
     game = mutate;
     const tasks = [
         mutate.load('/src/test/music/one forgotten night.mp3', '/src/test/chart/ofn.mtt'),
