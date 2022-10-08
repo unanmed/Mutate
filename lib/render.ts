@@ -180,9 +180,10 @@ export class Renderer {
         const htw = this.game.halfTopWidth;
         const hh = this.game.halfHeight;
         const style = this.game.multiStroke;
+        const alpha = note.custom.opacity;
 
         ctx.save();
-        ctx.translate(x * this.game.drawScale, y * this.game.drawScale);
+        ctx.translate(x * this.game.scale, y * this.game.scale);
         ctx.rotate(rad + Math.PI / 2);
         ctx.filter = note.ctxFilter;
         // 绘制
@@ -193,8 +194,9 @@ export class Renderer {
             ctx.shadowColor = 'gold';
             ctx.strokeStyle = style;
         }
+        ctx.globalAlpha = alpha;
         if (d < note.base.custom.radius) {
-            ctx.globalAlpha = d / note.base.custom.radius;
+            ctx.globalAlpha = d / note.base.custom.radius * alpha;
         }
         ctx.beginPath();
         ctx.moveTo(-hw, 0);
@@ -219,7 +221,7 @@ export class Renderer {
 
         const ctx = this.game.ctx;
         // 基地比较好画
-        const scale = this.game.drawScale;
+        const scale = this.game.scale;
         const x = base.x * scale,
             y = base.y * scale;
         const radius = base.custom.radius * scale;
@@ -263,14 +265,14 @@ export class Renderer {
         const [x, y] = note.note.calPosition();
         const r = time / 4;
         const ctx = this.game.ctx;
-        const scale = this.game.drawScale;
+        const scale = this.game.scale;
         ctx.save();
         ctx.strokeStyle = color;
         ctx.shadowBlur = 5;
         ctx.shadowColor = color;
         ctx.globalAlpha = 2 - time / 250;
         ctx.beginPath();
-        ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2);
+        ctx.arc(x * scale, y * scale, r * this.game.drawScale * 0.8, 0, Math.PI * 2);
         ctx.closePath();
         ctx.lineWidth = 5;
         ctx.stroke();

@@ -2,9 +2,240 @@
     "option": {
         "background": "#555"
     },
-    "bases": {
-        "base1": {}
-    },
-    "notes": [],
-    "camera": {}
+    "bases": [
+        {
+            "id": "base1",
+            "x": 960,
+            "y": 540,
+            "angle": 0,
+            "r": {
+                "0": 75
+            },
+            "bpm": {
+                "0": 86.5
+            },
+            "rgba": {
+                "0": [
+                    251,
+                    215,
+                    80,
+                    0
+                ]
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 500,
+                    "type": "a",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "notes": [
+        {
+            "base": "base1",
+            "type": "tap",
+            "config": {
+                "playTime": 1380
+            },
+            "speed": {
+                "0": 400
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 300,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base1",
+            "type": "tap",
+            "config": {
+                "playTime": 1560
+            },
+            "speed": {
+                "0": 400
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 300,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base1",
+            "type": "tap",
+            "config": {
+                "playTime": 1730
+            },
+            "speed": {
+                "0": 400
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 300,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        },
+        {
+            "base": "base1",
+            "type": "tap",
+            "config": {
+                "playTime": 1900
+            },
+            "speed": {
+                "0": 400
+            },
+            "animate": [
+                {
+                    "custom": true,
+                    "start": 300,
+                    "type": "opacity",
+                    "time": 500,
+                    "n": 1,
+                    "relation": "absolute",
+                    "mode": {
+                        "fnType": "generator",
+                        "fn": "hyper",
+                        "args": [
+                            "sin",
+                            "out"
+                        ]
+                    }
+                }
+            ],
+            "filter": {},
+            "shadow": {},
+            "opacity": {
+                "0": 0
+            }
+        }
+    ],
+    "camera": {
+        "id": "main",
+        "animate": [
+            {
+                "custom": false,
+                "start": 0,
+                "type": "resize",
+                "time": 1,
+                "n": 1.3,
+                "relation": "absolute",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "linear",
+                    "args": []
+                }
+            },
+            {
+                "custom": false,
+                "start": 1,
+                "type": "rotate",
+                "time": 20000,
+                "n": 35,
+                "relation": "absolute",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "linear",
+                    "args": []
+                }
+            },
+            {
+                "custom": false,
+                "start": 2,
+                "type": "move",
+                "time": 18000,
+                "n": 0,
+                "x": 200,
+                "y": 0,
+                "relation": "relative",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "linear",
+                    "args": []
+                }
+            },
+            {
+                "custom": false,
+                "start": 300,
+                "type": "resize",
+                "time": 18000,
+                "n": 0.7,
+                "relation": "absolute",
+                "mode": {
+                    "fnType": "generator",
+                    "fn": "linear",
+                    "args": []
+                }
+            }
+        ],
+        "css": {
+            "0": "filter: saturate(200%)sepia(70%);"
+        }
+    }
 }

@@ -12,14 +12,18 @@ import { create, Mutate } from '../../lib/core';
 
 let game: Mutate
 
+const config = {
+    noteScale: 0.7
+}
+
 async function start() {
     const span = document.getElementById('length') as HTMLSpanElement;
     const canvas = document.getElementById('game') as HTMLCanvasElement;
-    const mutate = create(canvas);
+    const mutate = create(canvas, config);
     game = mutate;
-    await mutate.load('/src/test/music/rr.mp3', '/src/test/chart/rr.mtt');
+    await mutate.load('/src/test/music/one forgotten night.mp3', '/src/test/chart/ofn.mtt');
     await mutate.setSound('tap', '/src/test/se/tap.wav');
-    mutate.start();
+    mutate.start(0);
     mutate.chart.judger.auto = true;
     mutate.ticker.add(() => {
         span.innerHTML = `打击数：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}

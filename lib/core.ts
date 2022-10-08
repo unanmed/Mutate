@@ -34,11 +34,11 @@ export type MutateDetail = {
 }
 
 export interface MutateOption {
-    noteScale: number
-    noteWidth: number
-    perfect: number
-    good: number
-    miss: number
+    noteScale?: number
+    noteWidth?: number
+    perfect?: number
+    good?: number
+    miss?: number
 }
 
 export class Mutate {

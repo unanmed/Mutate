@@ -4,52 +4,48 @@
 
 ```ts
 // 谱面文件的动画类型
-type MTTAnimate = {
-    [time: number]: { // 这个索引是开始时间
-        custom: boolean // 是否是自定义
-        start: number // 开始时间，应当与索引的时间相等
-        type: string // 动画的名称，如果不是自定义，就是'move' 'rotate' 'resize' 'moveAs' 'shake'的其中一个，如果是，一般就是属性名
-        time: number // 执行时长
-        n: number // 目标值，在不是'move' 'moveAs'的前提下
-        mode: {
-            fnType: 'generator' | 'timing' | 'path' | 'pathG' // generator是timing生成函数，pathG是路径生成函数
-            fn: string // timing或generator函数名称
-            args: any[] // timing函数参数列表
-            pathFn?: string // path或pathG函数名称
-            pathArg?: any[] // 参数列表
-            // 以上内容应当在游戏中注册，注册方法在chart一栏有说明，之后也会详细说明其运作机理
-        }
-        relation: 'absolute' | 'relative' // 相对模式
-        first?: boolean // 是否将动画插入到当前对象的所有动画的开头
-        shake?: boolean // 是否是震动变化
-        x?: number // 移动时的横坐标
-        y?: number // 移动时的纵坐标
+type MTTAnimate = Array<{ // 这个索引是开始时间
+    custom: boolean // 是否是自定义
+    start: number // 开始时间，应当与索引的时间相等
+    type: string // 动画的名称，如果不是自定义，就是'move' 'rotate' 'resize' 'moveAs' 'shake'的其中一个，如果是，一般就是属性名
+    time: number // 执行时长
+    n: number // 目标值，在不是'move' 'moveAs'的前提下
+    mode: {
+        fnType: 'generator' | 'timing' | 'path' | 'pathG' // generator是timing生成函数，pathG是路径生成函数
+        fn: string // timing或generator函数名称
+        args: any[] // timing函数参数列表
+        pathFn?: string // path或pathG函数名称
+        pathArg?: any[] // 参数列表
+        // 以上内容应当在游戏中注册，注册方法在chart一栏有说明，之后也会详细说明其运作机理
     }
-}
+    relation: 'absolute' | 'relative' // 相对模式
+    first?: boolean // 是否将动画插入到当前对象的所有动画的开头
+    shake?: boolean // 是否是震动变化
+    x?: number // 移动时的横坐标
+    y?: number // 移动时的纵坐标
+}>
 
 // 这个是谱面文件的类型
 type MTT = {
     option: { // 全局设置
         background?: string // 背景色
     }
-    bases: { // 所有的基地
-        [id: string]: { // 基地的id
-            id: string // 基地的id，应当与索引名相同
-            x: number // 初始横坐标
-            y: number // 初始纵坐标
-            angle: number // 初始旋转角度
-            r: { // 简易半径变化方式，索引表示变化时间，值表示变化到的目标值，动画时间1帧
-                [time: number]: number
-            } 
-            bpm: { // 简易旋转速度变化方式，同上
-                [time: number]: number
-            }
-            rgba: { // 同上
-                [time: number]: [number, number, number, number]
-            }
-            animate: MTTAnimate // 所有的动画
+    bases: Array<{ // 所有的基地
+        id: string // 基地的id，应当与索引名相同
+        x: number // 初始横坐标
+        y: number // 初始纵坐标
+        angle: number // 初始旋转角度
+        r: { // 简易半径变化方式，索引表示变化时间，值表示变化到的目标值，动画时间1帧
+            [time: number]: number
+        } 
+        bpm: { // 简易旋转速度变化方式，同上
+            [time: number]: number
         }
-    }
+        rgba: { // 同上
+            [time: number]: [number, number, number, number]
+        }
+        animate: MTTAnimate // 所有的动画
+    }>
     notes: Array<{
         base: string // 所属基地
         type: NoteType // note类型，tap drag hold
@@ -107,7 +103,7 @@ type MTT = {
 
 > `notes`配置项
 
-注意这是个数组，跟其他的三者不同。其中`filter`与`CanvasRenderingContext2d.filter`写法相同
+其中`filter`与`CanvasRenderingContext2d.filter`写法相同
 
 ## 摄像机
 

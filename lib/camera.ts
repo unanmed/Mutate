@@ -62,16 +62,16 @@ export class Camera extends AnimationBase {
      */
     effect(): void {
         const ctx = this.target;
-        const scale = this.game.drawScale;
+        const scale = this.game.scale;
         const dx = 960 * scale;
         const dy = 540 * scale;
         const x = this.x * scale;
         const y = this.y * scale;
         ctx.translate(dx, dy);
         ctx.rotate(this.angle * Math.PI / 180);
-        ctx.translate(-dx, -dy);
-        ctx.translate(x, y);
         ctx.scale(this.size, this.size);
+        ctx.translate(-dx, -dy);
+        ctx.translate(-x, -y);
 
         ctx.shadowBlur = 4;
         ctx.shadowColor = 'black'

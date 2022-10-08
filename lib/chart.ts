@@ -50,9 +50,7 @@ export type AnimateInfo<T extends string> = {
 /**
  * MTT文件的动画
  */
-export type MTTAnimate = {
-    [time: number]: AnimateInfo<string>
-}
+export type MTTAnimate = AnimateInfo<string>[]
 
 /**
  * 摄像机信息
@@ -116,7 +114,7 @@ export type ChartOption = {
  */
 export interface MutateChart {
     option: ChartOption
-    bases: { [id: string]: BaseChart }
+    bases: BaseChart[]
     notes: NoteChart[]
     camera: MutateCamera
 }
@@ -169,9 +167,6 @@ export type ExecuteDeclare = {
 export class Chart {
     /** 摄像机实例 */
     camera!: Camera
-    /** 解析结束后的回调函数 */
-    onExtracted: (chart: Chart) => void = () => { }
-
     /** 所有的音符 */
     notes: { [num: number]: BaseNote<NoteType> } = {}
     /** 所有的基地 */
@@ -213,8 +208,8 @@ export class Chart {
 
         await new Promise(res => {
             // 基地
-            for (const id in bases) {
-                const data = bases[id];
+            for (const data of bases) {
+                const id = data.id;
                 const base = new Base(id, this.game, data.x, data.y, Object.values(data.r)[0], data.angle);
                 this.bases[base.num] = base;
                 this.basesDict[id] = base;
@@ -257,7 +252,6 @@ export class Chart {
             res('extract success.');
         });
 
-        this.onExtracted(this);
         this.game.length = this.notesArr.filter(v => has(v.noteTime)).length;
         this.judger.judgeMissAndDrag();
     }
@@ -323,7 +317,7 @@ export class Chart {
             else return func.apply(this, res) as TimingFn | PathFn;
         }
         const fn = extract(data.mode.fn, data.mode.fnType, data.mode.args);
-        let path: PathFn | void
+        let path: PathFn | undefined
         if (data.type === 'moveAs')
             path = extract(data.mode.pathFn as string, 'path', data.mode.pathArg as any[]) as PathFn;
         else path = void 0;
@@ -348,8 +342,8 @@ export class Chart {
         else if (target === 'note') obj = this.notes[num as number];
         else obj = this.camera;
 
-        const data = this.sortMTT(ani)
-            .map(v => this.extractMTTAnimate(ani[v]));
+        const data = ani.sort((a, b) => a.start - b.start)
+            .map(v => this.extractMTTAnimate(v));
 
         let last = -1;
 
