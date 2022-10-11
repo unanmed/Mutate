@@ -210,12 +210,13 @@ export class Mutate {
      * 重新开始游戏
      */
     async restart(): Promise<void> {
-        this.ticker.destroy();
+        this.ticker.clear();
         this.ctx.restore();
         this.ctx.clearRect(0, 0, this.target.width, this.target.height);
         this.renderer.effects = [];
         this.status = 'pre';
         this.chart.judger.toJudge = [];
+        this.chart.camera.ticker.destroy();
         this.ac.restart();
         await this.chart.restart();
         this.start();
@@ -267,7 +268,7 @@ export class Mutate {
      */
     async setSound(type: NoteType, url: string): Promise<void> {
         const buffer = await this.post(url, 'arraybuffer');
-        this.ac.addSound(type, buffer.data);
+        await this.ac.addSound(type, buffer.data);
     }
 
     /**

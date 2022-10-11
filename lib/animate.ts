@@ -335,7 +335,7 @@ export class AnimationBase {
      * @param first 是否将动画添加到执行列表的开头
      */
     apply(key: string, n: number, first: boolean = false): AnimationBase {
-        if (this.animating[key] === true) this.error(`${key} is excuted twice.`);
+        if (this.animating[key] === true) this.error(`${key} is executed twice.`);
         if (!(key in this.custom)) this.error(`You are trying to execute nonexistent property ${key}.`);
 
         this.animating[key] = true;

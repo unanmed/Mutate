@@ -67,9 +67,7 @@ export class AudioExtractor {
         this.mainGain.connect(this.ac.destination);
         source.start();
         this.status = 'playing';
-        source.addEventListener('ended', e => {
-            this.status = 'exit';
-        });
+        this.startTime = this.ac.currentTime;
     }
 
     /**
@@ -117,9 +115,10 @@ export class AudioExtractor {
      * 重新播放音频
      */
     restart(): void {
-        this.status = 'pre';
         this.musicNode.stop();
         this.syncTime();
+        this.status = 'pre';
+        this.game.time = this.offset;
     }
 
     /**
@@ -127,11 +126,11 @@ export class AudioExtractor {
      */
     private syncTime(): void {
         const fn = () => {
-            const time = this.ac.currentTime;
             if (this.status === 'pre') {
-                this.startTime = time;
+                this.game.time = this.offset;
+            } else {
+                this.game.time = (this.ac.currentTime - this.startTime) * 1000 + this.offset;
             }
-            this.game.time = (time - this.startTime) * 1000 + this.offset;
         }
         this.game.ticker.add(fn, true);
     }

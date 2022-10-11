@@ -32,10 +32,18 @@ export class Ticker {
     }
 
     /**
-     * 摧毁这个ticker...的所有ticker函数
+     * 清空这个ticker的所有ticker函数
+     */
+    clear(): void {
+        this.funcs = [];
+    }
+
+    /**
+     * 摧毁这个ticker
      */
     destroy(): void {
-        this.funcs = [];
+        this.clear();
+        this.stop();
     }
 
     /**

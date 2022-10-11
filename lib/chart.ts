@@ -1,4 +1,4 @@
-import { AnimationBase } from "./animate";
+import { AnimationBase, sleep } from "./animate";
 import { Base } from "./base";
 import { Camera } from "./camera";
 import { Mutate } from "./core";
@@ -278,6 +278,7 @@ export class Chart {
         this.basesDict = {};
         BaseNote.cnt = 0;
         Base.cnt = 0;
+        await sleep(1000);
         await this.extract(this.game.mtt);
     }
 
