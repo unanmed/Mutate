@@ -308,7 +308,7 @@ note也有不少常用属性
 
 `Ticker`是一个类，它允许一个或多个函数每帧执行一次，在所有的`AnimationBase`和`Mutate`中都挂载了它。其中`AnimationBase`的`ticker`作用是执行动画，而`Mutate`则是一些核心判定函数等。
 
-当你想要向其中添加函数时，请使用`ticker.add(fn: (time: number) => void)`，其中`time`是自从`ticker`开始运行后（一般在new之后便会立刻开始运行）到目前经过的毫秒数。如果函数中出现了报错或`throw`，那么这个`ticker`将会立刻停止，这样可以让你更加方便地检查报错。移除函数请使用`ticker.remove(fn: (time: number) => void)`。除了这两个，还有一个方法允许你直接删除所有的函数，它是`ticker.destroy()`，不过这个函数并不会停止其运行，只会清空所有函数
+当你想要向其中添加函数时，请使用`ticker.add(fn: (time: number) => void)`，其中`time`是自从`ticker`开始运行后（一般在new之后便会立刻开始运行）到目前经过的毫秒数。如果函数中出现了报错或`throw`，那么这个`ticker`将会立刻停止，这样可以让你更加方便地检查报错。移除函数请使用`ticker.remove(fn: (time: number) => void)`。除了这两个，还有一个方法允许你直接删除所有的函数，它是`ticker.clear()`，以及一个删除所有函数并停止运行的函数，这会使这个`ticker`不能再使用，它是`ticker.destroy()`
 
 `ticker`中没有常用的属性
 
