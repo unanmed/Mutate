@@ -1,7 +1,7 @@
 import { comNum, TimingFn } from "./timing";
 import { add } from './timing';
 
-type Point = [x: number, y: number]
+export type Point = [x: number, y: number]
 
 /**
  * 路径函数，输入一个0-1的数，输出一个该时刻的位置

@@ -1,6 +1,6 @@
 {
   "name": "mutate-game",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "type": "module",
   "description": "A music game combine rotate and music",
   "license": "MIT",
@@ -8,17 +8,17 @@
   "repository": "https://github.com/unanmed/Mutate",
   "files": [
     "dist",
-    "lib"
+    "index.d.ts"
   ],
-  "main": "./dist/mutate.umd.cjs",
-  "module": "./dist/mutate.js",
+  "main": "./dist/mutate-game.umd.cjs",
+  "module": "./dist/mutate-game.js",
   "exports": {
     ".": {
-      "import": "./dist/mutate.js",
-      "require": "./dist/mutate.umd.js"
+      "import": "./dist/mutate-game.js",
+      "require": "./dist/mutate-game.umd.js"
     }
   },
-  "types": "./lib/index.ts",
+  "types": "./index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",

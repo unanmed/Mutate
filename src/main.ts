@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import * as mutate from '../lib/index'
 
 if (!AudioContext) {
     alert('浏览器版本过低，无法运行该游戏，请更新浏览器，建议使用chrome或edge浏览器');

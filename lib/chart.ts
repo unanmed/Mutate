@@ -156,8 +156,14 @@ export type ExtractedMTTAnimate<Path extends boolean, T extends string> = {
     path: Path extends true ? PathFn : void
 } & AnimateInfo<T>
 
+/**
+ * 预执行函数
+ */
 export type Executer<T extends keyof ChartDataMap> = (value: any, target: ChartMap[T]) => void
 
+/**
+ * 预执行函数列表
+ */
 export type ExecuteDeclare = {
     note: { [key: string]: Executer<'note'> }
     base: { [key: string]: Executer<'base'> }

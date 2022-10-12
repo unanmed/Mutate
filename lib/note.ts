@@ -258,6 +258,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
 
     /**
      * 计算音符与基地的距离
+     * @returns 音符距离基地中心的距离
      */
     calDistance(): number {
         if (!has(this.noteTime)) return 0;
