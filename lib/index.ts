@@ -12,7 +12,9 @@ import * as audio from './audio';
 import * as judge from './judge';
 import * as utils from './utils';
 
-export default {
+const create = core.create;
+
+export {
     camera,
     extract,
     note,
@@ -25,5 +27,6 @@ export default {
     core,
     audio,
     judge,
-    utils
+    utils,
+    create
 }

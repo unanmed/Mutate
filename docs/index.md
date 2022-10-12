@@ -44,10 +44,10 @@ script标签引入，使用本地文件
 
 ### 引入mutate
 
-`mutate`使用默认导出来导出所有内容，因此你可以很轻松地导入它
+你可以很轻松地导入它
 
 ```js
-import mutate from 'mutate';
+import * as mutate from 'mutate';
 ```
 
 ### 创建游戏

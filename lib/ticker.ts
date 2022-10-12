@@ -1,4 +1,4 @@
-export type TickerFn = (time?: number) => void
+export type TickerFn = (time: number) => void
 
 export class Ticker {
     /** 所有的ticker函数 */

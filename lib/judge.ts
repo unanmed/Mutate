@@ -58,6 +58,7 @@ export class Judger {
 
     /**
      * 判定音符
+     * @param key 记录长按按键的keycode
      */
     judge(key?: number): void {
         if (this.auto) return;
