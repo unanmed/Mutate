@@ -25,7 +25,7 @@ script标签引入，使用本地文件
 使用cdn
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/mutate-game/dist/mutate.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mutate-game/dist/mutate-game.iife.js"></script>
 ```
 
 使用后两种方法的时候，不再需要import引入，直接使用全局变量`Mutate`即可，例如`Mutate.core.create(canvas)`
@@ -47,7 +47,7 @@ script标签引入，使用本地文件
 你可以很轻松地导入它
 
 ```js
-import * as mutate from 'mutate';
+import * as mutate from 'mutate-game';
 ```
 
 ### 创建游戏

@@ -27,7 +27,7 @@ script标签引入，使用本地文件
 使用cdn
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/mutate-game/dist/mutate.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mutate-game/dist/mutate-game.iife.js"></script>
 ```
 
 ## 插入到你的项目中
@@ -37,7 +37,7 @@ script标签引入，使用本地文件
 然后，你可以使用以下代码来向你的项目中插入mutate游戏
 
 ```js
-import * as mutate from 'mutate';
+import * as mutate from 'mutate-game';
 
 // 这里要求画布的长宽比为16:9，如果不是的话会自动调整
 const canvas = document.getElementById('mutate');
@@ -78,4 +78,4 @@ pnpm dev
 pnpm build
 ```
 
-便可进行打包，打包后的入口为`dist/mutate.js`，该项可以在`vite.config.ts`中配置
+便可进行打包，打包后的入口为`dist/mutate-game.js`，该项可以在`vite.config.ts`中配置
