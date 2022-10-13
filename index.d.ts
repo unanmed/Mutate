@@ -143,6 +143,9 @@ declare module "mutate-game" {
         animate: MTTAnimate
     }
 
+    /**
+     * 谱面的全局设置
+     */
     export type ChartOption = {
         background?: string
     }
@@ -233,6 +236,10 @@ declare module "mutate-game" {
 
     /**
      * 打击特效
+     * start: 开始时间
+     * res: 打击的结果，完美 or 好 or 错过
+     * note: 音符实例
+     * end: 是否已经结束
      */
     export type ToDrawEffect = {
         start: number
@@ -321,7 +328,7 @@ declare module "mutate-game" {
      * ticker函数
      * @param time 从这个ticker被创建开始经过的时间，为毫秒数
      */
-    export type TickerFn = (time?: number) => void
+    export type TickerFn = (time: number) => void
 
     /**
      * 八种基本类型
@@ -758,8 +765,6 @@ declare module "mutate-game" {
         shakeTiming: TimingFn
         /** 根据路径移动时的路径函数 */
         path: PathFn
-        /** 所有的监听函数 */
-        private readonly listener: { [T in AnimateHook]: AnimateFn[] }
         /** 每帧执行函数 */
         ticker: Ticker
         /** 自定义的动画属性 */

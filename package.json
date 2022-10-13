@@ -1,6 +1,6 @@
 {
   "name": "mutate-game",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "description": "A music game combine rotate and music",
   "license": "MIT",
@@ -19,6 +19,11 @@
     }
   },
   "types": "./index.d.ts",
+  "keywords": [
+    "game",
+    "music-game",
+    "music"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
