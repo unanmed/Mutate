@@ -400,6 +400,19 @@ declare module "mutate-game" {
     export const baseMap: { [id: string]: Base }
 
     /**
+     * 计分时传递的参数
+     */
+    export interface ScoreParameters extends MutateDetail {
+        length: number
+        maxCombo: number
+    }
+
+    /**
+     * 分数计算函数
+     */
+    export type ScoreCalculator = (e: ScoreParameters) => number
+
+    /**
      * 游戏核心
      */
     class Mutate {
@@ -517,6 +530,11 @@ declare module "mutate-game" {
          * 设置音符的打击音效
          */
         setSound(type: NoteType, url: string): Promise<void>
+
+        /**
+         * 设置分数的计算函数
+         */
+        setScoreCalculator(fn: ScoreCalculator): void
     }
 
     /**

@@ -4,6 +4,8 @@
 
 这里展现了一些最基础的用法，详细用法请查看[详细使用文档](https://github.com/unanmed/Mutate/blob/master/docs/index.md)
 
+[English Documentation](https://github.com/unanmed/Mutate/blob/master/docs/index-en.md)
+
 ## 安装
 
 使用npm:

@@ -41,6 +41,13 @@ export interface MutateOption {
     miss?: number
 }
 
+export interface ScoreParameters extends MutateDetail {
+    length: number
+    maxCombo: number
+}
+
+export type ScoreCalculator = (e: ScoreParameters) => number
+
 export class Mutate {
     /** 音频信息 */
     audio!: AudioBuffer
@@ -54,6 +61,8 @@ export class Mutate {
     length: number = 0
     /** 是否已经结束游戏 */
     ended: boolean = false
+    /** 分数计算函数 */
+    scoreCalculator: ScoreCalculator = this.defaultScoreCalculator
 
     /** 是否是移动设备 */
     readonly isMobile: boolean = window.innerWidth < window.innerHeight
@@ -249,10 +258,12 @@ export class Mutate {
      * 获取分数
      */
     getScore(): number {
-        const per = 900000 / this.length;
-        const judger = this.chart.judger;
-        const combo = judger.maxCombo / this.length * 100000;
-        return Math.round(per * judger.perfect + per * 0.5 * judger.good + combo);
+        const e: ScoreParameters = {
+            ...this.getDetail(),
+            length: this.length,
+            maxCombo: this.chart.judger.maxCombo
+        }
+        return this.scoreCalculator(e);
     }
 
     /**
@@ -261,6 +272,13 @@ export class Mutate {
     getDetail(): MutateDetail {
         const { perfect, good, miss, early, late } = this.chart.judger;
         return { perfect, good, miss, early, late };
+    }
+
+    /**
+     * 设置分数的计算函数
+     */
+    setScoreCalculator(fn: ScoreCalculator): void {
+        this.scoreCalculator = fn;
     }
 
     /**
@@ -312,6 +330,16 @@ export class Mutate {
      */
     private fail(text: string, status: number): void {
         console.error(`${status}: ${text}`);
+    }
+
+    /**
+     * 默认的分数计算函数
+     */
+    private defaultScoreCalculator(e: ScoreParameters): number {
+        const per = 900000 / this.length;
+        const judger = this.chart.judger;
+        const combo = judger.maxCombo / this.length * 100000;
+        return Math.round(per * judger.perfect + per * 0.5 * judger.good + combo);
     }
 }
 

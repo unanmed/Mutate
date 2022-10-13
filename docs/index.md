@@ -2,6 +2,8 @@
 
 [谱面编写文档](./edit.md)
 
+[English Document](./index-en.md)
+
 ## 安装Mutate
 
 使用npm
@@ -94,9 +96,10 @@ game.start();
 4. `resume()`继续游戏
 5. `async restart()`重开游戏
 6. `end()`结束游戏，取消与canvas的绑定
-7. `getScore(): number`获取分数，分数计算方式暂不能自定义，目前的计分方式为：`900000 音符分（perfect算100%的分，good算50%的分） + 100000 连击分（最大连击 / 物量 * 100000）`
+7. `getScore(): number`获取分数，默认的计分方式为：`900000 音符分（perfect算100%的分，good算50%的分） + 100000 连击分（最大连击 / 物量 * 100000）`
 8. `setSound(type: NoteType, url: string)`设置特定类型音符的打击音效，url为音效地址
 9. `getDetail()`获得成绩的详细信息，有多少个`perfect` `good` `miss` `late` `early`，注意`late`和`early`只有在不是`perfect`的情况下才会被记录
+10. `setScoreCalculator(fn: ScoreCalculator)`修改计分方式，传入一个包含完美、好、错过、最大连击数、提前数、延后数、物量的对象
 
 常用属性：
 
@@ -160,7 +163,7 @@ game.start();
 
 2. 三角渐变函数  `trigo(type: 'sin' | 'sec', mode: EaseMode)`，该函数返回一个指定属性的三角函数变化函数，其中`EaseMode`可以填`in` `out` `in-out` `center`，分别表示 `慢-快`  `快-慢`  `慢-快-慢` `快-慢-快`
 
-3. 幂函数渐变  `power(n: number, mode: EaseMode)`，该函数返回一个以 $ x^n $ 变化的函数，n是指数
+3. 幂函数渐变  `power(n: number, mode: EaseMode)`，该函数返回一个以 `x^n` 变化的函数，n是指数
 
 4. 双曲渐变函数  `hyper(type: 'sin' | 'tan' | 'sec', mode: EaseMode)`，该函数返回一个双曲函数，分别是 `双曲正弦` `双曲正切` `双曲正割`
 
@@ -206,7 +209,7 @@ ani.move(100, 100); // 执行运动到100,100的动画
 2. `scale(size: number)`放缩
 3. `rotate(angle: number)`旋转
 4. `moveAs(path: PathFn)`按照路径函数移动，使用该动画时请先将相对模式改为相对
-5. `shake()`震动
+5. `shake(x: number, y: number)`震动，x和y分别表示横纵坐标上的震动大小，1表示最大，0表示最小
 
 当然，还有运行自定义属性的动画的函数，它是`ani.apply(key: string, n: number)`，其中`key`是动画属性，`n`是动画的目标值
 
@@ -218,7 +221,7 @@ ani.move(100, 100); // 执行运动到100,100的动画
 2. `ani.w(type: string)`，等待某种动画执行完毕
 3. `ani.all()`，等待所用动画执行完毕
 
-他们都是`async function`，所以请使用`await`来执行等待
+他们都是`async function`，所以请使用`await`或`promise`来执行等待
 
 除此之外，在`mutate.animate`中还提供了一个等待函数`sleep(time: number)`，它允许你等待指定毫秒数，同样也是`async function`
 
@@ -232,7 +235,9 @@ ani.move(100, 100); // 执行运动到100,100的动画
 
 ### 判定
 
-你可以修改某个特定音符的判定时间或其它配置，一般这个操作会在写谱的时候进行
+判定模块，一般用不到，这里只进行简单的说明
+
+你可以修改某个特定音符的判定时间或其它配置，一般这个操作会在写谱的时候进行，具体请参考谱面编写文档
 
 ### 渲染与物体
 
@@ -250,7 +255,7 @@ game.chart.camera.css(`
 `)
 ```
 
-没错！就像你写css的时候完全一样，不需要一个个地设置了
+没错！就像你写css的时候完全一样，不需要一个个地设置了，而且，谱面编写时你也可以这么做！具体请看谱面编写文档
 
 除此之外，摄像机还有个`save()`和`restore()`方法，与`CanvasRenderingContext2d`上的方法类似
 
@@ -282,7 +287,7 @@ note也有不少常用属性
 
 1. `speed: number`音符流速，单位是每秒多少像素
 2. `res: string`perfect or good or miss，未打击的时候是`pre`
-3. `detail: string`在good or miss的前提下是提前还是过晚，未打击时是`early`
+3. `detail: string`在good or miss的前提下是提前还是过晚，未打击时是`late`
 4. `multi: boolean`当前音符是否是多押音符
 5. `noteType: NoteType`音符类型，有`tap` `drag` `hold`三种，其中`hold`目前没有内置渲染函数
 6. `base: Base`所属基地
@@ -300,7 +305,7 @@ note也有不少常用属性
 
 > 游戏中内置了`tap`和`drag`的绘制函数及三种判定的打击特效函数
 
-`renderer`还有一个功能性函数`renderer.inGame(x: number, y: number, r: number = 10)`，可以判定在`[x,y]`坐标，半径为`10`的圆是否在游戏画面内
+`renderer`还有一个功能性函数`renderer.inGame(x: number, y: number, r: number = 10)`，可以判定在`[x,y]`坐标，半径为`r`的圆是否在游戏画面内
 
 `renderer`中没有常用的属性
 
