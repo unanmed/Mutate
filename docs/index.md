@@ -86,7 +86,7 @@ game.start();
 4. `good`: 好的判定区间，默认为80
 5. `miss`: miss判定区间，默认为120
 
-### core上面的方法和属性
+### Mutate上面的方法和属性
 
 常用方法：
 
@@ -100,6 +100,7 @@ game.start();
 8. `setSound(type: NoteType, url: string)`设置特定类型音符的打击音效，url为音效地址
 9. `getDetail()`获得成绩的详细信息，有多少个`perfect` `good` `miss` `late` `early`，注意`late`和`early`只有在不是`perfect`的情况下才会被记录
 10. `setScoreCalculator(fn: ScoreCalculator)`修改计分方式，传入一个包含完美、好、错过、最大连击数、提前数、延后数、物量的对象
+11. `setOffset(offset: number)`设置谱面偏移，正，谱面将会提前，负，谱面将会延后
 
 常用属性：
 
@@ -258,6 +259,8 @@ game.chart.camera.css(`
 没错！就像你写css的时候完全一样，不需要一个个地设置了，而且，谱面编写时你也可以这么做！具体请看谱面编写文档
 
 除此之外，摄像机还有个`save()`和`restore()`方法，与`CanvasRenderingContext2d`上的方法类似
+
+你还可以通过摄像机设置全局特效，全局特效函数每帧都会运行，设置的函数为`camera.setGlobalEffect(fn: (camera: Camera) => void)`，每帧都会将画布回退到初始状态并执行这个函数
 
 #### base
 

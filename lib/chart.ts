@@ -407,6 +407,7 @@ export class Chart {
                 if (!has(time)) return this.game.ticker.remove(fn);
                 if (this.game.time < time) return;
                 if (time === 0) requestAnimationFrame(() => target.inited = true);
+                if (this.game.time > 0 && !target.inited) requestAnimationFrame(() => target.inited = true);
                 last++;
                 // @ts-ignore
                 exe(data[key][time], target);

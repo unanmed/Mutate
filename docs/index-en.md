@@ -86,7 +86,7 @@ game.start();
 4. `good`: Good judgement interval. default: `80`
 5. `miss`: Miss judgement interval. default: `120`
 
-### The Methods And Properties on core
+### The Methods And Properties on Mutate
 
 Commonly used methods:
 
@@ -99,15 +99,17 @@ Commonly used methods:
 7. `getScore(): number`Get the score of the game. The default scoring method is: `900000 notes (perfect counts as 100% of the score, good counts as 50% of the score) + 100000 combo points (max combo / amount of notes * 100000)`.
 8. `async setSound(type: NoteType, url: string)`Set the percussive sound for a specific type of note, `url` is the sound url.
 9. `getDetail()`Get details of how many `perfect` `good` `miss` `late` `early`, note that `late` and `early` are only recorded if the note's result is not `perfect`.
+10. `setScoreCalculator(fn: ScoreCalculator)` Set the scoring method. Passing in an object containing perfect, good, missed, max combo, early number, late number, and note count, output a number.
+11. `setOffset(offset: number)` Set the chart's offset. If positive, the chart will be advanced. If negative, the chart will be delayed.
 
 Commonly used properties:
 
 1. `status: MutateStatus`Game status, including `pre`, `playing`, `pause` and `exit`, indicating before started, in play, paused and finished respectively.
 2. `time: number`Current music time milliseconds.
-3. `length: number`The note number of the chart.
+3. `length: number`The note count of the chart.
 4. `ended: boolean`Whether is the game over.
 
-以下为只读属性
+Readonly properties:
 
 1. `isMobile: boolean`Is mobile or not. The game determines if the game is mobile based on the length and width of the screen, if `length > width`, it is computer side, otherwise it is mobile side.
 2. `target: HTMLCanvasElement`The canvas bound to the game.
@@ -142,7 +144,7 @@ Commonly used properties:
 
 Animation is a core module of `mutate`. It is simple but powerful. Almost all the animations in the game are implemented by it, but of course you can use this functionality for some other things as well.
 
-The core of animation is a class `mutate.animationBase`, which is a highly customisable class.
+The core of animation is a class `mutate.animate.AnimationBase`, which is a highly customisable class.
 
 #### Animatable Properties
 
@@ -257,7 +259,9 @@ game.chart.camera.css(`
 
 It's exactly like when you write css, you don't have to set it up one by one. You can alse do it when you write the chart! See the chart editing documentation for details.
 
-In addition, the camera has a `save()` and `restore()` method, similar to the one on `CanvasRenderingContext2d`
+In addition, the camera has a `save()` and `restore()` method, similar to the one on `CanvasRenderingContext2d`.
+
+You can also set global effects via the camera. The global effect function runs every frame and is set as `camera.setGlobalEffect(fn: (camera: Camera) => void)`. Camera will rewind the canvas to its initial state and executes this function every frame.
 
 #### Base
 

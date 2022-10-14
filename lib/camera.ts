@@ -18,6 +18,8 @@ export class Camera extends AnimationBase {
     saveStack: CameraSaveInfo[] = []
     /** 第0毫秒的动画是否执行完毕 */
     inited: boolean = false
+    /** 效果函数 */
+    effectFn: (camera: Camera) => void = this.defaultEffect
 
     /** 摄像机作用的目标画布 */
     readonly target: CanvasRenderingContext2D
@@ -63,20 +65,7 @@ export class Camera extends AnimationBase {
      * 设置画布的全局特效
      */
     effect(): void {
-        const ctx = this.target;
-        const scale = this.game.scale;
-        const dx = 960 * scale;
-        const dy = 540 * scale;
-        const x = this.x * scale;
-        const y = this.y * scale;
-        ctx.translate(dx, dy);
-        ctx.rotate(this.angle * Math.PI / 180);
-        ctx.scale(this.size, this.size);
-        ctx.translate(-dx, -dy);
-        ctx.translate(-x, -y);
-
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = 'black'
+        this.effectFn(this);
     }
 
     /**
@@ -97,5 +86,33 @@ export class Camera extends AnimationBase {
                 canvas.style[key as CssKey] = value;
             }
         }
+    }
+
+    /**
+     * 设置全局效果
+     * @param fn 效果函数，传入摄像机实例
+     */
+    setGlobalEffects(fn: (camera: Camera) => void): void {
+        this.effectFn = fn;
+    }
+
+    /**
+     * 默认的效果函数
+     */
+    private defaultEffect(): void {
+        const ctx = this.target;
+        const scale = this.game.scale;
+        const dx = 960 * scale;
+        const dy = 540 * scale;
+        const x = this.x * scale;
+        const y = this.y * scale;
+        ctx.translate(dx, dy);
+        ctx.rotate(this.angle * Math.PI / 180);
+        ctx.scale(this.size, this.size);
+        ctx.translate(-dx, -dy);
+        ctx.translate(-x, -y);
+
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = 'black';
     }
 }

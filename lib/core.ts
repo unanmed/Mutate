@@ -218,7 +218,7 @@ export class Mutate {
     /**
      * 重新开始游戏
      */
-    async restart(): Promise<void> {
+    async restart(time: number = 1000): Promise<void> {
         this.ticker.clear();
         this.ctx.restore();
         this.ctx.clearRect(0, 0, this.target.width, this.target.height);
@@ -228,7 +228,7 @@ export class Mutate {
         this.chart.camera.ticker.destroy();
         this.ac.restart();
         await this.chart.restart();
-        this.start();
+        this.start(time);
     }
 
     /**
