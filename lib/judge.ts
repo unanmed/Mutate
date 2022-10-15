@@ -1,10 +1,12 @@
 import { Chart } from "./chart";
+import { MutateEventTarget } from "./event";
+import { JudgerEventMap } from "./event.map";
 import { BaseNote, NoteType } from "./note";
 import { has } from "./utils";
 
 export type JudgeRes = 'perfect' | 'good' | 'miss'
 
-export class Judger {
+export class Judger extends MutateEventTarget<JudgerEventMap> {
     /** 下一个或几个需要判定的音符 */
     toJudge: BaseNote<NoteType>[] = []
     /** 正在按住的长按音符 */
@@ -44,6 +46,11 @@ export class Judger {
     }
 
     constructor(chart: Chart) {
+        super({
+            hit: [],
+            hold: [],
+            holdend: []
+        })
         this.chart = chart;
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);
@@ -90,19 +97,20 @@ export class Judger {
             this.combo++;
         } else if (judge(note.goodTime)) {
             this.toJudge.shift();
-            const t = time > note.goodTime ? 'late' : 'early';
+            const t = time - noteTime > note.perfectTime ? 'late' : 'early';
             note.good(t);
             this[t]++;
             this.good++;
             this.combo++;
-        } else if (time > noteTime - note.missTime) {
+        } else if (judge(note.missTime)) {
             this.toJudge.shift();
-            const t = time > note.goodTime ? 'late' : 'early';
+            const t = time - noteTime > note.goodTime ? 'late' : 'early';
             note.miss(t);
             this[t]++;
             this.combo = 0;
             this.miss++;
         }
+
     }
 
     /**
@@ -114,20 +122,44 @@ export class Judger {
         if (this.auto) return;
         // 第一次按下
         if (first) {
-            if (has(note)) {
-                note.hold();
+            if (has(note) && has(note.noteTime)) {
+                // 判定函数
+                const time = this.chart.game.time;
+                const noteTime = note.noteTime;
+                const judge = (t: number) => {
+                    return time > noteTime - t && time < noteTime + t;
+                }
+                if (judge(note.perfectTime))
+                    note.hold('perfect', 'perfect', key);
+                else if (judge(note.goodTime))
+                    note.hold('good', time - noteTime > note.perfectTime ? 'late' : 'early', key);
+                else if (judge(note.missTime))
+                    note.hold('miss', time - noteTime > note.goodTime ? 'late' : 'early', key);
+
+                // 删除toJudge里面的音符
+                const i = this.toJudge.findIndex(v => v === note);
+                this.toJudge.splice(i, 1);
+                return;
             } else throw new TypeError(`There is no note on judging first hold.`);
         }
 
         // 不是第一次按下
         if (has(note) && has(key)) { // 电脑端
-            if (note.key !== key) return;
+            if (note.key === key) {
+                const i = this.holding.findIndex(v => v === note);
+                this.holding.splice(i, 1);
+                return note.miss('late');
+            }
         } else { // 手机端
             const all = this.holding;
             if (all.length > this.touching) {
                 const delta = all.length - this.touching;
                 const notes = all.splice(0, delta);
-                notes.forEach(v => v.miss('late'));
+                notes.forEach(v => {
+                    const i = this.holding.findIndex(v => v === note);
+                    this.holding.splice(i, 1);
+                    v.miss('late')
+                });
             }
         }
     }
@@ -142,7 +174,7 @@ export class Judger {
             if (all.length === 0) this.next();
             this.toJudge = this.toJudge.filter(v => {
                 if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
-                if (!this.auto) {
+                if (!this.auto) { // 不是自动播放时
                     if (v.noteType === 'drag') {
                         if (this.chart.game.time > v.noteTime - v.perfectTime) {
                             if (this.holdingKeys.length > 0 || this.touching > 0) {
@@ -160,14 +192,45 @@ export class Judger {
                     return true;
                 } else {
                     if (this.chart.game.time > v.noteTime) {
-                        v.perfect();
-                        this.perfect++;
-                        this.combo++;
+                        if (v.noteType !== 'hold') {
+                            v.perfect();
+                            this.perfect++;
+                            this.combo++;
+                        } else {
+                            v.hold('perfect', 'perfect');
+                            // 删除toJudge里面的音符
+                            const i = this.toJudge.findIndex(vv => v === vv);
+                            this.toJudge.splice(i, 1);
+                        }
                         return false;
                     }
                     return true;
                 }
             });
+            // 还有长按
+            this.holding = this.holding.filter(v => {
+                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
+                if (!has(v.holdTime)) throw new TypeError(`The note to be judge doesn't have the property 'holdTime'.`);
+                if (!this.auto) {
+                    if (v.holdTime > this.chart.game.time - v.noteTime - 100) {
+                        if (v.res === 'pre') throw new TypeError(`The note type is unexpected 'pre' when judging hold note.`);
+                        v[v.res as JudgeRes](v.detail);
+                        if (v.res !== 'miss') {
+                            this.combo++;
+                            this[v.res]++;
+                        }
+                        return false;
+                    }
+                } else {
+                    if (v.holdTime > this.chart.game.time - v.noteTime - 100) {
+                        v.perfect();
+                        this.combo++;
+                        this.perfect++;
+                        return false;
+                    }
+                }
+                return true;
+            })
         }
 
         this.chart.game.ticker.add(fn);
@@ -187,6 +250,13 @@ export class Judger {
         if (has(n) && has(n.noteTime) && n.noteTime === note.noteTime) return true;
 
         return false;
+    }
+
+    /**
+     * 执行监听事件
+     */
+    dispatchEvent<K extends keyof JudgerEventMap>(type: K, e: JudgerEventMap[K]): void {
+        this.dispatch(type, e);
     }
 
     /**
@@ -222,7 +292,9 @@ export class Judger {
     private keyup = (e: KeyboardEvent) => {
         const i = this.holdingKeys.findIndex(v => v === e.keyCode);
         this.holdingKeys.splice(i, 1);
-        this.judgeHold(false, this.holding[e.keyCode], e.keyCode);
+        const note = this.holding.find(v => (v.key as number) === e.keyCode);
+        if (!has(note)) return;
+        this.judgeHold(false, note, e.keyCode);
     }
 
     /**

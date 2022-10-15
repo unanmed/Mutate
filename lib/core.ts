@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { sleep } from "./animate";
 import { AudioExtractor } from "./audio";
 import { Chart, MutateChart } from "./chart";
+import { MutateEventTarget } from "./event";
+import { CoreEventMap, LoadEvent, StartEvent, TriggerEvent } from "./event.map";
 import { NoteShadow, NoteType } from "./note";
 import { circle, bezier as bezierPath } from "./path";
 import { Renderer } from "./render";
@@ -48,7 +50,7 @@ export interface ScoreParameters extends MutateDetail {
 
 export type ScoreCalculator = (e: ScoreParameters) => number
 
-export class Mutate {
+export class Mutate extends MutateEventTarget<CoreEventMap> {
     /** 音频信息 */
     audio!: AudioBuffer
     /** 读取的mtt谱面对象 */
@@ -112,6 +114,14 @@ export class Mutate {
     readonly miss: number = 120
 
     constructor(target: HTMLCanvasElement, option?: Partial<MutateOption>) {
+        super({
+            load: [],
+            start: [],
+            restart: [],
+            pause: [],
+            resume: [],
+            end: [],
+        });
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
         this.ctx.save();
@@ -180,10 +190,19 @@ export class Mutate {
      * @param mtt 谱面资源
      */
     async load(music: string, mtt: string): Promise<void> {
+        const startTime = Date.now();
+
         if (has(this.audio) || has(this.mtt))
             throw new TypeError(`The game's music or chart has already been loaded.`);
         const task = [this.loadMusic(music), this.loadMTT(mtt)];
         await Promise.all(task);
+
+        const e: LoadEvent<'load'> = {
+            target: this,
+            type: 'load',
+            time: Date.now() - startTime,
+        }
+        this.dispatch('load', e);
     }
 
     /**
@@ -195,24 +214,50 @@ export class Mutate {
         this.status = 'playing';
         this.ac.play();
         this.renderer.start();
+
+        const e: StartEvent<'start'> = {
+            target: this,
+            type: 'start',
+            music: this.ac.audio,
+            mtt: this.mtt
+        }
+        this.dispatch('start', e);
     }
 
     /**
      * 暂停
      */
     pause(): void {
+        const from = this.status as Exclude<MutateStatus, 'exit'>;
         if (this.status === 'pause') throw new TypeError(`The game has already paused.`);
         this.status = 'pause';
         this.ac.pause();
+
+        const e: TriggerEvent<'pause'> = {
+            target: this,
+            type: 'pause',
+            from,
+            to: this.status
+        }
+        this.dispatch('pause', e);
     }
 
     /**
      * 恢复游戏的进行
      */
     resume(): void {
+        const from = this.status as Exclude<MutateStatus, 'exit'>;
         if (this.status === 'playing') throw new TypeError(`The game has already resumed.`);
         this.status = 'playing'
         this.ac.resume();
+
+        const e: TriggerEvent<'resume'> = {
+            target: this,
+            type: 'resume',
+            from,
+            to: this.status
+        }
+        this.dispatch('resume', e);
     }
 
     /**
@@ -229,12 +274,22 @@ export class Mutate {
         this.ac.restart();
         await this.chart.restart();
         this.start(time);
+
+        const e: StartEvent<'restart'> = {
+            target: this,
+            type: 'restart',
+            music: this.ac.audio,
+            mtt: this.mtt
+        }
+        this.dispatch('restart', e);
     }
 
     /**
      * 结束本局游戏，取消与canvas的绑定
      */
     end(): void {
+        if (this.status === 'exit') throw new TypeError(`The game has already ended.`);
+        const from = this.status;
         this.ticker.destroy();
         this.ac.pause();
         this.ended = true;
@@ -244,6 +299,14 @@ export class Mutate {
         Object.values(bases).forEach(v => v.ticker.destroy());
         const notes = this.chart.notes;
         Object.values(notes).forEach(v => v.ticker.destroy());
+
+        const e: TriggerEvent<'end'> = {
+            target: this,
+            type: 'end',
+            from,
+            to: this.status
+        }
+        this.dispatch('end', e);
     }
 
     /**

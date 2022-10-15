@@ -1,6 +1,8 @@
 import axios from "axios";
 import { AnimationBase } from "./animate";
 import { Base } from "./base";
+import { HitEvent, HoldEvent } from "./event.map";
+import { JudgeRes } from "./judge";
 import { ToDrawEffect } from "./render";
 import { linear } from "./timing";
 import { has } from "./utils";
@@ -127,63 +129,36 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 判定该note为完美
      */
     perfect(): void {
-        const p = () => {
-            this.playSound();
-            this.res = 'perfect';
-            this.played = true;
-            this.destroy();
-            this.base.game.renderer.effects.push({
-                note: this,
-                start: this.base.game.time,
-                res: 'perfect',
-                end: false
-            });
-        }
-
+        if (this.noteType === 'hold') return this.holdEnd('perfect');
         // 如果是drag的话需要单独判定，要等到drag到了判定点再判定
         const fn = () => {
             if (this.base.game.time >= (this.noteTime as number)) {
-                p();
+                this.hit('perfect');
                 this.ticker.remove(fn);
             }
         }
 
         if (this.noteType === 'drag') {
             this.ticker.add(fn);
-        } else p();
+        } else this.hit('perfect');
     }
 
     /**
      * 判定该note为好
      */
     good(detail: DetailRes): void {
-        this.playSound();
-        this.res = 'good';
         this.detail = detail;
-        this.played = true;
-        this.destroy();
-        this.base.game.renderer.effects.push({
-            note: this,
-            start: this.base.game.time,
-            res: 'good',
-            end: false
-        });
+        if (this.noteType === 'hold') return this.holdEnd('good');
+        this.hit('good')
     }
 
     /**
      * 判定该note为miss
      */
     miss(detail: DetailRes): void {
-        this.res = 'miss';
         this.detail = detail;
-        this.played = true;
-        this.destroy();
-        this.base.game.renderer.effects.push({
-            note: this,
-            start: this.base.game.time,
-            res: 'miss',
-            end: false
-        })
+        if (this.noteType === 'hold') return this.holdEnd('miss');
+        this.hit('miss', true);
     }
 
     /**
@@ -209,9 +184,31 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     /**
      * 按住这个长按
      */
-    hold(): void {
+    hold(res: JudgeRes, detail: DetailRes | 'perfect', key?: number): void {
         if (this.noteType !== 'hold') throw new TypeError(`You are trying to hold non-hold note.`);
+        if (!has(this.holdTime) || !has(this.noteTime)) throw new TypeError(`This note has no noteTime or holdTime.`);
         this.holding = true;
+        if (has(key)) this.key = key;
+        this.base.game.chart.judger.holding.push(this as BaseNote<'hold'>);
+
+        this.base.game.renderer.effects.push({
+            note: this,
+            start: this.base.game.time,
+            res,
+            end: false
+        });
+
+        const e: HoldEvent<'hold'> = {
+            target: this.base.game.chart.judger,
+            type: 'hold',
+            time: this.base.game.time - this.noteTime,
+            totalTime: this.holdTime,
+            res,
+            note: this,
+            base: this.base,
+            detail
+        };
+        this.base.game.chart.judger.dispatchEvent('hold', e);
     }
 
     /**
@@ -247,6 +244,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      */
     destroy(): void {
         this.destroyed = true;
+        this.ticker.destroy();
     }
 
     /** 
@@ -339,5 +337,53 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             }
             this.lastD = res;
         }
+    }
+
+    /**
+     * 打击这个音符
+     * @param res 打击结果
+     */
+    private hit(res: JudgeRes, noSe: boolean = false): void {
+        if (!noSe)
+            this.playSound();
+        this.res = res;
+        this.played = true;
+        this.destroy();
+        this.base.game.renderer.effects.push({
+            note: this,
+            start: this.base.game.time,
+            res,
+            end: false
+        });
+
+        const e: HitEvent<'hit'> = {
+            target: this.base.game.chart.judger,
+            type: 'hit',
+            res,
+            note: this,
+            base: this.base,
+            detail: this.detail
+        }
+        this.base.game.chart.judger.dispatchEvent('hit', e);
+    }
+
+    /**
+     * 长按结束
+     */
+    private holdEnd(res: JudgeRes): void {
+        this.played = true;
+        this.destroy();
+
+        const e: HoldEvent<'holdend'> = {
+            target: this.base.game.chart.judger,
+            type: 'holdend',
+            res,
+            note: this,
+            base: this.base,
+            detail: this.detail,
+            time: this.base.game.time - (this.noteTime as number),
+            totalTime: this.holdTime as number
+        }
+        this.base.game.chart.judger.dispatchEvent('holdend', e);
     }
 }
