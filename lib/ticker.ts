@@ -6,6 +6,9 @@ export class Ticker {
     /** 当前ticker的状态 */
     status: 'stop' | 'running' = 'stop'
 
+    /** 开始时间 */
+    private startTime: number = 0;
+
     constructor() {
         this.run();
     }
@@ -67,7 +70,8 @@ export class Ticker {
         this.status = 'running';
         const fn = (time: number) => {
             if (this.status === 'stop') return;
-            this.one(time);
+            if (this.startTime === 0) this.startTime = time;
+            this.one(time - this.startTime);
             requestAnimationFrame(fn);
         }
         requestAnimationFrame(fn);
