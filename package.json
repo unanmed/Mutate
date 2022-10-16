@@ -1,6 +1,6 @@
 {
   "name": "mutate-game",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "type": "module",
   "description": "A music game combine rotate and music",
   "license": "MIT",
