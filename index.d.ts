@@ -535,11 +535,131 @@ declare module "mutate-game" {
     export type ScoreCalculator = (e: ScoreParameters) => number
 
     /**
+     * 事件
+     */
+    export interface MutateEvent<K extends string, T extends MutateEventMap<K>> {
+        target: MutateEventTarget<T>
+        type: K
+    }
+
+    /**
+     * 事件映射
+     */
+    export type MutateEventMap<T extends string = string> = {
+        [K in T]: MutateEvent<any, any>
+    }
+
+    /**
+     * 事件执行器，包括函数和配置
+     */
+    export type EventExecutor<T extends MutateEvent<any, any>> = {
+        fn: EventFn<T>
+        option: MutateEventOption
+    }
+
+    /**
+     * 事件监听函数
+     */
+    export type EventFn<T extends MutateEvent<any, any>> = (event: T) => void
+
+    /**
+     * 事件列表
+     */
+    export type MutateEventList<T extends MutateEventMap> = {
+        [E in keyof T]: EventExecutor<T[E]>[]
+    }
+
+    /**
+     * 事件配置
+     */
+    export type MutateEventOption = {
+
+    }
+
+    /**
+ * 游戏实例上的事件
+ */
+    export interface CoreEventMap {
+        load: LoadEvent<'load'>
+        start: StartEvent<'start'>
+        restart: StartEvent<'restart'>
+        pause: TriggerEvent<'pause'>
+        resume: TriggerEvent<'resume'>
+        end: TriggerEvent<'end'>
+    }
+
+    export interface LoadEvent<K extends keyof CoreEventMap> extends MutateEvent<K, CoreEventMap> {
+        /** 加载时长 */
+        time: number
+    }
+
+    export interface StartEvent<K extends keyof CoreEventMap> extends MutateEvent<K, CoreEventMap> {
+        music: AudioBuffer
+        mtt: MutateChart
+    }
+
+    export interface TriggerEvent<K extends keyof CoreEventMap> extends MutateEvent<K, CoreEventMap> {
+        from: Exclude<MutateStatus, 'exit'>
+        to: Exclude<MutateStatus, 'pre'> | 'win' | 'lose'
+    }
+
+    /**
+     * 判定事件
+     */
+    export interface JudgerEventMap extends NoteEventMap, BaseEventMap {
+
+    }
+
+    /**
+     * 音符上的事件
+     */
+    export interface NoteEventMap {
+        hit: HitEvent<'hit'>
+        hold: HoldEvent<'hold'>
+        holdend: HoldEvent<'holdend'>
+    }
+
+    export interface HitEvent<K extends keyof NoteEventMap> extends MutateEvent<K, NoteEventMap> {
+        res: JudgeRes
+        note: BaseNote<NoteType>
+        base: Base
+        detail: DetailRes | 'perfect'
+    }
+
+    export interface HoldEvent<K extends keyof NoteEventMap> extends HitEvent<K> {
+        time: number
+        totalTime: number
+    }
+
+    export interface BaseEventMap {
+
+    }
+
+    /**
+     * 渲染器事件
+     */
+    export interface RenderEventMap {
+        before: RenderEvent<'before'>
+        after: RenderEvent<'after'>
+        effectadd: EffectEvent<'effectadd'>
+        effectend: EffectEvent<'effectend'>
+    }
+
+    export interface RenderEvent<K extends keyof RenderEventMap> extends MutateEvent<K, RenderEventMap> {
+        ctx: CanvasRenderingContext2D
+        canvas: HTMLCanvasElement
+    }
+
+    export interface EffectEvent<K extends keyof RenderEventMap> extends RenderEvent<K> {
+        effect: ToDrawEffect
+    }
+
+    /**
      * 游戏核心
      * 
      * Core of the game.
      */
-    class Mutate {
+    class Mutate extends MutateEventTarget<CoreEventMap> {
         /** 
          * 音频信息
          * 
@@ -1082,7 +1202,7 @@ declare module "mutate-game" {
      * 
      * Judgement module.
      */
-    class Judger {
+    class Judger extends MutateEventTarget<JudgerEventMap> {
         /** 
          * 下一个或几个需要判定的音符
          * 
@@ -1227,7 +1347,7 @@ declare module "mutate-game" {
      * 
      * Renderer.
      */
-    class Renderer {
+    class Renderer extends MutateEventTarget<RenderEventMap> {
         /** 
          * 当前音乐时间
          * 
@@ -1241,13 +1361,6 @@ declare module "mutate-game" {
          * Whether there are striking effects finished.
          */
         effectEnd: boolean
-
-        /** 
-         * 需要绘制的打击特效
-         * 
-         * Hitting effects to be drawn.
-         */
-        effects: ToDrawEffect[]
 
         /** 
          * 游戏实例
@@ -1313,6 +1426,16 @@ declare module "mutate-game" {
          * Determine if an object is inside the game screen.
          */
         inGame(x: number, y: number, r?: number): boolean
+
+        /**
+         * 添加打击特效
+         */
+        addHitEffect(note: BaseNote<NoteType>): void
+
+        /**
+         * 清空打击特效
+         */
+        clearEffect(): void
     }
 
     /**
@@ -1384,6 +1507,8 @@ declare module "mutate-game" {
          */
         angle: number
 
+        game?: Mutate
+
         /**
          * 横坐标
          * 
@@ -1409,7 +1534,7 @@ declare module "mutate-game" {
          */
         animating: { [x: string]: boolean }
 
-        constructor()
+        constructor(game?: Mutate)
 
         /**
          * 设置动画时的动画函数
@@ -2137,6 +2262,30 @@ declare module "mutate-game" {
     }
 
     /**
+     * 事件目标，K是所有的事件名称，T是名称对应的事件
+     */
+    class MutateEventTarget<T extends MutateEventMap<keyof T & string>> {
+
+        constructor()
+
+        /**
+         * 添加事件监听器
+         */
+        on<K extends keyof T>(type: K, listener: EventFn<T[K]>, option?: MutateEventOption): void
+
+        /**
+         * 移除事件监听器
+         */
+        off<K extends keyof T>(type: K, listener: EventFn<T[K]>): void
+
+        /**
+         * 触发指定类型的事件
+         * @returns 是否成功执行了监听
+         */
+        protected dispatch<K extends keyof T>(type: K, event: T[K], option: MutateEventOption): boolean
+    }
+
+    /**
      * 游戏核心模块
      * 
      * Core module of the game.
@@ -2212,6 +2361,10 @@ declare module "mutate-game" {
      */
     export namespace base {
         export { Base, bases, baseMap }
+    }
+
+    export namespace event {
+        export { MutateEventTarget }
     }
 
     /**

@@ -336,3 +336,43 @@ note也有不少常用属性
 
 1. `register<T extends keyof TimingMode>(type: T, name: string, func: TimingMode[T])`，它允许你注册一个动画渐变函数，其中`TimingMode`包含四类渐变函数，为`timing` `generator` `path` `pathG`，分别为渐变函数、渐变函数生成函数、路径函数、路径函数生成函数，其中生成函数应当返回一个对应的渐变函数或路径函数。`name`是注册的函数名，在编写谱面时需要用到，`func`便是执行的函数
 2. `registerExecute<T extends keyof ExecuteDeclare>(type: T, key: string, fn: Executer<T>)`，注册一个谱面预执行函数，预处理简易动画。它的功能是在到达动画执行时间后执行注册的执行函数，从而达到简易动画的效果。其中`type`应为`note` `base` `camera`，`Executer`为执行函数，它有两个参数，第一个是`value`，是谱面文件中传入的参数，这方面会在谱面编写文档中有详细说明；第二个是`target`，是其作用目标，例如`note`的作用目标就是`BaseNote`
+
+## 事件系统
+
+`mutate`在1.0.0版本中添加了独立的事件系统，它使得`mutate`拥有更高程度的自定义空间。在目前版本中，`Mutate` `Judger` `Renderer`是可以进行事件监听的，它们都是`MutateEventTarget`的子类。`MutateEventTarget`有三个方法：
+
+1. `on(type: string, fn: (e: MutateEvent) => void, option?: MutateEventOption): void`，向某个事件添加监听函数。监听函数传入一个`MutateEvent`，不同的事件包含不同的内容，但一定会包含两个属性：`target`，表示在监听器添加到了哪个实例上，`type`，表示监听类型
+
+2. `off(type: string, fn: (e: MutateEvent) => void): void`，去除某个监听器
+
+3. `protected dispatch(type: string, option?: MutateEventOption)`，执行某个类型的监听器，用于在其子类中使用
+
+下面说明不同实例上的事件类型
+
+### Mutate
+
+游戏核心模块，这上面共有六种事件监听器
+
+1. `load`，当游戏加载完毕后会触发，事件为`LoadEvent`，包括一个`time`属性，表示加载用时的毫秒数
+2. `start`，当游戏在开始时会触发（包括重新开始），事件为`StartEvent`，包括一个`audio`属性，类型为`AudioBuffer`，表示音频信息，以及`mtt`属性，表示读取的谱面文件
+3. `restart`，与`start`类似，但只会在重新开始时触发，且在`start`之前
+4. `pause`，当游戏暂停时触发，事件为`TriggerEvent`，包括`from`类型，说明了暂停之前是什么状态，以及`to`类型，说明了暂停后转换成了什么状态
+5. `resume`，与`pause`类似，在游戏继续时触发
+6. `end`，在游戏结束时触发
+
+### Renderer
+
+渲染模块，共有四种监听器
+
+1. `before`，在每帧的渲染之前触发，事件为`RenderEvent`，包括了`canvas`和`ctx`两个属性，分别表示目标画布和画布的context
+2. `after`，在每帧的渲染只会触发
+3. `effectadd`，在添加打击特效时触发，事件为`EffectEvent`，包括`RenderEvent`的所有内容，除此之外还有一个`effect`的属性，表示添加的动画信息
+4. `effectend`，在打击特效绘制完毕后触发
+
+### Judger
+
+判定模块，共有三种监听器
+
+1. `hit`，在音符打击的时候触发，hold不会触发这个世界，事件为`HitEvent`，它拥有四个属性：`res`，表示打击结果，是完美还是好还是错过；`note`，表示打击音符；`base`，表示音符所属基地；`detail`，表示过早还是过晚，如果是完美的话该项也是`perfect`
+2. `hold`，在长按被按下时触发，事件为`HoldEvent`，包括`HitEvent`的所有属性，除此之外，还有两个属性：`time`，表示打击时间与音符标准时间的差值；`totalTime`，表示音符的长按总时间
+3. `holdend`，在长按结束或玩家手动松开时触发，与`hold`类似

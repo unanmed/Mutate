@@ -273,8 +273,6 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
         this.chart.camera.ticker.destroy();
         this.ac.restart();
         await this.chart.restart();
-        this.start(time);
-
         const e: StartEvent<'restart'> = {
             target: this,
             type: 'restart',
@@ -282,6 +280,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             mtt: this.mtt
         }
         this.dispatch('restart', e);
+        this.start(time);
+
     }
 
     /**
