@@ -1,5 +1,8 @@
 import { Base } from "./base";
 import { Mutate } from "./core";
+import { MutateEventTarget } from "./event";
+import { EffectEvent, RenderEvent, RenderEventMap } from "./event.map";
+import { JudgeRes } from "./judge";
 import { BaseNote, NoteType, PlayedEffect } from "./note";
 import { has } from "./utils";
 
@@ -22,11 +25,9 @@ export type ToDrawEffect = {
     end: boolean
 }
 
-export class Renderer {
+export class Renderer extends MutateEventTarget<RenderEventMap> {
     /** 当前音乐时间 */
     time: number = 0
-    /** 是否有打击特效完成了 */
-    effectEnd: boolean = false
 
     /** 游戏实例 */
     readonly game: Mutate
@@ -44,9 +45,15 @@ export class Renderer {
         miss: this.missEffect
     }
     /** 需要绘制的打击特效 */
-    effects: ToDrawEffect[] = []
+    private effects: ToDrawEffect[] = []
 
     constructor(game: Mutate) {
+        super({
+            before: [],
+            after: [],
+            effectadd: [],
+            effectend: []
+        });
         this.game = game;
     }
 
@@ -71,6 +78,15 @@ export class Renderer {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
 
+        // before render
+        const e: RenderEvent<'before'> = {
+            target: this,
+            type: 'before',
+            canvas: this.game.target,
+            ctx: this.game.ctx
+        };
+        this.dispatch('before', e);
+
         this.game.chart.camera.effect();
 
         // 基地
@@ -91,11 +107,6 @@ export class Renderer {
             if (note.noteType === 'drag') this.renderer.drag.call(this, note as BaseNote<'drag'>);
         }
 
-        // 过滤掉已经完成的特效
-        if (this.effectEnd === true) {
-            this.effects = this.effects.filter(v => v.end === false);
-        }
-
         // 特效
         const effect = this.effects;
         for (const data of effect) {
@@ -103,6 +114,15 @@ export class Renderer {
             if (data.res === 'good') this.effect.good.call(this, data);
             if (data.res === 'miss') this.effect.miss.call(this, data);
         }
+
+        // after render
+        const ee: RenderEvent<'after'> = {
+            target: this,
+            type: 'after',
+            canvas: this.game.target,
+            ctx: this.game.ctx
+        };
+        this.dispatch('after', ee);
     }
 
     /**
@@ -139,6 +159,60 @@ export class Renderer {
             x <= 1920 / size + r + 50 + left &&
             y >= -r - 50 + top &&
             y <= 1080 / size + r + 50 + top;
+    }
+
+    /**
+     * 添加打击特效
+     */
+    addHitEffect(note: BaseNote<NoteType>): void {
+        const effect: ToDrawEffect = {
+            start: this.game.time,
+            end: false,
+            res: note.res as JudgeRes,
+            note
+        };
+        const handler: ProxyHandler<ToDrawEffect> = {
+            set: (target, key, value) => {
+                if (typeof key === 'symbol') return false;
+                if (key === 'end' && value === true) {
+                    const i = this.effects.findIndex(v => v === proxy);
+                    this.effects.splice(i, 1);
+
+                    // effect end
+                    const e: EffectEvent<'effectend'> = {
+                        target: this,
+                        type: 'effectend',
+                        canvas: this.game.target,
+                        ctx: this.game.ctx,
+                        effect: proxy
+                    }
+                    this.dispatch('effectend', e);
+                }
+                // @ts-ignore
+                target[key] = value;
+                return true;
+            }
+        }
+
+        const proxy = new Proxy(effect, handler);
+        this.effects.push(proxy);
+
+        // effect add
+        const e: EffectEvent<'effectadd'> = {
+            target: this,
+            type: 'effectadd',
+            canvas: this.game.target,
+            ctx: this.game.ctx,
+            effect: proxy
+        }
+        this.dispatch('effectadd', e);
+    }
+
+    /**
+     * 清空打击特效
+     */
+    clearEffect(): void {
+        this.effects = [];
     }
 
     /**

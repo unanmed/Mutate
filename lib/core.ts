@@ -267,7 +267,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
         this.ticker.clear();
         this.ctx.restore();
         this.ctx.clearRect(0, 0, this.target.width, this.target.height);
-        this.renderer.effects = [];
+        this.renderer.clearEffect();
         this.status = 'pre';
         this.chart.judger.toJudge = [];
         this.chart.camera.ticker.destroy();

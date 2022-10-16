@@ -4,6 +4,7 @@ import { MutateStatus } from "./core";
 import { MutateEvent } from "./event";
 import { JudgeRes } from "./judge";
 import { BaseNote, DetailRes, NoteType } from "./note";
+import { ToDrawEffect } from "./render";
 
 /**
  * 游戏实例上的事件
@@ -35,7 +36,7 @@ export interface TriggerEvent<K extends keyof CoreEventMap> extends MutateEvent<
 /**
  * 判定事件
  */
-export interface JudgerEventMap extends NoteEventMap, BaseEvent {
+export interface JudgerEventMap extends NoteEventMap, BaseEventMap {
 
 }
 
@@ -60,6 +61,25 @@ export interface HoldEvent<K extends keyof NoteEventMap> extends HitEvent<K> {
     totalTime: number
 }
 
-export interface BaseEvent {
+export interface BaseEventMap {
 
+}
+
+/**
+ * 渲染器事件
+ */
+export interface RenderEventMap {
+    before: RenderEvent<'before'>
+    after: RenderEvent<'after'>
+    effectadd: EffectEvent<'effectadd'>
+    effectend: EffectEvent<'effectend'>
+}
+
+export interface RenderEvent<K extends keyof RenderEventMap> extends MutateEvent<K, RenderEventMap> {
+    ctx: CanvasRenderingContext2D
+    canvas: HTMLCanvasElement
+}
+
+export interface EffectEvent<K extends keyof RenderEventMap> extends RenderEvent<K> {
+    effect: ToDrawEffect
 }

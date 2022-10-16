@@ -162,26 +162,6 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     }
 
     /**
-     * 添加打击特效
-     */
-    pushEffect(data: ToDrawEffect): void {
-        const handler = {
-            set: (target: ToDrawEffect, key: keyof ToDrawEffect, v: any) => {
-                // @ts-ignore
-                target[key] = v;
-                if (key === 'end') {
-                    this.base.game.renderer.effectEnd = true;
-                }
-                return true;
-            }
-        }
-
-        const proxy = new Proxy(data, handler);
-
-        this.base.game.renderer.effects.push(proxy);
-    }
-
-    /**
      * 按住这个长按
      */
     hold(res: JudgeRes, detail: DetailRes | 'perfect', key?: number): void {
@@ -190,13 +170,6 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.holding = true;
         if (has(key)) this.key = key;
         this.base.game.chart.judger.holding.push(this as BaseNote<'hold'>);
-
-        this.base.game.renderer.effects.push({
-            note: this,
-            start: this.base.game.time,
-            res,
-            end: false
-        });
 
         const e: HoldEvent<'hold'> = {
             target: this.base.game.chart.judger,
@@ -349,12 +322,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.res = res;
         this.played = true;
         this.destroy();
-        this.base.game.renderer.effects.push({
-            note: this,
-            start: this.base.game.time,
-            res,
-            end: false
-        });
+        this.base.game.renderer.addHitEffect(this);
 
         const e: HitEvent<'hit'> = {
             target: this.base.game.chart.judger,
@@ -373,6 +341,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     private holdEnd(res: JudgeRes): void {
         this.played = true;
         this.destroy();
+        this.base.game.renderer.addHitEffect(this);
 
         const e: HoldEvent<'holdend'> = {
             target: this.base.game.chart.judger,
