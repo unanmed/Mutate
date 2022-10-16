@@ -2,7 +2,7 @@
     <div>
         <button id="start" @click="start">开始游戏</button>
         <button id="restart" @click="restart">重开</button>
-        <span id="length"></span>
+        <!-- <span id="length"></span> -->
     </div>
     <canvas id="game" width="1440" height="810"></canvas>
 </template>
@@ -17,7 +17,7 @@ const config = {
 }
 
 async function start() {
-    const span = document.getElementById('length') as HTMLSpanElement;
+    // const span = document.getElementById('length') as HTMLSpanElement;
     const canvas = document.getElementById('game') as HTMLCanvasElement;
     const mutate = create(canvas, config);
     mutate.setOffset(-200);
@@ -27,20 +27,41 @@ async function start() {
         mutate.setSound('tap', '/src/test/se/tap.wav'),
         mutate.setSound('drag', '/src/test/se/drag.wav')
     ]
+    mutate.on('start', e => console.log(e));
+    mutate.on('load', e => console.log(e));
+    mutate.on('restart', e => console.log(e));
+    mutate.on('pause', e => console.log(e));
     await Promise.all(tasks);
     mutate.start(0);
     mutate.chart.judger.auto = true;
-    mutate.ticker.add(() => {
-        span.innerHTML = `打击数：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连击数：${mutate.chart.judger.combo}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大连击：${mutate.chart.judger.maxCombo}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perfect：${mutate.chart.judger.perfect}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;good：${mutate.chart.judger.good}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;miss：${mutate.chart.judger.miss}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;late：${mutate.chart.judger.late}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;early：${mutate.chart.judger.early}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分数：${mutate.getScore()}`;
+    mutate.renderer.on('after', e => {
+        const ctx = e.ctx;
+        ctx.save();
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'right';
+        ctx.font = '100 24px Verdana';
+        ctx.fillText(mutate.getScore().toString().padStart(7, '0'), canvas.width - 20, 20);
+        const combo = mutate.chart.judger.combo;
+        if (combo < 3) return;
+        ctx.textAlign = 'center';
+        ctx.font = '100 32px Verdana';
+        ctx.fillText(`${combo}`, canvas.width / 2, 20);
+        ctx.font = '100 18px Verdana';
+        ctx.fillText(`combo`, canvas.width / 2, 50);
+        ctx.restore();
     })
+    //     mutate.ticker.add(() => {
+    //         span.innerHTML = `打击数：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连击数：${mutate.chart.judger.combo}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大连击：${mutate.chart.judger.maxCombo}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perfect：${mutate.chart.judger.perfect}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;good：${mutate.chart.judger.good}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;miss：${mutate.chart.judger.miss}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;late：${mutate.chart.judger.late}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;early：${mutate.chart.judger.early}
+    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分数：${mutate.getScore()}`;
+    //     })
 }
 
 async function restart() {

@@ -132,14 +132,18 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         if (this.noteType === 'hold') return this.holdEnd('perfect');
         // 如果是drag的话需要单独判定，要等到drag到了判定点再判定
         const fn = () => {
-            if (this.base.game.time >= (this.noteTime as number)) {
+            if (this.base.game.time >= this.noteTime!) {
                 this.hit('perfect');
                 this.ticker.remove(fn);
             }
         }
 
         if (this.noteType === 'drag') {
-            this.ticker.add(fn);
+            if (this.base.game.time >= this.noteTime!) {
+                this.hit('perfect');
+            } else {
+                this.ticker.add(fn);
+            }
         } else this.hit('perfect');
     }
 

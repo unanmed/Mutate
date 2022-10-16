@@ -74,7 +74,6 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
      */
     render(): void {
         const ctx = this.game.ctx;
-        ctx.restore();
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
 
@@ -115,6 +114,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
             if (data.res === 'miss') this.effect.miss.call(this, data);
         }
 
+        ctx.restore();
         // after render
         const ee: RenderEvent<'after'> = {
             target: this,

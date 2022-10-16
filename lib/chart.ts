@@ -284,6 +284,11 @@ export class Chart {
         this.basesDict = {};
         BaseNote.cnt = 0;
         Base.cnt = 0;
+        this.judger.perfect = 0;
+        this.judger.good = 0;
+        this.judger.miss = 0;
+        this.judger.combo = 0;
+        this.judger.maxCombo = 0;
         await sleep(1000);
         await this.extract(this.game.mtt);
     }
