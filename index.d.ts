@@ -504,20 +504,6 @@ declare module "mutate-game" {
     }
 
     /**
-     * 所有的基地
-     * 
-     * All the bases.
-     */
-    const bases: Base[]
-
-    /**
-     * 根据id列出的基地
-     * 
-     * Bases listed by id.
-     */
-    const baseMap: { [id: string]: Base }
-
-    /**
      * 计分时传递的参数
      * 
      * Parameters passed during scoring.
@@ -577,8 +563,8 @@ declare module "mutate-game" {
     }
 
     /**
- * 游戏实例上的事件
- */
+     * 游戏实例上的事件
+     */
     export interface CoreEventMap {
         load: LoadEvent<'load'>
         start: StartEvent<'start'>
@@ -2360,7 +2346,22 @@ declare module "mutate-game" {
      * 基地模块
      */
     export namespace base {
-        export { Base, bases, baseMap }
+
+        /**
+         * 所有的基地
+         * 
+         * All the bases.
+         */
+        export const bases: Base[]
+
+        /**
+         * 根据id列出的基地
+         * 
+         * Bases listed by id.
+         */
+        export const baseMap: { [id: string]: Base }
+
+        export { Base }
     }
 
     export namespace event {

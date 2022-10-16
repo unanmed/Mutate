@@ -1,5 +1,5 @@
 import * as camera from './camera';
-import * as extract from './chart';
+import * as chart from './chart';
 import * as note from './note';
 import * as path from './path';
 import * as render from './render';
@@ -11,12 +11,24 @@ import * as core from './core';
 import * as audio from './audio';
 import * as judge from './judge';
 import * as utils from './utils';
+import * as event from './event';
 
 const create = core.create;
+const Mutate = core.Mutate;
+const AnimiationBase = animate.AnimationBase;
+const AudioExtractor = audio.AudioExtractor;
+const Base = base.Base;
+const BaseNote = note.BaseNote;
+const Camera = camera.Camera;
+const Chart = chart.Chart;
+const Judger = judge.Judger;
+const Target = event.MutateEventTarget;
+const Renderer = render.Renderer;
+const Ticker = ticker.Ticker;
 
 export {
     camera,
-    extract,
+    chart,
     note,
     path,
     render,
@@ -28,5 +40,17 @@ export {
     audio,
     judge,
     utils,
-    create
+    event,
+    create,
+    Mutate,
+    AnimiationBase,
+    AudioExtractor,
+    Base,
+    BaseNote,
+    Camera,
+    Chart,
+    Judger,
+    Target as MutateEventTarget,
+    Renderer,
+    Ticker
 }
