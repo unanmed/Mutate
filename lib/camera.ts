@@ -29,7 +29,7 @@ export class Camera extends AnimationBase {
     readonly game: Mutate
 
     constructor(game: Mutate, id: string, target: CanvasRenderingContext2D) {
-        super();
+        super(game);
         this.target = target;
         this.id = id;
         this.game = game;

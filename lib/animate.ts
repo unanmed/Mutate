@@ -2,6 +2,7 @@ import { PathFn } from "./path"
 import { TimingFn } from "./timing"
 import { cloneDeep } from 'lodash'
 import { Ticker } from "./ticker"
+import { Mutate } from "./core"
 
 export type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void
 
@@ -57,6 +58,8 @@ export class AnimationBase {
     size: number = 1
     /** 角度 */
     angle: number = 0
+    /** mutate游戏实例，使用可选可保证动画可在其它地方使用 */
+    game?: Mutate
 
     get x(): number {
         return this.ox + this.sx;
@@ -76,7 +79,8 @@ export class AnimationBase {
     /** 正在执行的动画 */
     animating: { [x: string]: boolean } = {};
 
-    constructor() {
+    constructor(game?: Mutate) {
+        this.game = game;
         this.timing = n => n;
         this.shakeTiming = n => n;
         this.path = n => [n, n];
@@ -167,11 +171,11 @@ export class AnimationBase {
 
         this.animating.shake = true;
         const { easeTime: time, shakeTiming: timing } = this;
-        const start = Date.now();
+        const start = this.game?.time ?? Date.now();
         this.hook('start', 'shakestart');
 
         const fn = () => {
-            const now = Date.now();
+            const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
                 this.ticker.remove(fn);
@@ -199,7 +203,7 @@ export class AnimationBase {
         this.animating.move = true;
         this.path = path;
         const { easeTime: time, relation, timing } = this;
-        const start = Date.now();
+        const start = this.game?.time ?? Date.now();
         const [ox, oy] = [this.x, this.y];
         const [tx, ty] = (() => {
             if (relation === 'absolute') return path(1);
@@ -211,7 +215,7 @@ export class AnimationBase {
         this.hook('start', 'movestart');
 
         const fn = () => {
-            const now = Date.now();
+            const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
                 this.ticker.remove(fn);
@@ -340,13 +344,13 @@ export class AnimationBase {
 
         this.animating[key] = true;
         const origin = this.custom[key];
-        const start = Date.now();
+        const start = this.game?.time ?? Date.now();
         const { timing, relation, easeTime: time } = this;
         const d = relation === 'absolute' ? n - origin : n;
         this.hook('start');
 
         const fn = () => {
-            const now = Date.now();
+            const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
                 this.ticker.remove(fn);
@@ -374,7 +378,7 @@ export class AnimationBase {
 
         this.animating[type] = true;
         const origin = this[key];
-        const start = Date.now();
+        const start = this.game?.time ?? Date.now();
         const timing = this.timing;
         const relation = this.relation;
         const time = this.easeTime;
@@ -383,7 +387,7 @@ export class AnimationBase {
 
         // 每帧执行函数
         const fn = () => {
-            const now = Date.now();
+            const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
                 // 避免move执行多次

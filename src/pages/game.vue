@@ -2,6 +2,8 @@
     <div>
         <button id="start" @click="start">开始游戏</button>
         <button id="restart" @click="restart">重开</button>
+        <button id="pause" @click="pause">暂停</button>
+        <button id="resume" @click="resume">继续</button>
         <!-- <span id="length"></span> -->
     </div>
     <canvas id="game" width="1440" height="810"></canvas>
@@ -66,6 +68,14 @@ async function start() {
 
 async function restart() {
     await game.restart();
+}
+
+function pause() {
+    game.pause();
+}
+
+function resume() {
+    game.resume();
 }
 </script>
 

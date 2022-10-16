@@ -36,7 +36,7 @@ export class Base extends AnimationBase {
     readonly initAngle: number
 
     constructor(id: string, game: Mutate, x: number, y: number, r: number, a: number) {
-        super();
+        super(game);
         this.id = id;
         this.game = game;
         // 注册动画属性

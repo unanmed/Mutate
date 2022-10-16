@@ -102,7 +102,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     rad: number = 0
 
     constructor(type: T, base: Base, config?: NoteConfig) {
-        super();
+        super(base.game);
         this.noteType = type;
         this.noteTime = config?.playTime;
         this.base = base;
