@@ -1,51 +1,51 @@
-import { Base } from "./base";
-import { Mutate } from "./core";
-import { MutateEventTarget } from "./event";
-import { EffectEvent, RenderEvent, RenderEventMap } from "./event.map";
-import { JudgeRes } from "./judge";
-import { BaseNote, NoteType, PlayedEffect } from "./note";
-import { has } from "./utils";
+import { Base } from './base';
+import { Mutate } from './core';
+import { MutateEventTarget } from './event';
+import { EffectEvent, RenderEvent, RenderEventMap } from './event.map';
+import { JudgeRes } from './judge';
+import { BaseNote, NoteType, PlayedEffect } from './note';
+import { has } from './utils';
 
 export type RenderMap = {
-    note: BaseNote<NoteType>
-    base: Base
-}
+    note: BaseNote<NoteType>;
+    base: Base;
+};
 
 export type GameRenderer = {
-    base: (e: Base) => void
-    tap: (e: BaseNote<'tap'>) => void
-    hold: (e: BaseNote<'hold'>) => void
-    drag: (e: BaseNote<'drag'>) => void
-}
+    base: (e: Base) => void;
+    tap: (e: BaseNote<'tap'>) => void;
+    hold: (e: BaseNote<'hold'>) => void;
+    drag: (e: BaseNote<'drag'>) => void;
+};
 
 export type ToDrawEffect = {
-    start: number
-    res: 'perfect' | 'good' | 'miss'
-    note: BaseNote<NoteType>
-    end: boolean
-}
+    start: number;
+    res: 'perfect' | 'good' | 'miss';
+    note: BaseNote<NoteType>;
+    end: boolean;
+};
 
 export class Renderer extends MutateEventTarget<RenderEventMap> {
     /** 当前音乐时间 */
-    time: number = 0
+    time: number = 0;
 
     /** 游戏实例 */
-    readonly game: Mutate
+    readonly game: Mutate;
     /** 渲染器 */
     readonly renderer: GameRenderer = {
         base: this.renderBases,
         tap: this.renderTap,
         hold: this.renderHold,
         drag: this.renderDrag
-    }
+    };
     /** 打击特效 */
     readonly effect: PlayedEffect = {
         perfect: this.perfectEffect,
         good: this.goodEffect,
         miss: this.missEffect
-    }
+    };
     /** 需要绘制的打击特效 */
-    private effects: ToDrawEffect[] = []
+    private effects: ToDrawEffect[] = [];
 
     constructor(game: Mutate) {
         super({
@@ -64,7 +64,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         const fn = () => {
             if (this.game.status !== 'playing' || this.game.time <= 0) return;
             this.render();
-        }
+        };
 
         this.game.ticker.add(fn);
     }
@@ -101,9 +101,12 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         for (const num in notes) {
             const note = notes[num];
             if (note.played) continue;
-            if (note.noteType === 'tap') this.renderer.tap.call(this, note as BaseNote<'tap'>);
-            if (note.noteType === 'hold') this.renderer.hold.call(this, note as BaseNote<'hold'>);
-            if (note.noteType === 'drag') this.renderer.drag.call(this, note as BaseNote<'drag'>);
+            if (note.noteType === 'tap')
+                this.renderer.tap.call(this, note as BaseNote<'tap'>);
+            if (note.noteType === 'hold')
+                this.renderer.hold.call(this, note as BaseNote<'hold'>);
+            if (note.noteType === 'drag')
+                this.renderer.drag.call(this, note as BaseNote<'drag'>);
         }
 
         // 特效
@@ -142,7 +145,10 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
     /**
      * 设置打击特效
      */
-    setEffect(type: 'perfect' | 'good' | 'miss', fn: (e: ToDrawEffect) => void): void {
+    setEffect(
+        type: 'perfect' | 'good' | 'miss',
+        fn: (e: ToDrawEffect) => void
+    ): void {
         this.effect[type] = fn;
     }
 
@@ -155,10 +161,12 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         const left = camera.x / size,
             top = camera.y / size;
 
-        return x >= -r - 50 + left &&
+        return (
+            x >= -r - 50 + left &&
             x <= 1920 / size + r + 50 + left &&
             y >= -r - 50 + top &&
-            y <= 1080 / size + r + 50 + top;
+            y <= 1080 / size + r + 50 + top
+        );
     }
 
     /**
@@ -185,14 +193,14 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
                         canvas: this.game.target,
                         ctx: this.game.ctx,
                         effect: proxy
-                    }
+                    };
                     this.dispatch('effectend', e);
                 }
                 // @ts-ignore
                 target[key] = value;
                 return true;
             }
-        }
+        };
 
         const proxy = new Proxy(effect, handler);
         this.effects.push(proxy);
@@ -204,7 +212,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
             canvas: this.game.target,
             ctx: this.game.ctx,
             effect: proxy
-        }
+        };
         this.dispatch('effectadd', e);
     }
 
@@ -227,7 +235,6 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
      */
     private renderHold(note: BaseNote<'hold'>): void {
         // hold判定是否绘制比较麻烦，因为hold很长
-
     }
 
     /**
@@ -240,8 +247,15 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
     /**
      * 绘制非hold音符
      */
-    private renderNonHold(note: BaseNote<Exclude<NoteType, 'hold'>>, fillColor: string) {
-        if (has(note.noteTime) && this.game.time > note.noteTime + note.missTime) return;
+    private renderNonHold(
+        note: BaseNote<Exclude<NoteType, 'hold'>>,
+        fillColor: string
+    ) {
+        if (
+            has(note.noteTime) &&
+            this.game.time > note.noteTime + note.missTime
+        )
+            return;
         if (note.played) return;
         if (!note.inited) return;
 
@@ -249,7 +263,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         if (isNaN(x)) return;
         if (!this.inGame(x, y, this.game.drawWidth / 2)) return;
 
-        const rad = note.rad + note.angle * Math.PI / 180;
+        const rad = note.rad + (note.angle * Math.PI) / 180;
         const ctx = this.game.ctx;
         const hw = this.game.halfWidth;
         const htw = this.game.halfTopWidth;
@@ -271,7 +285,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         }
         ctx.globalAlpha = alpha;
         if (d < note.base.custom.radius) {
-            ctx.globalAlpha = d / note.base.custom.radius * alpha;
+            ctx.globalAlpha = (d / note.base.custom.radius) * alpha;
         }
         ctx.beginPath();
         ctx.moveTo(-hw, 0);
@@ -293,7 +307,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
     private renderBases(base: Base): void {
         if (!this.inGame(base.x, base.y)) return;
         if (!base.inited) return;
-        const rad = base.calRad() + base.angle * Math.PI / 180;
+        const rad = base.calRad() + (base.angle * Math.PI) / 180;
 
         const ctx = this.game.ctx;
         // 基地比较好画
@@ -307,13 +321,14 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(rad + Math.PI);
+        ctx.filter = base.ctxFilter;
         ctx.moveTo(0, 0);
         ctx.fillStyle = ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
         ctx.fillRect(-radius, -radius * 0.06, radius, radius * 0.12);
         ctx.beginPath();
-        ctx.arc(0, 0, radius * 2 / 5, 0, Math.PI * 2);
+        ctx.arc(0, 0, (radius * 2) / 5, 0, Math.PI * 2);
         ctx.closePath();
-        ctx.lineWidth = radius / 10 * scale;
+        ctx.lineWidth = (radius / 10) * scale;
         ctx.fill();
         ctx.beginPath();
         ctx.lineCap = 'round';
@@ -348,7 +363,13 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         ctx.shadowColor = color;
         ctx.globalAlpha = 2 - time / 250;
         ctx.beginPath();
-        ctx.arc(x * scale, y * scale, r * this.game.drawScale * 0.8, 0, Math.PI * 2);
+        ctx.arc(
+            x * scale,
+            y * scale,
+            r * this.game.drawScale * 0.8,
+            0,
+            Math.PI * 2
+        );
         ctx.closePath();
         ctx.lineWidth = 5;
         ctx.stroke();

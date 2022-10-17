@@ -1,117 +1,125 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { sleep } from "./animate";
-import { AudioExtractor } from "./audio";
-import { Chart, MutateChart } from "./chart";
-import { MutateEventTarget } from "./event";
-import { CoreEventMap, LoadEvent, StartEvent, TriggerEvent } from "./event.map";
-import { NoteShadow, NoteType } from "./note";
-import { circle, bezier as bezierPath } from "./path";
-import { Renderer } from "./render";
-import { Ticker } from "./ticker";
-import { bezier, hyper, inverseTrigo, linear, power, shake, trigo } from "./timing";
-import { has } from "./utils";
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { sleep } from './animate';
+import { AudioExtractor } from './audio';
+import { Chart, MutateChart } from './chart';
+import { MutateEventTarget } from './event';
+import { CoreEventMap, LoadEvent, StartEvent, TriggerEvent } from './event.map';
+import { NoteShadow, NoteType } from './note';
+import { circle, bezier as bezierPath } from './path';
+import { Renderer } from './render';
+import { Ticker } from './ticker';
+import {
+    bezier,
+    hyper,
+    inverseTrigo,
+    linear,
+    power,
+    shake,
+    trigo
+} from './timing';
+import { has } from './utils';
 
 /**
  * 游戏状态
  */
-export type MutateStatus = 'pre' | 'playing' | 'pause' | 'exit'
+export type MutateStatus = 'pre' | 'playing' | 'pause' | 'exit';
 
 /**
  * 请求类型
  */
 export interface PostType {
-    arraybuffer: ArrayBuffer
-    json: MutateChart
+    arraybuffer: ArrayBuffer;
+    json: MutateChart;
 }
 
 /**
  * 结算时的详细信息
  */
 export type MutateDetail = {
-    perfect: number
-    good: number
-    miss: number
-    early: number
-    late: number
-}
+    perfect: number;
+    good: number;
+    miss: number;
+    early: number;
+    late: number;
+};
 
 export interface MutateOption {
-    noteScale?: number
-    noteWidth?: number
-    perfect?: number
-    good?: number
-    miss?: number
+    noteScale?: number;
+    noteWidth?: number;
+    perfect?: number;
+    good?: number;
+    miss?: number;
 }
 
 export interface ScoreParameters extends MutateDetail {
-    length: number
-    maxCombo: number
+    length: number;
+    maxCombo: number;
 }
 
-export type ScoreCalculator = (e: ScoreParameters) => number
+export type ScoreCalculator = (e: ScoreParameters) => number;
 
 export class Mutate extends MutateEventTarget<CoreEventMap> {
     /** 音频信息 */
-    audio!: AudioBuffer
+    audio!: AudioBuffer;
     /** 读取的mtt谱面对象 */
-    mtt!: MutateChart
+    mtt!: MutateChart;
     /** 游戏状态 */
-    status: MutateStatus = 'pre'
+    status: MutateStatus = 'pre';
     /** 音乐时间，毫秒数 */
-    time: number = 0
+    time: number = 0;
     /** 谱面物量 */
-    length: number = 0
+    length: number = 0;
     /** 是否已经结束游戏 */
-    ended: boolean = false
+    ended: boolean = false;
     /** 分数计算函数 */
-    scoreCalculator: ScoreCalculator = this.defaultScoreCalculator
+    scoreCalculator: ScoreCalculator = this.defaultScoreCalculator;
 
     /** 是否是移动设备 */
-    readonly isMobile: boolean = window.innerWidth < window.innerHeight
+    readonly isMobile: boolean = window.innerWidth < window.innerHeight;
     /** 游戏渲染目标 */
-    readonly target: HTMLCanvasElement
+    readonly target: HTMLCanvasElement;
     /** 目标的context */
-    readonly ctx: CanvasRenderingContext2D
+    readonly ctx: CanvasRenderingContext2D;
     /** 核心ticker，用于计算音乐时间等 */
-    readonly ticker: Ticker = new Ticker()
+    readonly ticker: Ticker = new Ticker();
     /** 音频处理模块 */
-    readonly ac: AudioExtractor = new AudioExtractor(this)
+    readonly ac: AudioExtractor = new AudioExtractor(this);
     /** 谱面信息 */
-    readonly chart: Chart = new Chart(this)
+    readonly chart: Chart = new Chart(this);
     /** 渲染器 */
-    readonly renderer: Renderer = new Renderer(this)
+    readonly renderer: Renderer = new Renderer(this);
     /** 游戏宽度 */
-    readonly width: number
+    readonly width: number;
     /** 游戏高度 */
-    readonly height: number
+    readonly height: number;
     /** 放缩比例 */
-    readonly scale: number
+    readonly scale: number;
     /** 音符放缩比例 */
-    readonly noteScale: number = 1
+    readonly noteScale: number = 1;
     /** 音符的长度 */
-    readonly noteWidth: number = this.isMobile ? 200 : 150
+    readonly noteWidth: number = this.isMobile ? 200 : 150;
     /** 音符的绘制比例 */
-    readonly drawScale: number
+    readonly drawScale: number;
     /** 音符的宽度 */
-    readonly drawWidth: number
+    readonly drawWidth: number;
     /** 音符宽度的一半 */
-    readonly halfWidth: number
+    readonly halfWidth: number;
     /** 音符高度 */
-    readonly drawHeight: number
+    readonly drawHeight: number;
     /** 音符高度的一半 */
-    readonly halfHeight: number
+    readonly halfHeight: number;
     /** 音符的上部宽度 */
-    readonly topWidth: number
+    readonly topWidth: number;
     /** 音符上宽的一半 */
-    readonly halfTopWidth: number
+    readonly halfTopWidth: number;
     /** 默认的音符描边样式 */
-    readonly multiStroke: CanvasGradient
+    readonly multiStroke: CanvasGradient;
     /** 完美判定区间 */
-    readonly perfect: number = 50
+    readonly perfect: number = 50;
     /** 好的判定区间 */
-    readonly good: number = 80
+    readonly good: number = 80;
     /** miss的判定区间 */
-    readonly miss: number = 120
+    readonly miss: number = 120;
 
     constructor(target: HTMLCanvasElement, option?: Partial<MutateOption>) {
         super({
@@ -120,7 +128,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             restart: [],
             pause: [],
             resume: [],
-            end: [],
+            end: []
         });
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
@@ -133,11 +141,11 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             const ws = this.width / 1920;
             const hs = this.height / 1080;
             if (ws < hs) {
-                const height = target.width * 9 / 16
+                const height = (target.width * 9) / 16;
                 target.height = height;
                 target.style.height = `${height}px`;
             } else {
-                const width = target.height * 16 / 9;
+                const width = (target.height * 16) / 9;
                 target.width = width;
                 target.style.width = `${width}px`;
             }
@@ -156,7 +164,12 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
         this.halfHeight = this.drawHeight / 2;
         this.topWidth = this.drawWidth - this.halfHeight * 2;
         this.halfTopWidth = this.topWidth / 2;
-        this.multiStroke = this.ctx.createLinearGradient(0, -this.halfHeight, 0, this.halfHeight);
+        this.multiStroke = this.ctx.createLinearGradient(
+            0,
+            -this.halfHeight,
+            0,
+            this.halfHeight
+        );
         this.multiStroke.addColorStop(0, '#fff');
         this.multiStroke.addColorStop(0.5, '#fef267');
         this.multiStroke.addColorStop(1, '#fff');
@@ -174,13 +187,30 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
         this.chart.register('pathG', 'circle', circle);
         this.chart.register('pathG', 'bezier', bezierPath);
         // 注册系统预执行函数
-        this.chart.registerExecute('base', 'r', (v: number, t) => t.setRadius(v));
-        this.chart.registerExecute('base', 'bpm', (v: number, t) => t.setSpeed(v));
-        this.chart.registerExecute('base', 'rgba', (v: number[], t) => t.rgba(...v));
-        this.chart.registerExecute('note', 'speed', (v: number, t) => t.setSpeed(v));
-        this.chart.registerExecute('note', 'filter', (v: string, t) => t.filter(v));
-        this.chart.registerExecute('note', 'shadow', (v: NoteShadow, t) => t.shadow(v.x, v.y, v.blur, v.color));
-        this.chart.registerExecute('note', 'opacity', (v: number, t) => t.opacity(v));
+        this.chart.registerExecute('base', 'r', (v: number, t) =>
+            t.setRadius(v)
+        );
+        this.chart.registerExecute('base', 'bpm', (v: number, t) =>
+            t.setSpeed(v)
+        );
+        this.chart.registerExecute('base', 'rgba', (v: number[], t) =>
+            t.rgba(...v)
+        );
+        this.chart.registerExecute('base', 'filter', (v: string, t) =>
+            t.filter(v)
+        );
+        this.chart.registerExecute('note', 'speed', (v: number, t) =>
+            t.setSpeed(v)
+        );
+        this.chart.registerExecute('note', 'filter', (v: string, t) =>
+            t.filter(v)
+        );
+        this.chart.registerExecute('note', 'shadow', (v: NoteShadow, t) =>
+            t.shadow(v.x, v.y, v.blur, v.color)
+        );
+        this.chart.registerExecute('note', 'opacity', (v: number, t) =>
+            t.opacity(v)
+        );
         this.chart.registerExecute('camera', 'css', (v: string, t) => t.css(v));
     }
 
@@ -193,15 +223,17 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
         const startTime = Date.now();
 
         if (has(this.audio) || has(this.mtt))
-            throw new TypeError(`The game's music or chart has already been loaded.`);
+            throw new TypeError(
+                `The game's music or chart has already been loaded.`
+            );
         const task = [this.loadMusic(music), this.loadMTT(mtt)];
         await Promise.all(task);
 
         const e: LoadEvent<'load'> = {
             target: this,
             type: 'load',
-            time: Date.now() - startTime,
-        }
+            time: Date.now() - startTime
+        };
         this.dispatch('load', e);
     }
 
@@ -209,7 +241,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * 开始游戏
      */
     async start(time: number = 1000): Promise<void> {
-        if (this.status !== 'pre') throw new TypeError(`The game has already started or ended.`);
+        if (this.status !== 'pre')
+            throw new TypeError(`The game has already started or ended.`);
         await sleep(time);
         this.status = 'playing';
         this.ac.play();
@@ -220,7 +253,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             type: 'start',
             music: this.ac.audio,
             mtt: this.mtt
-        }
+        };
         this.dispatch('start', e);
     }
 
@@ -229,7 +262,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      */
     pause(): void {
         const from = this.status as Exclude<MutateStatus, 'exit'>;
-        if (this.status === 'pause') throw new TypeError(`The game has already paused.`);
+        if (this.status === 'pause')
+            throw new TypeError(`The game has already paused.`);
         this.status = 'pause';
         this.ac.pause();
 
@@ -238,7 +272,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             type: 'pause',
             from,
             to: this.status
-        }
+        };
         this.dispatch('pause', e);
     }
 
@@ -247,8 +281,9 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      */
     resume(): void {
         const from = this.status as Exclude<MutateStatus, 'exit'>;
-        if (this.status === 'playing') throw new TypeError(`The game has already resumed.`);
-        this.status = 'playing'
+        if (this.status === 'playing')
+            throw new TypeError(`The game has already resumed.`);
+        this.status = 'playing';
         this.ac.resume();
 
         const e: TriggerEvent<'resume'> = {
@@ -256,7 +291,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             type: 'resume',
             from,
             to: this.status
-        }
+        };
         this.dispatch('resume', e);
     }
 
@@ -278,17 +313,17 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             type: 'restart',
             music: this.ac.audio,
             mtt: this.mtt
-        }
+        };
         this.dispatch('restart', e);
         this.start(time);
-
     }
 
     /**
      * 结束本局游戏，取消与canvas的绑定
      */
     end(): void {
-        if (this.status === 'exit') throw new TypeError(`The game has already ended.`);
+        if (this.status === 'exit')
+            throw new TypeError(`The game has already ended.`);
         const from = this.status;
         this.ticker.destroy();
         this.ac.pause();
@@ -305,7 +340,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             type: 'end',
             from,
             to: this.status
-        }
+        };
         this.dispatch('end', e);
     }
 
@@ -313,7 +348,10 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * 设置谱面偏差，正，谱面将会提前，负，谱面将会延后
      */
     setOffset(time: number): void {
-        if (this.status !== 'pre') throw new TypeError(`Offset can only be set before the game starts.`);
+        if (this.status !== 'pre')
+            throw new TypeError(
+                `Offset can only be set before the game starts.`
+            );
         this.ac.offset = time;
     }
 
@@ -325,7 +363,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             ...this.getDetail(),
             length: this.length,
             maxCombo: this.chart.judger.maxCombo
-        }
+        };
         return this.scoreCalculator(e);
     }
 
@@ -357,11 +395,14 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * @param url 请求地址
      * @param type 接收的数据类型
      */
-    private async post<T extends keyof PostType>(url: string, type: T): Promise<AxiosResponse<PostType[T]>> {
+    private async post<T extends keyof PostType>(
+        url: string,
+        type: T
+    ): Promise<AxiosResponse<PostType[T]>> {
         const config: AxiosRequestConfig = {
             responseType: type,
             timeout: 60000
-        }
+        };
         return await axios.get(url, config);
     }
 
@@ -371,7 +412,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      */
     private async loadMusic(url: string): Promise<void> {
         const data = await this.post(url, 'arraybuffer');
-        if (data.status !== 200) return this.fail(`Fail to load url [${url}]`, data.status);
+        if (data.status !== 200)
+            return this.fail(`Fail to load url [${url}]`, data.status);
         const audio = await this.ac.extract(data.data);
         this.audio = audio;
     }
@@ -382,7 +424,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      */
     private async loadMTT(url: string): Promise<void> {
         const data = await this.post(url, 'json');
-        if (data.status !== 200) return this.fail(`Fail to load url [${url}]`, data.status);
+        if (data.status !== 200)
+            return this.fail(`Fail to load url [${url}]`, data.status);
         this.mtt = data.data;
         this.chart.extract(this.mtt);
     }
@@ -401,8 +444,10 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
     private defaultScoreCalculator(e: ScoreParameters): number {
         const per = 900000 / this.length;
         const judger = this.chart.judger;
-        const combo = judger.maxCombo / this.length * 100000;
-        return Math.round(per * judger.perfect + per * 0.5 * judger.good + combo);
+        const combo = (judger.maxCombo / this.length) * 100000;
+        return Math.round(
+            per * judger.perfect + per * 0.5 * judger.good + combo
+        );
     }
 }
 
@@ -410,6 +455,9 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
  * 创建一个mutate游戏
  * @param target 目标画布
  */
-export function create(target: HTMLCanvasElement, option?: MutateOption): Mutate {
+export function create(
+    target: HTMLCanvasElement,
+    option?: MutateOption
+): Mutate {
     return new Mutate(target, option);
 }
