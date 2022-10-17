@@ -12,11 +12,11 @@
 <script setup lang="ts">
 import { create, Mutate } from '../../lib/core';
 
-let game: Mutate
+let game: Mutate;
 
 const config = {
     noteScale: 0.7
-}
+};
 
 async function start() {
     // const span = document.getElementById('length') as HTMLSpanElement;
@@ -25,10 +25,13 @@ async function start() {
     mutate.setOffset(-200);
     game = mutate;
     const tasks = [
-        mutate.load('/src/test/music/one forgotten night.mp3', '/src/test/chart/ofn.mtt'),
+        mutate.load(
+            '/src/test/music/one forgotten night.mp3',
+            '/src/test/chart/ofn.mtt'
+        ),
         mutate.setSound('tap', '/src/test/se/tap.wav'),
         mutate.setSound('drag', '/src/test/se/drag.wav')
-    ]
+    ];
     mutate.on('start', e => console.log(e));
     mutate.on('load', e => console.log(e));
     mutate.on('restart', e => console.log(e));
@@ -43,7 +46,11 @@ async function start() {
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'right';
         ctx.font = '100 24px Verdana';
-        ctx.fillText(mutate.getScore().toString().padStart(7, '0'), canvas.width - 20, 20);
+        ctx.fillText(
+            mutate.getScore().toString().padStart(7, '0'),
+            canvas.width - 20,
+            20
+        );
         const combo = mutate.chart.judger.combo;
         if (combo < 3) return;
         ctx.textAlign = 'center';
@@ -52,18 +59,10 @@ async function start() {
         ctx.font = '100 18px Verdana';
         ctx.fillText(`combo`, canvas.width / 2, 50);
         ctx.restore();
-    })
-    //     mutate.ticker.add(() => {
-    //         span.innerHTML = `打击数：${mutate.chart.judger.perfect + mutate.chart.judger.good} / ${mutate.length}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连击数：${mutate.chart.judger.combo}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大连击：${mutate.chart.judger.maxCombo}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perfect：${mutate.chart.judger.perfect}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;good：${mutate.chart.judger.good}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;miss：${mutate.chart.judger.miss}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;late：${mutate.chart.judger.late}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;early：${mutate.chart.judger.early}
-    // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分数：${mutate.getScore()}`;
-    //     })
+    });
+    mutate.on('end', e => {
+        console.log('music ended');
+    });
 }
 
 async function restart() {

@@ -1,20 +1,20 @@
-import { Mutate, MutateStatus } from "./core";
-import { has } from "./utils";
+import { sleep } from './animate';
+import { Mutate, MutateStatus } from './core';
+import { has } from './utils';
 
 export class AudioExtractor {
-
     /** 音频信息 */
-    audio!: AudioBuffer
+    audio!: AudioBuffer;
     /** 音频播放状态 */
-    status: MutateStatus = 'pre'
+    status: MutateStatus = 'pre';
     /** 开始播放时的时间，用于计算音乐时间 */
-    startTime: number = 0
+    startTime: number = 0;
     /** 音效的音量 */
-    seVolume: number = 0.5
+    seVolume: number = 0.5;
     /** 音乐的音量 */
-    musicVolume: number = 1
+    musicVolume: number = 1;
     /** 谱面误差 */
-    offset: number = -100
+    offset: number = -100;
 
     set volume(v: number) {
         this.mainGain.gain.value = v;
@@ -25,16 +25,16 @@ export class AudioExtractor {
     }
 
     /** 游戏实例 */
-    readonly game: Mutate
+    readonly game: Mutate;
     /** 音频处理模块 */
-    readonly ac: AudioContext = new AudioContext()
+    readonly ac: AudioContext = new AudioContext();
     /** 音效 */
-    readonly sounds: { [key: string]: AudioBuffer } = {}
+    readonly sounds: { [key: string]: AudioBuffer } = {};
     /** 全局音量控制器 */
-    readonly mainGain = this.ac.createGain()
+    readonly mainGain = this.ac.createGain();
 
     /** 当前音乐资源节点 */
-    private musicNode!: AudioBufferSourceNode
+    private musicNode!: AudioBufferSourceNode;
 
     constructor(game: Mutate) {
         this.game = game;
@@ -54,7 +54,8 @@ export class AudioExtractor {
      * 播放音频
      */
     play(): void {
-        if (this.status === 'playing') throw new TypeError(`The game music is playing now.`);
+        if (this.status === 'playing')
+            throw new TypeError(`The game music is playing now.`);
         this.startTime = this.ac.currentTime;
         this.game.time = (this.ac.currentTime - this.startTime) * 1000;
         const gain = this.ac.createGain();
@@ -68,13 +69,19 @@ export class AudioExtractor {
         source.start();
         this.status = 'playing';
         this.startTime = this.ac.currentTime;
+        source.addEventListener('ended', e => {
+            this.musicEnd();
+        });
     }
 
     /**
      * 暂停播放
      */
     async pause(): Promise<void> {
-        if (this.status !== 'playing') throw new TypeError(`You are trying to pause an already paused music.`);
+        if (this.status !== 'playing')
+            throw new TypeError(
+                `You are trying to pause an already paused music.`
+            );
         await this.ac.suspend();
         this.status = 'pause';
     }
@@ -83,7 +90,10 @@ export class AudioExtractor {
      * 继续播放
      */
     async resume(): Promise<void> {
-        if (this.status !== 'pause') throw new TypeError(`You are trying to resume an already playing music.`);
+        if (this.status !== 'pause')
+            throw new TypeError(
+                `You are trying to resume an already playing music.`
+            );
         await this.ac.resume();
         this.status = 'playing';
     }
@@ -129,9 +139,18 @@ export class AudioExtractor {
             if (this.status === 'pre') {
                 this.game.time = this.offset;
             } else {
-                this.game.time = (this.ac.currentTime - this.startTime) * 1000 + this.offset;
+                this.game.time =
+                    (this.ac.currentTime - this.startTime) * 1000 + this.offset;
             }
-        }
+        };
         this.game.ticker.add(fn, true);
+    }
+
+    /**
+     * 当音频结束时
+     */
+    private async musicEnd(): Promise<void> {
+        await sleep(1000);
+        this.game.end();
     }
 }
