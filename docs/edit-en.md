@@ -5,84 +5,98 @@ The suffix name of the chart is usually `.mtt`, in `json` format. Its type is
 ```ts
 // The animation type of the chart file
 type MTTAnimate = Array<{
-    custom: boolean // Whether it is custom or not
-    start: number // Start time of the animation
-    type: string // The name of the animation. If it is not custom, it is one of 'move', 'rotate', 'resize', 'moveAs' and 'shake'. If it is, it is usually the property name.
-    time: number // Duration of execution
-    n: number // Target value, if it is not 'move' or 'moveAs'
-    mode: { // Animation rate function
-        fnType: 'generator' | 'timing' | 'path' | 'pathG' // Generator is the rate generator, pathG is the path generator
-        fn: string // Timing or generator function name
-        args: any[] // List of arguments for the timing generator
-        pathFn?: string // Path or pathG function name
-        pathArg?: any[] // List of arguments for the path or path generator
+    custom: boolean; // Whether it is custom or not
+    start: number; // Start time of the animation
+    type: string; // The name of the animation. If it is not custom, it is one of 'move', 'rotate', 'resize', 'moveAs' and 'shake'. If it is, it is usually the property name.
+    time: number; // Duration of execution
+    n: number; // Target value, if it is not 'move' or 'moveAs'
+    mode: {
+        // Animation rate function
+        fnType: 'generator' | 'timing' | 'path' | 'pathG'; // Generator is the rate generator, pathG is the path generator
+        fn: string; // Timing or generator function name
+        args: any[]; // List of arguments for the timing generator
+        pathFn?: string; // Path or pathG function name
+        pathArg?: any[]; // List of arguments for the path or path generator
         // The above should be registered in the game, the registration method is described in the chart section, and the mechanism will be explained in detail afterwards
-    }
-    relation: 'absolute' | 'relative' // Relative or absolute
-    first?: boolean // Whether to insert the animation at the beginning of all animations of the current object
-    shake?: boolean // If or not it is a shake change
-    x?: number // The horizontal coordinate to move to
-    y?: number // The vertical coordinate when moving
-}>
+    };
+    relation: 'absolute' | 'relative'; // Relative or absolute
+    first?: boolean; // Whether to insert the animation at the beginning of all animations of the current object
+    shake?: boolean; // If or not it is a shake change
+    x?: number; // The horizontal coordinate to move to
+    y?: number; // The vertical coordinate when moving
+}>;
 
 // The type of the chart file
 type MTT = {
-    option: { // Global settings
-        background?: string // Background color
-    }
-    bases: Array<{ // All bases
-        id: string // The id of the base
-        x: number // Initial horizontal coordinate
-        y: number // Initial vertical coordinate
-        angle: number // The initial rotation angle
-        r: { // Simple radius change method, index indicates the change time, value indicates the target value. It will be animated in 1 frame.
-            [time: number]: number
-        } 
-        bpm: { // Rotation speed change method, same as above
-            [time: number]: number
-        }
-        rgba: { // Same as above
-            [time: number]: [number, number, number, number]
-        }
-        animate: MTTAnimate // All animations
-    }>
+    option: {
+        // Global settings
+        background?: string; // Background color
+    };
+    bases: Array<{
+        // All bases
+        id: string; // The id of the base
+        x: number; // Initial horizontal coordinate
+        y: number; // Initial vertical coordinate
+        angle: number; // The initial rotation angle
+        r: {
+            // Simple radius change method, index indicates the change time, value indicates the target value. It will be animated in 1 frame.
+            [time: number]: number;
+        };
+        bpm: {
+            // Rotation speed change method, same as above
+            [time: number]: number;
+        };
+        rgba: {
+            // Same as above
+            [time: number]: [number, number, number, number];
+        };
+        filter: {
+            [time: number]: string;
+        };
+        animate: MTTAnimate; // All animations
+    }>;
     notes: Array<{
-        base: string // The base to which it belongs
-        type: NoteType // Note type, tap or drag or hold
+        base: string; // The base to which it belongs
+        type: NoteType; // Note type, tap or drag or hold
         config?: {
-            playTime?: number // Hit time
-            perfectTime?: number // Perfect judgement interval
-            goodTime?: number // Good judgement interval
-            missTime?: number // Miss judgment interval
-            time?: number // Time of long press
-        }
-        speed: { // Flow speed change method
-            [time: number]: number
-        }
-        filter: { // Set the filter at a specific time, no animation
-            [time: number]: string
-        }
-        shadow: { // Shadow
+            playTime?: number; // Hit time
+            perfectTime?: number; // Perfect judgement interval
+            goodTime?: number; // Good judgement interval
+            missTime?: number; // Miss judgment interval
+            time?: number; // Time of long press
+        };
+        speed: {
+            // Flow speed change method
+            [time: number]: number;
+        };
+        filter: {
+            // Set the filter at a specific time, no animation
+            [time: number]: string;
+        };
+        shadow: {
+            // Shadow
             [time: number]: {
-                x: number
-                y: number
-                blur: number
-                color: string
-            }
-        }
-        opacity: { // Opacity
-            [time: number]: number
-        }
-        animate: MTTAnimate // Animation
-    }>
+                x: number;
+                y: number;
+                blur: number;
+                color: string;
+            };
+        };
+        opacity: {
+            // Opacity
+            [time: number]: number;
+        };
+        animate: MTTAnimate; // Animation
+    }>;
     camera: {
-        id: string // Camera id
-        animate: MTTAnimate // Animation
-        css: { // Set the css at a specific time, written in the same way as css
-            [time: number]: string
-        }
-    }
-}
+        id: string; // Camera id
+        animate: MTTAnimate; // Animation
+        css: {
+            // Set the css at a specific time, written in the same way as css
+            [time: number]: string;
+        };
+    };
+};
 ```
 
 ## Initial Configuration
