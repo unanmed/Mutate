@@ -134,7 +134,6 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         const fn = () => {
             if (this.base.game.time >= this.noteTime!) {
                 this.hit('perfect');
-                this.ticker.remove(fn);
             }
         };
 

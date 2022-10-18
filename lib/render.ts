@@ -71,8 +71,9 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
 
     /**
      * 渲染所有内容
+     * @param time 渲染指定时刻的内容
      */
-    render(): void {
+    render(time?: number): void {
         const ctx = this.game.ctx;
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
