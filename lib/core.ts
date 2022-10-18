@@ -222,7 +222,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
     async load(
         music: string,
         mtt: string,
-        onProgress?: (e: ProgressEvent) => void
+        onMusicProgress?: (e: ProgressEvent) => void,
+        onMTTProgress?: (e: ProgressEvent) => void
     ): Promise<void> {
         const startTime = Date.now();
 
@@ -231,8 +232,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
                 `The game's music or chart has already been loaded.`
             );
         const task = [
-            this.loadMusic(music, onProgress),
-            this.loadMTT(mtt, onProgress)
+            this.loadMusic(music, onMusicProgress),
+            this.loadMTT(mtt, onMTTProgress)
         ];
         await Promise.all(task);
 
