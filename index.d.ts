@@ -879,7 +879,7 @@ declare module 'mutate-game' {
          * @param music 音乐资源地址 | Music resource url.
          * @param mtt 谱面资源地址 | Chart resource url.
          */
-        load(music: string, mtt: string): Promise<void>;
+        load(music: string, mtt: string, onProgress?: (e: ProgressEvent) => void): Promise<void>;
 
         /**
          * 开始游戏
@@ -964,10 +964,7 @@ declare module 'mutate-game' {
      *
      * @param target 目标画布 | The target canvas of the game.
      */
-    export function create(
-        target: HTMLCanvasElement,
-        option?: MutateOption
-    ): Mutate;
+    export function create(target: HTMLCanvasElement,option?: MutateOption): Mutate;
 
     /**
      * 谱面解析器

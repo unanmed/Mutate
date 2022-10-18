@@ -219,14 +219,21 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * @param music 音乐资源
      * @param mtt 谱面资源
      */
-    async load(music: string, mtt: string): Promise<void> {
+    async load(
+        music: string,
+        mtt: string,
+        onProgress?: (e: ProgressEvent) => void
+    ): Promise<void> {
         const startTime = Date.now();
 
         if (has(this.audio) || has(this.mtt))
             throw new TypeError(
                 `The game's music or chart has already been loaded.`
             );
-        const task = [this.loadMusic(music), this.loadMTT(mtt)];
+        const task = [
+            this.loadMusic(music, onProgress),
+            this.loadMTT(mtt, onProgress)
+        ];
         await Promise.all(task);
 
         const e: LoadEvent<'load'> = {
@@ -397,11 +404,12 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      */
     private async post<T extends keyof PostType>(
         url: string,
-        type: T
+        type: T,
+        on?: (e: ProgressEvent) => void
     ): Promise<AxiosResponse<PostType[T]>> {
         const config: AxiosRequestConfig = {
             responseType: type,
-            timeout: 60000
+            onDownloadProgress: on
         };
         return await axios.get(url, config);
     }
@@ -410,8 +418,11 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * 加载某个音乐
      * @param url 音乐的地址
      */
-    private async loadMusic(url: string): Promise<void> {
-        const data = await this.post(url, 'arraybuffer');
+    private async loadMusic(
+        url: string,
+        on?: (e: ProgressEvent) => void
+    ): Promise<void> {
+        const data = await this.post(url, 'arraybuffer', on);
         if (data.status !== 200)
             return this.fail(`Fail to load url [${url}]`, data.status);
         const audio = await this.ac.extract(data.data);
@@ -422,8 +433,11 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
      * 加载某个音乐
      * @param url 谱面的地址
      */
-    private async loadMTT(url: string): Promise<void> {
-        const data = await this.post(url, 'json');
+    private async loadMTT(
+        url: string,
+        on?: (e: ProgressEvent) => void
+    ): Promise<void> {
+        const data = await this.post(url, 'json', on);
         if (data.status !== 200)
             return this.fail(`Fail to load url [${url}]`, data.status);
         this.mtt = data.data;
