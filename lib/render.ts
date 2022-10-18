@@ -251,12 +251,12 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         note: BaseNote<Exclude<NoteType, 'hold'>>,
         fillColor: string
     ) {
+        if (note.played) return;
         if (
             has(note.noteTime) &&
             this.game.time > note.noteTime + note.missTime
         )
             return;
-        if (note.played) return;
         if (!note.inited) return;
 
         const [x, y, d] = note.calPosition();

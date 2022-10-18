@@ -1,190 +1,193 @@
-import { AnimationBase, sleep } from "./animate";
-import { Base } from "./base";
-import { Camera } from "./camera";
-import { Mutate } from "./core";
-import { Judger } from "./judge";
-import { BaseNote, NoteConfig, NoteShadow, NoteType } from "./note";
-import { PathFn, PathG } from "./path";
-import { TimingFn, TimingGenerator } from "./timing";
-import { has, isMTTFn } from "./utils";
+import { AnimationBase, sleep } from './animate';
+import { Base } from './base';
+import { Camera } from './camera';
+import { Mutate } from './core';
+import { Judger } from './judge';
+import { BaseNote, NoteConfig, NoteShadow, NoteType } from './note';
+import { PathFn, PathG } from './path';
+import { TimingFn, TimingGenerator } from './timing';
+import { has, isMTTFn } from './utils';
 
-export type SystemAnimate = 'move' | 'moveAs' | 'rotate' | 'resize'
+export type SystemAnimate = 'move' | 'moveAs' | 'rotate' | 'resize';
 
 export interface ChartDataMap {
-    note: NoteChart
-    base: BaseChart
-    camera: MutateCamera
+    note: NoteChart;
+    base: BaseChart;
+    camera: MutateCamera;
 }
 
 export interface ChartMap {
-    note: BaseNote<NoteType>
-    base: Base
-    camera: Camera
+    note: BaseNote<NoteType>;
+    base: Base;
+    camera: Camera;
 }
 
 export type MTTMode<T extends string> = {
-    fnType: keyof TimingMode
-    fn: string
-    args: any[]
-    pathFn: T extends 'moveAs' ? string : void
-    pathArg: T extends 'moveAs' ? any[] : void
-}
+    fnType: keyof TimingMode;
+    fn: string;
+    args: any[];
+    pathFn: T extends 'moveAs' ? string : void;
+    pathArg: T extends 'moveAs' ? any[] : void;
+};
 
 /**
  * 动画信息
  */
 export type AnimateInfo<T extends string> = {
-    custom: T extends SystemAnimate ? false : true
-    start: number
-    type: T
-    time: number
-    n: number
-    mode: MTTMode<T>
-    relation: 'absolute' | 'relative'
-    first?: boolean
-    shake?: boolean
-    x?: number
-    y?: number
-}
+    custom: T extends SystemAnimate ? false : true;
+    start: number;
+    type: T;
+    time: number;
+    n: number;
+    mode: MTTMode<T>;
+    relation: 'absolute' | 'relative';
+    first?: boolean;
+    shake?: boolean;
+    x?: number;
+    y?: number;
+};
 
 /**
  * MTT文件的动画
  */
-export type MTTAnimate = AnimateInfo<string>[]
+export type MTTAnimate = AnimateInfo<string>[];
 
 /**
  * 摄像机信息
  */
 export type MutateCamera = {
-    id: string
-    animate: MTTAnimate
+    id: string;
+    animate: MTTAnimate;
     css: {
-        [time: number]: string
-    }
-}
+        [time: number]: string;
+    };
+};
 
 /**
  * 基地信息
  */
 export type BaseChart = {
-    id: string
-    x: number
-    y: number
-    angle: number
+    id: string;
+    x: number;
+    y: number;
+    angle: number;
     r: {
-        [time: number]: number
-    }
+        [time: number]: number;
+    };
     bpm: {
-        [time: number]: number
-    }
+        [time: number]: number;
+    };
     rgba: {
-        [time: number]: [number, number, number, number]
-    }
-    animate: MTTAnimate
-}
+        [time: number]: [number, number, number, number];
+    };
+    animate: MTTAnimate;
+};
 
 /**
  * 音符信息
  */
 export type NoteChart = {
-    base: string
-    type: NoteType
-    config?: NoteConfig
+    base: string;
+    type: NoteType;
+    config?: NoteConfig;
     speed: {
-        [time: number]: number
-    }
+        [time: number]: number;
+    };
     filter: {
-        [time: number]: string
-    }
+        [time: number]: string;
+    };
     shadow: {
-        [time: number]: NoteShadow
-    }
+        [time: number]: NoteShadow;
+    };
     opacity: {
-        [time: number]: number
-    }
-    animate: MTTAnimate
-}
+        [time: number]: number;
+    };
+    animate: MTTAnimate;
+};
 
 export type ChartOption = {
-    background?: string
-}
+    background?: string;
+};
 
 /**
  * 读取的谱面信息
  */
 export interface MutateChart {
-    option: ChartOption
-    bases: BaseChart[]
-    notes: NoteChart[]
-    camera: MutateCamera
+    option: ChartOption;
+    bases: BaseChart[];
+    notes: NoteChart[];
+    camera: MutateCamera;
 }
 
 /**
  * 缓动函数
  */
 export type TimingMode = {
-    timing: TimingFn
-    generator: TimingGenerator
-    path: PathFn
-    pathG: PathG
-}
+    timing: TimingFn;
+    generator: TimingGenerator;
+    path: PathFn;
+    pathG: PathG;
+};
 
 /**
  * 某个特定种类的缓动函数
  */
 export type Animates<T extends keyof TimingMode> = {
-    [name: string]: TimingMode[T]
-}
+    [name: string]: TimingMode[T];
+};
 
 /**
  * 缓动函数定义
  */
 export type AnimateDeclare = {
-    [T in keyof TimingMode]: Animates<T>
-}
+    [T in keyof TimingMode]: Animates<T>;
+};
 
 /**
  * 所有的缓动函数
  */
-export type TimingAnimateFn = TimingFn | TimingGenerator | PathFn
+export type TimingAnimateFn = TimingFn | TimingGenerator | PathFn;
 
 /**
  * 解析过的单个动画
  */
 export type ExtractedMTTAnimate<Path extends boolean, T extends string> = {
-    fn: TimingFn
-    path: Path extends true ? PathFn : void
-} & AnimateInfo<T>
+    fn: TimingFn;
+    path: Path extends true ? PathFn : void;
+} & AnimateInfo<T>;
 
 /**
  * 预执行函数
  */
-export type Executer<T extends keyof ChartDataMap> = (value: any, target: ChartMap[T]) => void
+export type Executer<T extends keyof ChartDataMap> = (
+    value: any,
+    target: ChartMap[T]
+) => void;
 
 /**
  * 预执行函数列表
  */
 export type ExecuteDeclare = {
-    note: { [key: string]: Executer<'note'> }
-    base: { [key: string]: Executer<'base'> }
-    camera: { [key: string]: Executer<'camera'> }
-}
+    note: { [key: string]: Executer<'note'> };
+    base: { [key: string]: Executer<'base'> };
+    camera: { [key: string]: Executer<'camera'> };
+};
 
 export class Chart {
     /** 摄像机实例 */
-    camera!: Camera
+    camera!: Camera;
     /** 所有的音符 */
-    notes: { [num: number]: BaseNote<NoteType> } = {}
+    notes: { [num: number]: BaseNote<NoteType> } = {};
     /** 所有的基地 */
-    bases: { [num: number]: Base } = {}
+    bases: { [num: number]: Base } = {};
     /** 按id区分的基地 */
-    basesDict: { [id: string]: Base } = {}
+    basesDict: { [id: string]: Base } = {};
     /** 剩余的音符数组 */
-    notesArr: BaseNote<NoteType>[] = []
+    notesArr: BaseNote<NoteType>[] = [];
     /** 游戏实例 */
-    readonly game: Mutate
+    readonly game: Mutate;
     /** 判定模块 */
-    readonly judger: Judger = new Judger(this)
+    readonly judger: Judger = new Judger(this);
 
     /** 已注册的动画类型 */
     private readonly animate: AnimateDeclare = {
@@ -192,14 +195,14 @@ export class Chart {
         generator: {},
         path: {},
         pathG: {}
-    }
+    };
 
     /** 所有需要预执行的类型 */
     private readonly attrSet: ExecuteDeclare = {
         note: {},
         base: {},
         camera: {}
-    }
+    };
 
     constructor(mutate: Mutate) {
         this.game = mutate;
@@ -216,12 +219,21 @@ export class Chart {
             // 基地
             for (const data of bases) {
                 const id = data.id;
-                const base = new Base(id, this.game, data.x, data.y, Object.values(data.r)[0], data.angle);
+                const base = new Base(
+                    id,
+                    this.game,
+                    data.x,
+                    data.y,
+                    Object.values(data.r)[0],
+                    data.angle
+                );
                 this.bases[base.num] = base;
                 this.basesDict[id] = base;
                 base.timeNodes.push(
-                    ...Object.entries(data.bpm)
-                        .map(v => [parseFloat(v[0]), v[1]]) as [number, number][]
+                    ...(Object.entries(data.bpm).map(v => [
+                        parseFloat(v[0]),
+                        v[1]
+                    ]) as [number, number][])
                 );
                 base.sort();
                 this.execute('base', data, base);
@@ -236,7 +248,7 @@ export class Chart {
                 if (aa && !bb) return -1;
                 if (!aa && bb) return 1;
                 return 0;
-            })
+            });
 
             // 音符
             for (const n of notes) {
@@ -245,8 +257,10 @@ export class Chart {
                 this.notes[note.num] = note;
                 this.notesArr.push(note);
                 note.timeNodes.push(
-                    ...Object.entries(n.speed)
-                        .map(v => [parseFloat(v[0]), v[1]]) as [number, number][]
+                    ...(Object.entries(n.speed).map(v => [
+                        parseFloat(v[0]),
+                        v[1]
+                    ]) as [number, number][])
                 );
                 note.sort();
                 this.execute('note', n, note);
@@ -255,7 +269,7 @@ export class Chart {
 
             this.notesArr.forEach(v => {
                 v.multi = this.judger.isMulti(v);
-            })
+            });
 
             // 摄像机
             const c = new Camera(this.game, camera.id, this.game.ctx);
@@ -299,7 +313,11 @@ export class Chart {
      * @param name 动画名称
      * @param func 动画函数
      */
-    register<T extends keyof TimingMode>(type: T, name: string, func: TimingMode[T]): void {
+    register<T extends keyof TimingMode>(
+        type: T,
+        name: string,
+        func: TimingMode[T]
+    ): void {
         (this.animate[type] as AnimateDeclare[keyof TimingMode])[name] = func;
     }
 
@@ -308,7 +326,11 @@ export class Chart {
      * @param type 注册的类型
      * @param fn 执行的函数
      */
-    registerExecute<T extends keyof ExecuteDeclare>(type: T, key: string, fn: Executer<T>): void {
+    registerExecute<T extends keyof ExecuteDeclare>(
+        type: T,
+        key: string,
+        fn: Executer<T>
+    ): void {
         (this.attrSet[type] as { [key: string]: Executer<T> })[key] = fn;
     }
 
@@ -318,16 +340,22 @@ export class Chart {
     private sortMTT(data: { [time: number]: any }): number[] {
         return Object.keys(data)
             .map(v => parseFloat(v))
-            .sort((a, b) => a - b)
+            .sort((a, b) => a - b);
     }
 
     /**
      * 解析MTT文件的动画信息
      * @param data 动画信息
      */
-    private extractMTTAnimate<T extends string>(data: AnimateInfo<T>): ExtractedMTTAnimate<T extends 'moveAs' ? true : false, T> {
+    private extractMTTAnimate<T extends string>(
+        data: AnimateInfo<T>
+    ): ExtractedMTTAnimate<T extends 'moveAs' ? true : false, T> {
         // 主要目标是解析函数
-        const extract = <T extends keyof TimingMode>(fn: string, type: T, args: any[]): TimingFn | PathFn => {
+        const extract = <T extends keyof TimingMode>(
+            fn: string,
+            type: T,
+            args: any[]
+        ): TimingFn | PathFn => {
             const res = args.map(v => {
                 // 如果参数是个函数...
                 if (isMTTFn(v)) return extract(v.fn, v.fnType, v.args);
@@ -337,11 +365,15 @@ export class Chart {
             if (type === 'timing') return func as TimingFn;
             // @ts-ignore
             else return func.apply(this, res) as TimingFn | PathFn;
-        }
+        };
         const fn = extract(data.mode.fn, data.mode.fnType, data.mode.args);
-        let path: PathFn | undefined
+        let path: PathFn | undefined;
         if (data.type === 'moveAs')
-            path = extract(data.mode.pathFn as string, 'path', data.mode.pathArg as any[]) as PathFn;
+            path = extract(
+                data.mode.pathFn as string,
+                'path',
+                data.mode.pathArg as any[]
+            ) as PathFn;
         else path = void 0;
 
         return {
@@ -349,22 +381,31 @@ export class Chart {
             fn,
             // @ts-ignore
             path,
-            ...data,
-        }
+            ...data
+        };
     }
 
     /**
      * 解析并执行音符动画或基地动画（当然是设置好时间自动运行，不是立即运行
      */
-    private executeAnimate(target: 'camera', ani: MTTAnimate): void
-    private executeAnimate(target: 'note' | 'base', ani: MTTAnimate, num: number): void
-    private executeAnimate(target: 'note' | 'base' | 'camera', ani: MTTAnimate, num?: number): void {
-        let obj: AnimationBase
+    private executeAnimate(target: 'camera', ani: MTTAnimate): void;
+    private executeAnimate(
+        target: 'note' | 'base',
+        ani: MTTAnimate,
+        num: number
+    ): void;
+    private executeAnimate(
+        target: 'note' | 'base' | 'camera',
+        ani: MTTAnimate,
+        num?: number
+    ): void {
+        let obj: AnimationBase;
         if (target === 'base') obj = this.bases[num as number];
         else if (target === 'note') obj = this.notes[num as number];
         else obj = this.camera;
 
-        const data = ani.sort((a, b) => a.start - b.start)
+        const data = ani
+            .sort((a, b) => a.start - b.start)
             .map(v => this.extractMTTAnimate(v));
 
         let last = -1;
@@ -376,8 +417,7 @@ export class Chart {
             const time = a.start;
             if (this.game.time < time) return;
             last++;
-            obj.mode(a.fn, a.shake)
-                .time(a.time)
+            obj.mode(a.fn, a.shake).time(a.time);
             if (a.relation === 'absolute') obj.absolute();
             else obj.relative();
 
@@ -387,8 +427,9 @@ export class Chart {
             else if (a.type === 'move') obj.move(a.x as number, a.y as number);
             else if (a.type === 'rotate') obj.rotate(a.n);
             else if (a.type === 'resize') obj.scale(a.n);
-            else if (a.type === 'shake') obj.shake(a.x as number, a.y as number);
-        }
+            else if (a.type === 'shake')
+                obj.shake(a.x as number, a.y as number);
+        };
 
         this.game.ticker.add(fn);
     }
@@ -396,7 +437,11 @@ export class Chart {
     /**
      * 执行某个种类的预执行操作
      */
-    private execute<T extends keyof ChartDataMap>(type: T, data: ChartDataMap[T], target: ChartMap[T]): void {
+    private execute<T extends keyof ChartDataMap>(
+        type: T,
+        data: ChartDataMap[T],
+        target: ChartMap[T]
+    ): void {
         const all = this.attrSet[type];
 
         // 执行某个类型的预执行函数
@@ -411,14 +456,15 @@ export class Chart {
                 const time = sorted[last + 1];
                 if (!has(time)) return this.game.ticker.remove(fn);
                 if (this.game.time < time) return;
-                if (time === 0) requestAnimationFrame(() => target.inited = true);
-                if (this.game.time > 0 && !target.inited) requestAnimationFrame(() => target.inited = true);
+                if (time === 0) setTimeout(() => (target.inited = true), 50);
+                if (this.game.time > 0 && !target.inited)
+                    setTimeout(() => (target.inited = true), 50);
                 last++;
                 // @ts-ignore
                 exe(data[key][time], target);
-            }
+            };
             this.game.ticker.add(fn);
-        }
+        };
 
         for (const key in all) {
             f(key as keyof ChartDataMap[T]);
