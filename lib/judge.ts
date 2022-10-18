@@ -1,40 +1,40 @@
-import { Chart } from "./chart";
-import { MutateEventTarget } from "./event";
-import { JudgerEventMap } from "./event.map";
-import { BaseNote, NoteType } from "./note";
-import { has } from "./utils";
+import { Chart } from './chart';
+import { MutateEventTarget } from './event';
+import { JudgerEventMap } from './event.map';
+import { BaseNote, NoteType } from './note';
+import { has } from './utils';
 
-export type JudgeRes = 'perfect' | 'good' | 'miss'
+export type JudgeRes = 'perfect' | 'good' | 'miss';
 
 export class Judger extends MutateEventTarget<JudgerEventMap> {
     /** 下一个或几个需要判定的音符 */
-    toJudge: BaseNote<NoteType>[] = []
+    toJudge: BaseNote<NoteType>[] = [];
     /** 正在按住的长按音符 */
-    holding: BaseNote<'hold'>[] = []
+    holding: BaseNote<'hold'>[] = [];
     /** 现在正在按住的键 */
-    holdingKeys: number[] = []
+    holdingKeys: number[] = [];
     /** 完美的个数 */
-    perfect: number = 0
+    perfect: number = 0;
     /** 好的个数 */
-    good: number = 0
+    good: number = 0;
     /** miss的个数 */
-    miss: number = 0
+    miss: number = 0;
     /** 最大连击数 */
-    maxCombo: number = 0
+    maxCombo: number = 0;
     /** 提前的个数 */
-    early: number = 0
+    early: number = 0;
     /** 过晚的个数 */
-    late: number = 0
+    late: number = 0;
     /** 按住的手指数 */
-    touching: number = 0
+    touching: number = 0;
     /** 自动播放 */
-    auto: boolean = false
+    auto: boolean = false;
 
     /** 谱面实例 */
-    readonly chart: Chart
+    readonly chart: Chart;
 
     /** 连击数 */
-    private c: number = 0
+    private c: number = 0;
 
     set combo(v: number) {
         this.c = v;
@@ -50,7 +50,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             hit: [],
             hold: [],
             holdend: []
-        })
+        });
         this.chart = chart;
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);
@@ -60,7 +60,9 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      * 判断一个音符是否在判定区间内
      */
     inJudge(num: number): boolean {
-        return num <= this.perfect + this.good + this.miss + this.toJudge.length;
+        return (
+            num <= this.perfect + this.good + this.miss + this.toJudge.length
+        );
     }
 
     /**
@@ -87,7 +89,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
         // 判定函数
         const judge = (t: number) => {
             return time > noteTime - t && time < noteTime + t;
-        }
+        };
 
         // 判断perfect good miss
         if (judge(note.perfectTime)) {
@@ -110,14 +112,13 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             this.combo = 0;
             this.miss++;
         }
-
     }
 
     /**
      * 判定长按
      */
-    judgeHold(first: boolean): void
-    judgeHold(first: boolean, note: BaseNote<'hold'>, key: number): void
+    judgeHold(first: boolean): void;
+    judgeHold(first: boolean, note: BaseNote<'hold'>, key: number): void;
     judgeHold(first: boolean, note?: BaseNote<'hold'>, key?: number): void {
         if (this.auto) return;
         // 第一次按下
@@ -128,29 +129,40 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                 const noteTime = note.noteTime;
                 const judge = (t: number) => {
                     return time > noteTime - t && time < noteTime + t;
-                }
+                };
                 if (judge(note.perfectTime))
                     note.hold('perfect', 'perfect', key);
                 else if (judge(note.goodTime))
-                    note.hold('good', time - noteTime > note.perfectTime ? 'late' : 'early', key);
+                    note.hold(
+                        'good',
+                        time - noteTime > note.perfectTime ? 'late' : 'early',
+                        key
+                    );
                 else if (judge(note.missTime))
-                    note.hold('miss', time - noteTime > note.goodTime ? 'late' : 'early', key);
+                    note.hold(
+                        'miss',
+                        time - noteTime > note.goodTime ? 'late' : 'early',
+                        key
+                    );
 
                 // 删除toJudge里面的音符
                 const i = this.toJudge.findIndex(v => v === note);
                 this.toJudge.splice(i, 1);
                 return;
-            } else throw new TypeError(`There is no note on judging first hold.`);
+            } else
+                throw new TypeError(`There is no note on judging first hold.`);
         }
 
         // 不是第一次按下
-        if (has(note) && has(key)) { // 电脑端
+        if (has(note) && has(key)) {
+            // 电脑端
             if (note.key === key) {
                 const i = this.holding.findIndex(v => v === note);
                 this.holding.splice(i, 1);
                 return note.miss('late');
             }
-        } else { // 手机端
+        } else {
+            // 手机端
             const all = this.holding;
             if (all.length > this.touching) {
                 const delta = all.length - this.touching;
@@ -158,7 +170,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                 notes.forEach(v => {
                     const i = this.holding.findIndex(v => v === note);
                     this.holding.splice(i, 1);
-                    v.miss('late')
+                    v.miss('late');
                 });
             }
         }
@@ -173,11 +185,18 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             const all = this.toJudge;
             if (all.length === 0) this.next();
             this.toJudge = this.toJudge.filter(v => {
-                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
-                if (!this.auto) { // 不是自动播放时
+                if (!has(v.noteTime))
+                    throw new TypeError(
+                        `The note to be judge doesn't have the property 'noteTime'.`
+                    );
+                if (!this.auto) {
+                    // 不是自动播放时
                     if (v.noteType === 'drag') {
                         if (this.chart.game.time > v.noteTime - v.perfectTime) {
-                            if (this.holdingKeys.length > 0 || this.touching > 0) {
+                            if (
+                                this.holdingKeys.length > 0 ||
+                                this.touching > 0
+                            ) {
                                 v.perfect();
                                 return false;
                             }
@@ -209,11 +228,20 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             });
             // 还有长按
             this.holding = this.holding.filter(v => {
-                if (!has(v.noteTime)) throw new TypeError(`The note to be judge doesn't have the property 'noteTime'.`);
-                if (!has(v.holdTime)) throw new TypeError(`The note to be judge doesn't have the property 'holdTime'.`);
+                if (!has(v.noteTime))
+                    throw new TypeError(
+                        `The note to be judge doesn't have the property 'noteTime'.`
+                    );
+                if (!has(v.holdTime))
+                    throw new TypeError(
+                        `The note to be judge doesn't have the property 'holdTime'.`
+                    );
                 if (!this.auto) {
                     if (v.holdTime > this.chart.game.time - v.noteTime - 100) {
-                        if (v.res === 'pre') throw new TypeError(`The note type is unexpected 'pre' when judging hold note.`);
+                        if (v.res === 'pre')
+                            throw new TypeError(
+                                `The note type is unexpected 'pre' when judging hold note.`
+                            );
                         v[v.res as JudgeRes](v.detail);
                         if (v.res !== 'miss') {
                             this.combo++;
@@ -230,8 +258,8 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                     }
                 }
                 return true;
-            })
-        }
+            });
+        };
 
         this.chart.game.ticker.add(fn);
     }
@@ -244,10 +272,12 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
         const num = note.num;
 
         const l = this.chart.notes[num - 1];
-        if (has(l) && has(l.noteTime) && l.noteTime === note.noteTime) return true;
+        if (has(l) && has(l.noteTime) && l.noteTime === note.noteTime)
+            return true;
 
         const n = this.chart.notes[num + 1];
-        if (has(n) && has(n.noteTime) && n.noteTime === note.noteTime) return true;
+        if (has(n) && has(n.noteTime) && n.noteTime === note.noteTime)
+            return true;
 
         return false;
     }
@@ -255,7 +285,10 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     /**
      * 执行监听事件
      */
-    dispatchEvent<K extends keyof JudgerEventMap>(type: K, e: JudgerEventMap[K]): void {
+    dispatchEvent<K extends keyof JudgerEventMap>(
+        type: K,
+        e: JudgerEventMap[K]
+    ): void {
         this.dispatch(type, e);
     }
 
@@ -266,9 +299,13 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
         const all = this.chart.notesArr;
         const start = all.find(v => has(v.noteTime));
         let i = all.findIndex(v => {
-            return has(v.noteTime) && (v.noteTime > (start?.noteTime as number) ||
-                // 如果有间距极短的drag（一般是超过1s 60个的），就需要单独判定打击时间了
-                (v.noteType === 'drag' && v.noteTime < this.chart.game.time));
+            return (
+                has(v.noteTime) &&
+                (v.noteTime > (start?.noteTime as number) ||
+                    // 如果有间距极短的drag（一般是超过1s 60个的），就需要单独判定打击时间了
+                    (v.noteType === 'drag' &&
+                        v.noteTime < this.chart.game.time))
+            );
         });
 
         if (i === -1) i = all.length + 1;
@@ -284,7 +321,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             this.holdingKeys.push(e.keyCode);
             this.judge(e.keyCode);
         }
-    }
+    };
 
     /**
      * 键盘松开时
@@ -295,7 +332,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
         const note = this.holding.find(v => (v.key as number) === e.keyCode);
         if (!has(note)) return;
         this.judgeHold(false, note, e.keyCode);
-    }
+    };
 
     /**
      * 触摸屏按下时
@@ -303,7 +340,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     touchstart = (e: TouchEvent) => {
         this.touching++;
         this.judge();
-    }
+    };
 
     /**
      * 触摸屏松开时
@@ -311,5 +348,5 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     touchend = (e: TouchEvent) => {
         this.touching--;
         this.judgeHold(false);
-    }
+    };
 }

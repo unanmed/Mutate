@@ -1,105 +1,105 @@
-import axios from "axios";
-import { AnimationBase } from "./animate";
-import { Base } from "./base";
-import { HitEvent, HoldEvent } from "./event.map";
-import { JudgeRes } from "./judge";
-import { ToDrawEffect } from "./render";
-import { linear } from "./timing";
-import { has } from "./utils";
+import axios from 'axios';
+import { AnimationBase } from './animate';
+import { Base } from './base';
+import { HitEvent, HoldEvent } from './event.map';
+import { JudgeRes } from './judge';
+import { ToDrawEffect } from './render';
+import { linear } from './timing';
+import { has } from './utils';
 
-export type NoteType = 'tap' | 'hold' | 'drag'
+export type NoteType = 'tap' | 'hold' | 'drag';
 
-export type DetailRes = 'late' | 'early'
+export type DetailRes = 'late' | 'early';
 
 export interface NoteConfig {
     /** 音符的打击时间 */
-    playTime?: number
+    playTime?: number;
     /** perfect判定的时间 */
-    perfectTime?: number
+    perfectTime?: number;
     /** good判定的时间 */
-    goodTime?: number
+    goodTime?: number;
     /** miss判定的时间 */
-    missTime?: number
+    missTime?: number;
     /** 长按的时间 */
-    time?: number
+    time?: number;
 }
 
 export type NoteShadow = {
-    x: number
-    y: number
-    blur: number
-    color: string
-}
+    x: number;
+    y: number;
+    blur: number;
+    color: string;
+};
 
 export type PlayedEffect = {
-    perfect: (note: ToDrawEffect) => void
-    good: (note: ToDrawEffect) => void
-    miss: (note: ToDrawEffect) => void
-}
+    perfect: (note: ToDrawEffect) => void;
+    good: (note: ToDrawEffect) => void;
+    miss: (note: ToDrawEffect) => void;
+};
 
 export class BaseNote<T extends NoteType> extends AnimationBase {
-    static cnt: number = 0
+    static cnt: number = 0;
 
     /** 是否已经打击过 */
-    played: boolean = false
+    played: boolean = false;
     /** 音符流速，每秒多少像素 */
-    speed: number = 500
+    speed: number = 500;
     /** 不透明度 */
-    alpha: number = 1
+    alpha: number = 1;
     /** 滤镜 */
-    ctxFilter: string = ''
+    ctxFilter: string = '';
     /** 阴影 */
     ctxShadow: NoteShadow = {
         x: 0,
         y: 0,
         blur: 0,
         color: ''
-    }
+    };
     /** 按这个长按的键 */
-    key: number = 0
+    key: number = 0;
     /** 是否按住 */
-    holding: boolean = false
+    holding: boolean = false;
     /** 是否已经被销毁 */
-    destroyed: boolean = false
+    destroyed: boolean = false;
     /** 是完美还是好还是miss */
-    res: 'pre' | 'perfect' | 'good' | 'miss' = 'pre'
+    res: 'pre' | 'perfect' | 'good' | 'miss' = 'pre';
     /** 是提前还是过晚 */
-    detail: DetailRes = 'early'
+    detail: DetailRes = 'early';
     /** 上一个音符速度节点 */
-    lastNode: number = -1
+    lastNode: number = -1;
     /** 上一个速度节点时该音符距离基地的距离 */
-    lastD: number = 0
+    lastD: number = 0;
     /** 是否是多压 */
-    multi: boolean = false
+    multi: boolean = false;
     /** 绝对横坐标 */
-    px: number = 0
+    px: number = 0;
     /** 绝对纵坐标 */
-    py: number = 0
+    py: number = 0;
     /** 第0毫秒的动画是否执行完毕 */
-    inited: boolean = false
+    inited: boolean = false;
 
     /** 音符的专属id */
-    readonly num: number = BaseNote.cnt++
+    readonly num: number = BaseNote.cnt++;
     /** 音符种类 */
-    readonly noteType: T
+    readonly noteType: T;
     /** 该音符所属的基地 */
-    readonly base: Base
+    readonly base: Base;
     /** 长按时间 */
-    readonly holdTime?: number
+    readonly holdTime?: number;
     /** 打击时间 */
-    readonly noteTime?: number
+    readonly noteTime?: number;
     /** 完美的判定区间 */
-    readonly perfectTime: number
+    readonly perfectTime: number;
     /** 好的判定区间 */
-    readonly goodTime: number
+    readonly goodTime: number;
     /** miss的判定区间 */
-    readonly missTime: number
+    readonly missTime: number;
     /** 速度节点 */
-    readonly timeNodes: [number, number][] = []
+    readonly timeNodes: [number, number][] = [];
     /** 音符进入时的方向 */
-    dir: [number, number] = [0, 0]
+    dir: [number, number] = [0, 0];
     /** 音符的旋转弧度 */
-    rad: number = 0
+    rad: number = 0;
 
     constructor(type: T, base: Base, config?: NoteConfig) {
         super(base.game);
@@ -136,7 +136,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
                 this.hit('perfect');
                 this.ticker.remove(fn);
             }
-        }
+        };
 
         if (this.noteType === 'drag') {
             if (this.base.game.time >= this.noteTime!) {
@@ -153,7 +153,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
     good(detail: DetailRes): void {
         this.detail = detail;
         if (this.noteType === 'hold') return this.holdEnd('good');
-        this.hit('good')
+        this.hit('good');
     }
 
     /**
@@ -169,8 +169,10 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * 按住这个长按
      */
     hold(res: JudgeRes, detail: DetailRes | 'perfect', key?: number): void {
-        if (this.noteType !== 'hold') throw new TypeError(`You are trying to hold non-hold note.`);
-        if (!has(this.holdTime) || !has(this.noteTime)) throw new TypeError(`This note has no noteTime or holdTime.`);
+        if (this.noteType !== 'hold')
+            throw new TypeError(`You are trying to hold non-hold note.`);
+        if (!has(this.holdTime) || !has(this.noteTime))
+            throw new TypeError(`This note has no noteTime or holdTime.`);
         this.holding = true;
         if (has(key)) this.key = key;
         this.base.game.chart.judger.holding.push(this as BaseNote<'hold'>);
@@ -202,9 +204,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param num 要设置成的不透明度
      */
     opacity(num: number): BaseNote<T> {
-        this.mode(linear())
-            .time(1)
-            .apply('opacity', num);
+        this.mode(linear()).time(1).apply('opacity', num);
         return this;
     }
 
@@ -224,7 +224,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.ticker.destroy();
     }
 
-    /** 
+    /**
      * 排序速度节点
      */
     sort(): void {
@@ -239,7 +239,12 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         if (!has(this.noteTime)) return 0;
         this.checkNode();
 
-        return -(this.base.game.time - this.timeNodes[this.lastNode][0]) * this.speed / 1000 + this.lastD;
+        return (
+            (-(this.base.game.time - this.timeNodes[this.lastNode][0]) *
+                this.speed) /
+                1000 +
+            this.lastD
+        );
     }
 
     /**
@@ -271,18 +276,19 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @returns 音符进入的方向，为[cos, sin]形式
      */
     private calDir(): [number, number] {
-        if (!has(this.noteTime)) throw new TypeError(`The note doesn't have noteTime.`);
+        if (!has(this.noteTime))
+            throw new TypeError(`The note doesn't have noteTime.`);
         const speeds = this.base.timeNodes;
-        let res = this.base.initAngle * Math.PI / 180;
+        let res = (this.base.initAngle * Math.PI) / 180;
 
         for (let i = 0; i < speeds.length; i++) {
             const [time, speed] = speeds[i];
             const nextTime = speeds[i + 1]?.[0] ?? this.noteTime;
             if (nextTime > this.noteTime) {
-                res += (this.noteTime - time) * speed / 30000 * Math.PI;
+                res += (((this.noteTime - time) * speed) / 30000) * Math.PI;
                 break;
             }
-            res += (nextTime - time) * speed / 30000 * Math.PI;
+            res += (((nextTime - time) * speed) / 30000) * Math.PI;
         }
 
         return [Math.cos(res), Math.sin(res)];
@@ -310,7 +316,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             for (let i = this.timeNodes.length - 1; i >= this.lastNode; i--) {
                 const [time, speed] = this.timeNodes[i];
                 const lastTime = this.timeNodes[i + 1]?.[0] ?? this.noteTime;
-                res += (lastTime - time) * speed / 1000;
+                res += ((lastTime - time) * speed) / 1000;
             }
             this.lastD = res;
         }
@@ -321,12 +327,13 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
      * @param res 打击结果
      */
     private hit(res: JudgeRes, noSe: boolean = false): void {
-        if (!noSe)
-            this.playSound();
+        if (!noSe) this.playSound();
         this.res = res;
         this.played = true;
         this.destroy();
         this.base.game.renderer.addHitEffect(this);
+        if (res !== 'miss') this.base.game.chart.judger.combo = 0;
+        else this.base.game.chart.judger.combo++;
 
         const e: HitEvent<'hit'> = {
             target: this.base.game.chart.judger,
@@ -335,7 +342,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             note: this,
             base: this.base,
             detail: this.detail
-        }
+        };
         this.base.game.chart.judger.dispatchEvent('hit', e);
     }
 
@@ -346,6 +353,8 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.played = true;
         this.destroy();
         this.base.game.renderer.addHitEffect(this);
+        if (res !== 'miss') this.base.game.chart.judger.combo = 0;
+        else this.base.game.chart.judger.combo++;
 
         const e: HoldEvent<'holdend'> = {
             target: this.base.game.chart.judger,
@@ -356,7 +365,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
             detail: this.detail,
             time: this.base.game.time - (this.noteTime as number),
             totalTime: this.holdTime as number
-        }
+        };
         this.base.game.chart.judger.dispatchEvent('holdend', e);
     }
 }
