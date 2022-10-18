@@ -332,7 +332,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.played = true;
         this.destroy();
         this.base.game.renderer.addHitEffect(this);
-        if (res !== 'miss') this.base.game.chart.judger.combo = 0;
+        if (res === 'miss') this.base.game.chart.judger.combo = 0;
         else this.base.game.chart.judger.combo++;
 
         const e: HitEvent<'hit'> = {
@@ -353,7 +353,7 @@ export class BaseNote<T extends NoteType> extends AnimationBase {
         this.played = true;
         this.destroy();
         this.base.game.renderer.addHitEffect(this);
-        if (res !== 'miss') this.base.game.chart.judger.combo = 0;
+        if (res === 'miss') this.base.game.chart.judger.combo = 0;
         else this.base.game.chart.judger.combo++;
 
         const e: HoldEvent<'holdend'> = {
