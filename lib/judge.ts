@@ -96,20 +96,17 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             this.toJudge.shift();
             note.perfect();
             this.perfect++;
-            this.combo++;
         } else if (judge(note.goodTime)) {
             this.toJudge.shift();
             const t = time - noteTime > note.perfectTime ? 'late' : 'early';
             note.good(t);
             this[t]++;
             this.good++;
-            this.combo++;
         } else if (judge(note.missTime)) {
             this.toJudge.shift();
             const t = time - noteTime > note.goodTime ? 'late' : 'early';
             note.miss(t);
             this[t]++;
-            this.combo = 0;
             this.miss++;
         }
     }
@@ -214,7 +211,6 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                         if (v.noteType !== 'hold') {
                             v.perfect();
                             this.perfect++;
-                            this.combo++;
                         } else {
                             v.hold('perfect', 'perfect');
                             // 删除toJudge里面的音符
@@ -244,7 +240,6 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                             );
                         v[v.res as JudgeRes](v.detail);
                         if (v.res !== 'miss') {
-                            this.combo++;
                             this[v.res]++;
                         }
                         return false;
@@ -252,7 +247,6 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                 } else {
                     if (v.holdTime > this.chart.game.time - v.noteTime - 100) {
                         v.perfect();
-                        this.combo++;
                         this.perfect++;
                         return false;
                     }
