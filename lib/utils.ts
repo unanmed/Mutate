@@ -1,15 +1,17 @@
-import { MTTMode } from "./chart"
+import { MTTMode } from './chart';
 
 export type BaseType = {
-    number: number
-    string: string
-    object: object
-    boolean: boolean
-    undefined: undefined
-    function: Function
-    bigint: bigint
-    symbol: symbol
-}
+    number: number;
+    string: string;
+    object: object;
+    boolean: boolean;
+    undefined: undefined;
+    function: Function;
+    bigint: bigint;
+    symbol: symbol;
+};
+
+export const radius = (1920 ** 2 + 1080 ** 2) / 4;
 
 /**
  * 判断一个值是否不是null和undefined
@@ -24,7 +26,10 @@ export function has<T>(v: T): v is NonNullable<T> {
  * @param v 要判断的值
  * @param type 类型
  */
-export function is<T extends keyof BaseType>(v: any, type: T): v is BaseType[T] {
+export function is<T extends keyof BaseType>(
+    v: any,
+    type: T
+): v is BaseType[T] {
     return typeof v === type;
 }
 
@@ -33,7 +38,13 @@ export function is<T extends keyof BaseType>(v: any, type: T): v is BaseType[T] 
  * @param v 要判断的值
  */
 export function isMTTFn(v: any): v is MTTMode<string> {
-    return has(v) && has(v.fnType) && (v.fnType === 'timing' || v.fnType === 'generator' || v.fnType === 'path');
+    return (
+        has(v) &&
+        has(v.fnType) &&
+        (v.fnType === 'timing' ||
+            v.fnType === 'generator' ||
+            v.fnType === 'path')
+    );
 }
 
 /**
@@ -41,8 +52,12 @@ export function isMTTFn(v: any): v is MTTMode<string> {
  * @param fn 要判断的函数
  * @param type 要判断的返回值类型
  * @param test 函数的参数
- * @returns 
+ * @returns
  */
-export function isReturnType<T extends keyof BaseType>(fn: (...args: any) => any, type: T, ...test: any[]): fn is (...args: any) => T {
+export function isReturnType<T extends keyof BaseType>(
+    fn: (...args: any) => any,
+    type: T,
+    ...test: any[]
+): fn is (...args: any) => BaseType[T] {
     return typeof fn(...test) === type;
 }

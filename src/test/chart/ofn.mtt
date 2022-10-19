@@ -22,6 +22,7 @@
                     0
                 ]
             },
+            "filter": {},
             "animate": [
                 {
                     "custom": true,
@@ -100,6 +101,7 @@
                     0
                 ]
             },
+            "filter": {},
             "animate": [
                 {
                     "custom": true,
