@@ -2566,6 +2566,8 @@ declare module 'mutate-game' {
      * 工具模块
      */
     export namespace utils {
+        export const radius: 1213200
+
         /**
          * 判断一个值是否不是null和undefined
          *
@@ -2610,6 +2612,6 @@ declare module 'mutate-game' {
             fn: (...args: any) => any,
             type: T,
             ...test: any[]
-        ): fn is (...args: any) => T;
+        ): fn is (...args: any) => BaseType[T];
     }
 }

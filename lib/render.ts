@@ -4,7 +4,7 @@ import { MutateEventTarget } from './event';
 import { EffectEvent, RenderEvent, RenderEventMap } from './event.map';
 import { JudgeRes } from './judge';
 import { BaseNote, NoteType, PlayedEffect } from './note';
-import { has } from './utils';
+import { has, radius } from './utils';
 
 export type RenderMap = {
     note: BaseNote<NoteType>;
@@ -94,6 +94,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
 
         for (const num in bases) {
             const base = bases[num];
+            if (base.custom.a === 0) continue;
             this.renderer.base.call(this, base);
         }
 
@@ -101,6 +102,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         const notes = this.game.chart.notes;
         for (const num in notes) {
             const note = notes[num];
+            if (note.custom.opacity === 0) return;
             if (note.played) continue;
             if (note.noteType === 'tap')
                 this.renderer.tap.call(this, note as BaseNote<'tap'>);
@@ -163,10 +165,8 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
             top = camera.y / size;
 
         return (
-            x >= -r - 50 + left &&
-            x <= 1920 / size + r + 50 + left &&
-            y >= -r - 50 + top &&
-            y <= 1080 / size + r + 50 + top
+            (x - 960 + left) ** 2 + (y - 540 + top) ** 2 + r ** 2 <=
+            radius / size
         );
     }
 
