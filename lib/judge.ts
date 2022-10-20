@@ -195,6 +195,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                                 this.touching > 0
                             ) {
                                 v.perfect();
+                                this.perfect++;
                                 return false;
                             }
                         }

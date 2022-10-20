@@ -1,18 +1,28 @@
 export type TickerFn = (time: number) => void;
 
+const tickers: Ticker[] = [];
+const fn = (time: number) => {
+    for (const ticker of tickers) {
+        for (const fn of ticker.funcs) {
+            fn(time - ticker.startTime);
+        }
+    }
+    requestAnimationFrame(fn);
+};
+requestAnimationFrame(fn);
+
 export class Ticker {
     /** 所有的ticker函数 */
     funcs: TickerFn[] = [];
     /** 当前ticker的状态 */
     status: 'stop' | 'running' = 'stop';
-
     /** 开始时间 */
-    private startTime: number = 0;
-    /** 动画函数的id */
-    private handle: number = 0;
+    startTime: number = 0;
 
     constructor() {
-        this.run();
+        this.status = 'running';
+        tickers.push(this);
+        requestAnimationFrame(time => (this.startTime = time));
     }
 
     /**
@@ -55,37 +65,11 @@ export class Ticker {
     }
 
     /**
-     * 每帧执行的函数
-     */
-    private one(time: number): void {
-        for (const fn of this.funcs) {
-            try {
-                fn(time);
-            } catch (e) {
-                this.stop();
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * 开始运行这个ticker
-     */
-    private run(): void {
-        this.status = 'running';
-        requestAnimationFrame(time => (this.startTime = time));
-        const fn = (time: number) => {
-            this.one(time - this.startTime);
-            this.handle = requestAnimationFrame(fn);
-        };
-        requestAnimationFrame(fn);
-    }
-
-    /**
      * 停止运行这个ticker
      */
     private stop(): void {
         this.status = 'stop';
-        cancelAnimationFrame(this.handle);
+        const i = tickers.findIndex(v => v === this);
+        tickers.splice(i, 1);
     }
 }
