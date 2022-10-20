@@ -252,7 +252,7 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
         note: BaseNote<Exclude<NoteType, 'hold'>>,
         fillColor: string
     ) {
-        if (note.played) return;
+        if (note.destroyed) return;
         if (
             has(note.noteTime) &&
             this.game.time > note.noteTime + note.missTime

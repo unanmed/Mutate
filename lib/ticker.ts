@@ -1,13 +1,15 @@
-export type TickerFn = (time: number) => void
+export type TickerFn = (time: number) => void;
 
 export class Ticker {
     /** 所有的ticker函数 */
-    funcs: TickerFn[] = []
+    funcs: TickerFn[] = [];
     /** 当前ticker的状态 */
-    status: 'stop' | 'running' = 'stop'
+    status: 'stop' | 'running' = 'stop';
 
     /** 开始时间 */
     private startTime: number = 0;
+    /** 动画函数的id */
+    private handle: number = 0;
 
     constructor() {
         this.run();
@@ -29,7 +31,10 @@ export class Ticker {
      */
     remove(fn: TickerFn): Ticker {
         const index = this.funcs.findIndex(v => v === fn);
-        if (index === -1) throw new ReferenceError(`You are going to remove nonexistent ticker function.`);
+        if (index === -1)
+            throw new ReferenceError(
+                `You are going to remove nonexistent ticker function.`
+            );
         this.funcs.splice(index, 1);
         return this;
     }
@@ -68,19 +73,19 @@ export class Ticker {
      */
     private run(): void {
         this.status = 'running';
+        requestAnimationFrame(time => (this.startTime = time));
         const fn = (time: number) => {
-            if (this.status === 'stop') return;
-            if (this.startTime === 0) this.startTime = time;
             this.one(time - this.startTime);
-            requestAnimationFrame(fn);
-        }
+            this.handle = requestAnimationFrame(fn);
+        };
         requestAnimationFrame(fn);
     }
 
-    /** 
+    /**
      * 停止运行这个ticker
      */
     private stop(): void {
         this.status = 'stop';
+        cancelAnimationFrame(this.handle);
     }
 }
