@@ -413,7 +413,14 @@ export class Chart {
         // 每帧执行的函数
         const fn = () => {
             const a = data[last + 1];
-            if (!has(a)) return this.game.ticker.remove(fn);
+            if (!a) {
+                new Promise(async res => {
+                    await obj.all();
+                    obj.ticker.destroy();
+                    res('deleted');
+                });
+                return this.game.ticker.remove(fn);
+            }
             const time = a.start;
             if (this.game.time < time) return;
             last++;
@@ -426,7 +433,7 @@ export class Chart {
             else if (a.path) obj.moveAs(a.path);
             else if (a.type === 'move') obj.move(a.x as number, a.y as number);
             else if (a.type === 'rotate') obj.rotate(a.n);
-            else if (a.type === 'resize') obj.scale(a.n);
+            else if (a.type === 'resize' || a.type === 'scale') obj.scale(a.n);
             else if (a.type === 'shake')
                 obj.shake(a.x as number, a.y as number);
         };

@@ -1,32 +1,38 @@
-import { AnimationBase } from "./animate";
-import { Mutate } from "./core";
+import { AnimationBase } from './animate';
+import { Mutate } from './core';
 
-type ToOmittedKey = 'getPropertyPriority' | 'length' | 'parentRule'
-    | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'
+type ToOmittedKey =
+    | 'getPropertyPriority'
+    | 'length'
+    | 'parentRule'
+    | 'getPropertyValue'
+    | 'item'
+    | 'removeProperty'
+    | 'setProperty';
 
-type CssKey = keyof Omit<CSSStyleDeclaration, ToOmittedKey> & string
+type CssKey = keyof Omit<CSSStyleDeclaration, ToOmittedKey> & string;
 
 type CameraSaveInfo = {
-    x: number
-    y: number
-    angle: number
-    size: number
-}
+    x: number;
+    y: number;
+    angle: number;
+    size: number;
+};
 
 export class Camera extends AnimationBase {
     /** 存档栈 */
-    saveStack: CameraSaveInfo[] = []
+    saveStack: CameraSaveInfo[] = [];
     /** 第0毫秒的动画是否执行完毕 */
-    inited: boolean = false
+    inited: boolean = false;
     /** 效果函数 */
-    effectFn: (camera: Camera) => void = this.defaultEffect
+    effectFn: (camera: Camera) => void = this.defaultEffect;
 
     /** 摄像机作用的目标画布 */
-    readonly target: CanvasRenderingContext2D
+    readonly target: CanvasRenderingContext2D;
     /** 摄像机id */
-    readonly id: string
+    readonly id: string;
     /** 游戏实例 */
-    readonly game: Mutate
+    readonly game: Mutate;
 
     constructor(game: Mutate, id: string, target: CanvasRenderingContext2D) {
         super(game);
@@ -79,7 +85,7 @@ export class Camera extends AnimationBase {
 
         for (const str of all) {
             const [key, value] = str.split(/\s*:\s*/);
-            let id = key.replace(/-([a-z])/g, ($1) => `-${$1.toUpperCase()}`);
+            let id = key.replace(/-([a-z])/g, $1 => `-${$1.toUpperCase()}`);
             if (id.length === 0) continue;
             id = id[0].toLowerCase() + id.slice(1);
             if (key in canvas.style) {
@@ -107,7 +113,7 @@ export class Camera extends AnimationBase {
         const x = this.x * scale;
         const y = this.y * scale;
         ctx.translate(dx, dy);
-        ctx.rotate(this.angle * Math.PI / 180);
+        ctx.rotate((this.angle * Math.PI) / 180);
         ctx.scale(this.size, this.size);
         ctx.translate(-dx, -dy);
         ctx.translate(-x, -y);
