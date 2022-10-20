@@ -414,11 +414,6 @@ export class Chart {
         const fn = () => {
             const a = data[last + 1];
             if (!a) {
-                new Promise(async res => {
-                    await obj.all();
-                    obj.ticker.destroy();
-                    res('deleted');
-                });
                 return this.game.ticker.remove(fn);
             }
             const time = a.start;

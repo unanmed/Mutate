@@ -3,8 +3,15 @@ export type TickerFn = (time: number) => void;
 const tickers: Ticker[] = [];
 const fn = (time: number) => {
     for (const ticker of tickers) {
-        for (const fn of ticker.funcs) {
-            fn(time - ticker.startTime);
+        if (ticker.status === 'running') {
+            try {
+                for (const fn of ticker.funcs) {
+                    fn(time - ticker.startTime);
+                }
+            } catch (e) {
+                ticker.destroy();
+                console.error(e);
+            }
         }
     }
     requestAnimationFrame(fn);
