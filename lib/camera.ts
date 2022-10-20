@@ -112,11 +112,11 @@ export class Camera extends AnimationBase {
         const dy = 540 * scale;
         const x = this.x * scale;
         const y = this.y * scale;
+        ctx.translate(-x, -y);
         ctx.translate(dx, dy);
         ctx.rotate((this.angle * Math.PI) / 180);
         ctx.scale(this.size, this.size);
         ctx.translate(-dx, -dy);
-        ctx.translate(-x, -y);
 
         ctx.shadowBlur = 4;
         ctx.shadowColor = 'black';

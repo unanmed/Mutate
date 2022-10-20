@@ -165,8 +165,8 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
             top = camera.y / size;
 
         return (
-            (x - 960 + left) ** 2 + (y - 540 + top) ** 2 + r ** 2 <=
-            radius / size
+            (x - 960 - left) ** 2 + (y - 540 - top) ** 2 + r ** 2 <=
+            radius / size ** 2
         );
     }
 

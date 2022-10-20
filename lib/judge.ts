@@ -296,7 +296,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
         let i = all.findIndex(v => {
             return (
                 has(v.noteTime) &&
-                (v.noteTime > (start?.noteTime as number) ||
+                (v.noteTime > start?.noteTime! ||
                     // 如果有间距极短的drag（一般是超过1s 60个的），就需要单独判定打击时间了
                     (v.noteType === 'drag' &&
                         v.noteTime < this.chart.game.time))
