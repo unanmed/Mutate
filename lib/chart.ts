@@ -366,7 +366,10 @@ export class Chart {
             // @ts-ignore
             else return func.apply(this, res) as TimingFn | PathFn;
         };
-        const fn = extract(data.mode.fn, data.mode.fnType, data.mode.args);
+        const fn =
+            data.type === 'moveAs'
+                ? void 0
+                : extract(data.mode.fn, data.mode.fnType, data.mode.args);
         let path: PathFn | undefined;
         if (data.type === 'moveAs')
             path = extract(
