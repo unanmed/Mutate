@@ -374,7 +374,7 @@ export class Chart {
         if (data.type === 'moveAs')
             path = extract(
                 data.mode.pathFn as string,
-                'path',
+                data.mode.fnType,
                 data.mode.pathArg as any[]
             ) as PathFn;
         else path = void 0;
