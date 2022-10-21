@@ -313,6 +313,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      */
     private keydown = (e: KeyboardEvent) => {
         if (!this.holdingKeys.includes(e.keyCode)) {
+            this.chart.game.ac.sync();
             this.holdingKeys.push(e.keyCode);
             this.judge(e.keyCode);
         }
@@ -322,6 +323,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      * 键盘松开时
      */
     private keyup = (e: KeyboardEvent) => {
+        this.chart.game.ac.sync();
         const i = this.holdingKeys.findIndex(v => v === e.keyCode);
         this.holdingKeys.splice(i, 1);
         const note = this.holding.find(v => (v.key as number) === e.keyCode);
@@ -333,6 +335,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      * 触摸屏按下时
      */
     touchstart = (e: TouchEvent) => {
+        this.chart.game.ac.sync();
         this.touching++;
         this.judge();
     };
@@ -341,6 +344,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      * 触摸屏松开时
      */
     touchend = (e: TouchEvent) => {
+        this.chart.game.ac.sync();
         this.touching--;
         this.judgeHold(false);
     };

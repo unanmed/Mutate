@@ -1,37 +1,63 @@
-import { PathFn } from "./path"
-import { TimingFn } from "./timing"
-import { cloneDeep } from 'lodash'
-import { Ticker } from "./ticker"
-import { Mutate } from "./core"
+import { PathFn } from './path';
+import { TimingFn } from './timing';
+import { cloneDeep } from 'lodash';
+import { Ticker, TickerFn } from './ticker';
+import { Mutate } from './core';
+import { Base } from './base';
 
-export type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void
+export type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void;
 
-export type AnimateType = 'move' | 'rotate' | 'resize' | 'shake'
+export type AnimateType = 'move' | 'rotate' | 'resize' | 'shake';
 
-export type AnimateTime = 'start' | 'end'
+export type AnimateTime = 'start' | 'end';
 
 /**
  * 动画生命周期钩子
  */
-export type AnimateHook = `${AnimateType}${AnimateTime}` | AnimateType | 'animating' | AnimateTime
+export type AnimateHook =
+    | `${AnimateType}${AnimateTime}`
+    | AnimateType
+    | 'animating'
+    | AnimateTime;
+
+export interface AnimateTargets {
+    system: {
+        move: [x: number, y: number];
+        rotate: number;
+        resize: number;
+        shake: 0;
+    };
+    custom: Record<string, number>;
+}
+
+export interface AnimateTickers {
+    system: {
+        move: [TickerFn, TickerFn];
+        moveAs: TickerFn;
+        rotate: TickerFn;
+        resize: TickerFn;
+        shake: TickerFn;
+    };
+    custom: Record<string, TickerFn>;
+}
 
 const listener = {
-    'move': [],
-    'moveend': [],
-    'movestart': [],
-    'resize': [],
-    'resizeend': [],
-    'resizestart': [],
-    'rotate': [],
-    'rotateend': [],
-    'rotatestart': [],
-    'shake': [],
-    'shakeend': [],
-    'shakestart': [],
-    'start': [],
-    'end': [],
-    'animating': []
-}
+    move: [],
+    moveend: [],
+    movestart: [],
+    resize: [],
+    resizeend: [],
+    resizestart: [],
+    rotate: [],
+    rotateend: [],
+    rotatestart: [],
+    shake: [],
+    shakeend: [],
+    shakestart: [],
+    start: [],
+    end: [],
+    animating: []
+};
 
 export async function sleep(time: number) {
     await new Promise(res => setTimeout(res, time));
@@ -39,27 +65,50 @@ export async function sleep(time: number) {
 
 export class AnimationBase {
     /** 渐变函数 */
-    timing: TimingFn
+    timing: TimingFn;
     /** 震动变化函数 */
-    shakeTiming: TimingFn
+    shakeTiming: TimingFn;
     /** 根据路径移动时的路径函数 */
-    path: PathFn
-    /** 所有的监听函数 */
-    private readonly listener: { [T in AnimateHook]: AnimateFn[] } = cloneDeep(listener);
+    path: PathFn;
     /** 每帧执行函数 */
-    ticker: Ticker = new Ticker()
+    ticker: Ticker = new Ticker();
     /** 自定义的动画属性 */
-    custom: { [key: string]: number } = {}
+    custom: { [key: string]: number } = {};
     /** 变换时的相对模式，相对或绝对 */
-    relation: 'relative' | 'absolute' = 'absolute'
+    relation: 'relative' | 'absolute' = 'absolute';
     /** 渐变时间 */
-    easeTime: number = 0
+    easeTime: number = 0;
     /** 放缩的大小 */
-    size: number = 1
+    size: number = 1;
     /** 角度 */
-    angle: number = 0
+    angle: number = 0;
     /** mutate游戏实例，使用可选可保证动画可在其它地方使用 */
-    game?: Mutate
+    game?: Mutate;
+
+    /** 所有的监听函数 */
+    private readonly listener: { [T in AnimateHook]: AnimateFn[] } =
+        cloneDeep(listener);
+    /** 各个动画的目标值 */
+    private readonly targetValue: AnimateTargets = {
+        system: {
+            move: [0, 0],
+            resize: 0,
+            rotate: 0,
+            shake: 0
+        },
+        custom: {}
+    };
+    /** 动画的帧函数 */
+    private readonly animateFn: AnimateTickers = {
+        system: {
+            move: [() => 0, () => 0],
+            moveAs: () => 0,
+            resize: () => 0,
+            rotate: () => 0,
+            shake: () => 0
+        },
+        custom: {}
+    };
 
     get x(): number {
         return this.ox + this.sx;
@@ -70,11 +119,11 @@ export class AnimationBase {
     }
 
     // 无震动时的坐标
-    protected ox: number = 0
-    protected oy: number = 0
+    protected ox: number = 0;
+    protected oy: number = 0;
     // 震动时的坐标
-    private sx: number = 0
-    private sy: number = 0
+    private sx: number = 0;
+    private sy: number = 0;
 
     /** 正在执行的动画 */
     animating: { [x: string]: boolean } = {};
@@ -85,10 +134,10 @@ export class AnimationBase {
         this.shakeTiming = n => n;
         this.path = n => [n, n];
         this.animating = {
-            'move': false,
-            'scale': false,
-            'rotate': false,
-            'shake': false
+            move: false,
+            scale: false,
+            rotate: false,
+            shake: false
         };
         // animating listener
         this.ticker.add(() => {
@@ -96,7 +145,7 @@ export class AnimationBase {
             for (const fn of animating) {
                 fn(this, 'all');
             }
-        })
+        });
     }
 
     /**
@@ -138,6 +187,7 @@ export class AnimationBase {
      * 移动
      */
     move(x: number, y: number): AnimationBase {
+        if (this.animating.move) this.end(true, 'move');
         this.applySys('ox', x, 'move');
         this.applySys('oy', y, 'move');
         return this;
@@ -167,7 +217,7 @@ export class AnimationBase {
      * @param y 纵向震动比例，范围0-1
      */
     shake(x: number, y: number): AnimationBase {
-        if (this.animating.shake === true) this.error(`shake is executed twice.`);
+        if (this.animating.shake === true) this.end(true, 'shake');
 
         this.animating.shake = true;
         const { easeTime: time, shakeTiming: timing } = this;
@@ -188,7 +238,7 @@ export class AnimationBase {
             const p = timing(rate);
             this.sx = p * x;
             this.sy = p * y;
-        }
+        };
         this.ticker.add(fn);
         return this;
     }
@@ -198,9 +248,9 @@ export class AnimationBase {
      */
     moveAs(path: PathFn): AnimationBase {
         // 这个比较独特，要单独处理
-        if (this.animating.move) this.error(`move is executed twice.`);
+        if (this.animating.moveAs) this.end(true, 'move');
 
-        this.animating.move = true;
+        this.animating.moveAs = true;
         this.path = path;
         const { easeTime: time, relation, timing } = this;
         const start = this.game?.time ?? Date.now();
@@ -234,8 +284,10 @@ export class AnimationBase {
                 this.ox = ox + x;
                 this.oy = oy + y;
             }
-        }
+        };
         this.ticker.add(fn, true);
+        this.animateFn.system.moveAs = fn;
+        this.targetValue.system.move = [tx, ty];
 
         return this;
     }
@@ -247,13 +299,13 @@ export class AnimationBase {
         if (Object.values(this.animating).every(v => v === true)) {
             return this.error('There is no animates to be waited.');
         }
-        await new Promise((res) => {
+        await new Promise(res => {
             const fn = () => {
                 if (Object.values(this.animating).every(v => v === false)) {
                     this.unlisten('end', fn);
                     res('all animated.');
                 }
-            }
+            };
             this.listen('end', fn);
         });
     }
@@ -263,21 +315,25 @@ export class AnimationBase {
      * @param n 要等待的个数
      */
     async n(n: number): Promise<void> {
-        const all = Object.values(this.animating).filter(v => v === true).length;
+        const all = Object.values(this.animating).filter(
+            v => v === true
+        ).length;
         if (all < n) {
-            return this.error(`You are trying to wait ${n} animate, but there are only ${all} animate animating.`);
+            return this.error(
+                `You are trying to wait ${n} animate, but there are only ${all} animate animating.`
+            );
         }
         let now = 0;
-        await new Promise((res) => {
+        await new Promise(res => {
             const fn = () => {
                 now++;
                 if (now === n) {
                     this.unlisten('end', fn);
                     res(`${n} animated.`);
                 }
-            }
+            };
             this.listen('end', fn);
-        })
+        });
     }
 
     /**
@@ -288,15 +344,15 @@ export class AnimationBase {
         if (this.animating[type] === false) {
             return this.error(`The ${type} animate is not animating.`);
         }
-        await new Promise((res) => {
+        await new Promise(res => {
             const fn = () => {
                 if (this.animating[type] === false) {
                     this.unlisten('end', fn);
                     res(`${type} animated.`);
                 }
-            }
+            };
             this.listen('end', fn);
-        })
+        });
     }
 
     /**
@@ -315,7 +371,10 @@ export class AnimationBase {
      */
     unlisten(type: AnimateHook, fn: AnimateFn): void {
         const index = this.listener[type].findIndex(v => v === fn);
-        if (index === -1) return this.error('You are trying to remove a nonexistent listener.');
+        if (index === -1)
+            return this.error(
+                'You are trying to remove a nonexistent listener.'
+            );
         this.listener[type].splice(index, 1);
     }
 
@@ -326,7 +385,10 @@ export class AnimationBase {
      */
     register(key: string, n: number): void {
         if (typeof this.custom[key] === 'number') {
-            return this.error(`Property ${key} has been regietered twice.`, 'reregister');
+            return this.error(
+                `Property ${key} has been regietered twice.`,
+                'reregister'
+            );
         }
         this.custom[key] = n;
         this.animating[key] = false;
@@ -339,8 +401,11 @@ export class AnimationBase {
      * @param first 是否将动画添加到执行列表的开头
      */
     apply(key: string, n: number, first: boolean = false): AnimationBase {
-        if (this.animating[key] === true) this.error(`${key} is executed twice.`);
-        if (!(key in this.custom)) this.error(`You are trying to execute nonexistent property ${key}.`);
+        if (this.animating[key] === true) this.end(false, key);
+        if (!(key in this.custom))
+            this.error(
+                `You are trying to execute nonexistent property ${key}.`
+            );
 
         this.animating[key] = true;
         const origin = this.custom[key];
@@ -353,17 +418,16 @@ export class AnimationBase {
             const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
-                this.ticker.remove(fn);
-                this.animating[key] = false;
-                this.custom[key] = n;
-                this.hook('end');
+                this.end(false, key);
                 return;
             }
             const rate = delta / time;
             const per = timing(rate);
             this.custom[key] = origin + per * d;
-        }
+        };
         this.ticker.add(fn, first);
+        this.animateFn.custom[key] = fn;
+        this.targetValue.custom[key] = d + origin;
 
         return this;
     }
@@ -373,8 +437,13 @@ export class AnimationBase {
      * @param key 系统动画id
      * @param n 最终值
      */
-    private applySys(key: 'ox' | 'oy' | 'angle' | 'size', n: number, type: AnimateType): void {
-        if (key !== 'oy' && this.animating[type] === true) this.error(`${type} is executed twice.`);
+    private applySys(
+        key: 'ox' | 'oy' | 'angle' | 'size',
+        n: number,
+        type: AnimateType
+    ): void {
+        if (type !== 'move' && this.animating[type] === true)
+            this.end(true, type);
 
         this.animating[type] = true;
         const origin = this[key];
@@ -391,26 +460,39 @@ export class AnimationBase {
             const delta = now - start;
             if (delta > time) {
                 // 避免move执行多次
-                this.ticker.remove(fn);
-                this.animating[type] = false;
-                this[key] = origin + d;
-                if (key !== 'oy') this.hook('end', `${type}end`);
+                this.end(true, type);
                 return;
             }
             const rate = delta / time;
             const per = timing(rate);
             this[key] = origin + d * per;
-            if (key !== 'oy') this.hook(`${type}`);
-        }
+            if (key !== 'oy') this.hook(type);
+        };
         this.ticker.add(fn, true);
+        if (key === 'ox') this.animateFn.system.move[0] = fn;
+        else if (key === 'oy') this.animateFn.system.move[1] = fn;
+        else this.animateFn.system[type as Exclude<AnimateType, 'move'>] = fn;
+
+        if (type === 'move') {
+            key === 'ox' && (this.targetValue.system.move[0] = d + origin);
+            key === 'oy' && (this.targetValue.system.move[1] = d + origin);
+        } else if (type !== 'shake') {
+            this.targetValue.system[type] = d + origin;
+        }
     }
 
     /**
      * 报错
      */
     private error(text: string, type?: 'repeat' | 'reregister'): void {
-        if (type === 'repeat') throw new Error(`Cannot execute the same animation twice. Info: ${text}`);
-        if (type === 'reregister') throw new Error(`Cannot register a animated property twice. Info: ${text}`);
+        if (type === 'repeat')
+            throw new Error(
+                `Cannot execute the same animation twice. Info: ${text}`
+            );
+        if (type === 'reregister')
+            throw new Error(
+                `Cannot register a animated property twice. Info: ${text}`
+            );
         throw new Error(text);
     }
 
@@ -419,11 +501,58 @@ export class AnimationBase {
      * @param type 监听类型
      */
     private hook(...type: AnimateHook[]): void {
-        const all = Object.entries(this.listener).filter(v => type.includes(v[0] as AnimateHook));
+        const all = Object.entries(this.listener).filter(v =>
+            type.includes(v[0] as AnimateHook)
+        );
         for (const [type, fns] of all) {
             for (const fn of fns) {
                 fn(this, type as AnimateHook);
             }
+        }
+    }
+
+    /**
+     * 结束一个动画
+     */
+    private end(sys: true, type: keyof AnimateTargets['system']): void;
+    private end(sys: false, type: string): void;
+    private end(sys: boolean, type: string): void {
+        if (sys === true) {
+            // 系统动画
+            this.animating[type] = false;
+
+            if (type === 'move') {
+                this.ticker.remove(this.animateFn.system.move[0]);
+                this.ticker.remove(this.animateFn.system.move[1]);
+            } else {
+                this.ticker.remove(
+                    this.animateFn.system[
+                        type as Exclude<keyof AnimateTargets['system'], 'move'>
+                    ]
+                );
+            }
+            if (type === 'move') {
+                const [x, y] = this.targetValue.system.move;
+                this.ox = x;
+                this.oy = y;
+                this.hook('moveend', 'end');
+            } else if (type === 'rotate') {
+                this.angle = this.targetValue.system.rotate;
+                this.hook('rotateend', 'end');
+            } else if (type === 'resize') {
+                this.size = this.targetValue.system.resize;
+                this.hook('resizeend', 'end');
+            } else {
+                this.sx = 0;
+                this.sy = 0;
+                this.hook('shakeend', 'end');
+            }
+        } else {
+            // 自定义动画
+            this.animating[type] = false;
+            this.ticker.remove(this.animateFn.custom[type]);
+            this.custom[type] = this.targetValue.custom[type];
+            this.hook('end');
         }
     }
 }

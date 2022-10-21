@@ -38,7 +38,7 @@ async function start() {
     mutate.on('pause', e => console.log(e));
     await Promise.all(tasks);
     mutate.start(0);
-    mutate.chart.judger.auto = true;
+    // mutate.chart.judger.auto = true;
     mutate.renderer.on('after', e => {
         const ctx = e.ctx;
         ctx.save();

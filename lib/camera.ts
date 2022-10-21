@@ -43,7 +43,7 @@ export class Camera extends AnimationBase {
         this.game = game;
         this.ticker.add(() => {
             const rad = (this.angle / 180) * Math.PI;
-            this.trigo = [Math.cos(-rad), Math.sin(-rad)];
+            this.trigo = [Math.cos(rad), Math.sin(rad)];
         });
     }
 

@@ -132,17 +132,22 @@ export class AudioExtractor {
     }
 
     /**
+     * 立即同步时间
+     */
+    sync(): void {
+        if (this.status === 'pre') {
+            this.game.time = this.offset;
+        } else {
+            this.game.time =
+                (this.ac.currentTime - this.startTime) * 1000 + this.offset;
+        }
+    }
+
+    /**
      * 添加同步音频时间的函数
      */
     private syncTime(): void {
-        const fn = () => {
-            if (this.status === 'pre') {
-                this.game.time = this.offset;
-            } else {
-                this.game.time =
-                    (this.ac.currentTime - this.startTime) * 1000 + this.offset;
-            }
-        };
+        const fn = () => this.sync();
         this.game.ticker.add(fn, true);
     }
 

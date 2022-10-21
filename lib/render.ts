@@ -161,14 +161,14 @@ export class Renderer extends MutateEventTarget<RenderEventMap> {
     inGame(x: number, y: number, r: number = 10): boolean {
         const camera = this.game.chart.camera;
         const size = camera.size;
-        const ox = x - camera.x / size - 960,
-            oy = y - camera.y / size - 540;
-        const [sin, cos] = camera.trigo;
+        const ox = x - 960,
+            oy = y - 540;
+        const [cos, sin] = camera.trigo;
 
-        const px = ox * cos - oy * sin,
-            py = ox * sin + oy * cos;
+        const px = ox * cos - oy * sin - camera.x / size,
+            py = ox * sin + oy * cos - camera.y / size;
 
-        return px ** 2 + py ** 2 + r ** 2 <= radius / size ** 2;
+        return px ** 2 + py ** 2 - r ** 2 <= radius / size ** 2;
     }
 
     /**
