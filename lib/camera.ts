@@ -26,6 +26,8 @@ export class Camera extends AnimationBase {
     inited: boolean = false;
     /** 效果函数 */
     effectFn: (camera: Camera) => void = this.defaultEffect;
+    /** 角度的三角函数值 */
+    trigo: [cos: number, sin: number] = [0, 0];
 
     /** 摄像机作用的目标画布 */
     readonly target: CanvasRenderingContext2D;
@@ -39,6 +41,10 @@ export class Camera extends AnimationBase {
         this.target = target;
         this.id = id;
         this.game = game;
+        this.ticker.add(() => {
+            const rad = (this.angle / 180) * Math.PI;
+            this.trigo = [Math.cos(-rad), Math.sin(-rad)];
+        });
     }
 
     /**
