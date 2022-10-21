@@ -12,9 +12,10 @@ type MTTAnimate = Array<{
     n: number; // Target value, if it is not 'move' or 'moveAs'
     mode: {
         // Animation rate function
-        fnType: 'generator' | 'timing' | 'path' | 'pathG'; // Generator is the rate generator, pathG is the path generator
+        fnType: 'generator' | 'timing'; // Generator is the rate generator, pathG is the path generator
         fn: string; // Timing or generator function name
         args: any[]; // List of arguments for the timing generator
+        pathType?: 'path' | 'pathG';
         pathFn?: string; // Path or pathG function name
         pathArg?: any[]; // List of arguments for the path or path generator
         // The above should be registered in the game, the registration method is described in the chart section, and the mechanism will be explained in detail afterwards

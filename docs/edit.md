@@ -12,9 +12,10 @@ type MTTAnimate = Array<{
     n: number; // 目标值，在不是'move' 'moveAs'的前提下
     mode: {
         // 渐变函数
-        fnType: 'generator' | 'timing' | 'path' | 'pathG'; // generator是timing生成函数，pathG是路径生成函数
+        fnType: 'generator' | 'timing'; // generator是timing生成函数，在路径模式下，此项依然必填，表示路径进度
         fn: string; // timing或generator函数名称
         args: any[]; // timing函数参数列表
+        pathType?: 'path' | 'pathG'; // 路径函数类型，pathG是路径生成函数，是否是路径由fn是否为'moveAs'决定
         pathFn?: string; // path或pathG函数名称
         pathArg?: any[]; // 参数列表
         // 以上内容应当在游戏中注册，注册方法在chart一栏有说明，之后也会详细说明其运作机理

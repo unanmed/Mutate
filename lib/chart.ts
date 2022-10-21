@@ -26,6 +26,7 @@ export type MTTMode<T extends string> = {
     fnType: keyof TimingMode;
     fn: string;
     args: any[];
+    pathType: T extends 'moveAs' ? 'path' | 'pathG' : void;
     pathFn: T extends 'moveAs' ? string : void;
     pathArg: T extends 'moveAs' ? any[] : void;
 };
@@ -366,15 +367,12 @@ export class Chart {
             // @ts-ignore
             else return func.apply(this, res) as TimingFn | PathFn;
         };
-        const fn =
-            data.type === 'moveAs'
-                ? void 0
-                : extract(data.mode.fn, data.mode.fnType, data.mode.args);
+        const fn = extract(data.mode.fn, data.mode.fnType, data.mode.args);
         let path: PathFn | undefined;
         if (data.type === 'moveAs')
             path = extract(
                 data.mode.pathFn as string,
-                data.mode.fnType,
+                data.mode.pathType!,
                 data.mode.pathArg as any[]
             ) as PathFn;
         else path = void 0;
