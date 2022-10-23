@@ -179,8 +179,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     judgeMissAndDrag(): void {
         // 每帧都要判定
         const fn = () => {
-            const all = this.toJudge;
-            if (all.length === 0) this.next();
+            if (this.toJudge.length === 0) this.next();
             this.toJudge = this.toJudge.filter(v => {
                 if (!has(v.noteTime))
                     throw new TypeError(
@@ -293,17 +292,22 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     private next(): void {
         const all = this.chart.notesArr;
         const start = all.find(v => has(v.noteTime));
-        let i = all.findIndex(v => {
-            return (
-                has(v.noteTime) &&
-                (v.noteTime > start?.noteTime! ||
-                    // 如果有间距极短的drag（一般是超过1s 60个的），就需要单独判定打击时间了
-                    (v.noteType === 'drag' &&
-                        v.noteTime < this.chart.game.time))
-            );
-        });
+        let i = -1;
+        for (let ii = 0; ii < all.length; ii++) {
+            const v = all[ii];
+            if (!has(v.noteTime)) continue;
+            if (v.noteTime > start?.noteTime! && v.noteType !== 'drag') {
+                i = ii;
+                break;
+            }
+            if (v.noteType === 'drag') {
+                if (v.noteTime > this.chart.game.time) {
+                    i = ii;
+                }
+            }
+        }
 
-        if (i === -1) i = all.length + 1;
+        if (i === -1 || i === 0) i = all.length + 1;
         const to = all.splice(0, i);
         this.toJudge = to.filter(v => has(v.noteTime));
     }
