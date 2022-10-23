@@ -56,6 +56,7 @@ export class AudioExtractor {
     play(): void {
         if (this.status === 'playing')
             throw new TypeError(`The game music is playing now.`);
+
         this.startTime = this.ac.currentTime;
         this.game.time = (this.ac.currentTime - this.startTime) * 1000;
         const gain = this.ac.createGain();
@@ -128,6 +129,7 @@ export class AudioExtractor {
         this.status = 'pre';
         this.musicNode.stop();
         this.syncTime();
+        this.ac.resume();
         this.game.time = this.offset;
     }
 
