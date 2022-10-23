@@ -1,6 +1,6 @@
 export type TickerFn = (time: number) => void;
 
-const tickers: Ticker[] = [];
+let tickers: Ticker[] = [];
 const fn = (time: number) => {
     for (const ticker of tickers) {
         if (ticker.status === 'running') {
@@ -76,7 +76,6 @@ export class Ticker {
      */
     private stop(): void {
         this.status = 'stop';
-        const i = tickers.findIndex(v => v === this);
-        tickers.splice(i, 1);
+        tickers = tickers.filter(v => v !== this);
     }
 }

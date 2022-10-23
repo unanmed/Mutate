@@ -52,7 +52,6 @@ export function isMTTFn(v: any): v is MTTMode<string> {
  * @param fn 要判断的函数
  * @param type 要判断的返回值类型
  * @param test 函数的参数
- * @returns
  */
 export function isReturnType<T extends keyof BaseType>(
     fn: (...args: any) => any,

@@ -78,7 +78,7 @@ export class AudioExtractor {
      * 暂停播放
      */
     async pause(): Promise<void> {
-        if (this.status !== 'playing')
+        if (this.status === 'pause')
             throw new TypeError(
                 `You are trying to pause an already paused music.`
             );
@@ -125,9 +125,9 @@ export class AudioExtractor {
      * 重新播放音频
      */
     restart(): void {
+        this.status = 'pre';
         this.musicNode.stop();
         this.syncTime();
-        this.status = 'pre';
         this.game.time = this.offset;
     }
 
@@ -155,6 +155,7 @@ export class AudioExtractor {
      * 当音频结束时
      */
     private async musicEnd(): Promise<void> {
+        if (this.status === 'pre') return;
         await sleep(1000);
         this.game.end();
     }
