@@ -23,6 +23,7 @@ export type AnimateHook =
 export interface AnimateTargets {
     system: {
         move: [x: number, y: number];
+        moveAs: [x: number, y: number];
         rotate: number;
         resize: number;
         shake: 0;
@@ -92,6 +93,7 @@ export class AnimationBase {
     private readonly targetValue: AnimateTargets = {
         system: {
             move: [0, 0],
+            moveAs: [0, 0],
             resize: 0,
             rotate: 0,
             shake: 0
@@ -248,7 +250,7 @@ export class AnimationBase {
      */
     moveAs(path: PathFn): AnimationBase {
         // 这个比较独特，要单独处理
-        if (this.animating.moveAs) this.end(true, 'move');
+        if (this.animating.moveAs) this.end(true, 'moveAs');
 
         this.animating.moveAs = true;
         this.path = path;
@@ -287,7 +289,7 @@ export class AnimationBase {
         };
         this.ticker.add(fn, true);
         this.animateFn.system.moveAs = fn;
-        this.targetValue.system.move = [tx, ty];
+        this.targetValue.system.moveAs = [tx, ty];
 
         return this;
     }
@@ -524,6 +526,8 @@ export class AnimationBase {
             if (type === 'move') {
                 this.ticker.remove(this.animateFn.system.move[0]);
                 this.ticker.remove(this.animateFn.system.move[1]);
+            } else if (type === 'moveAs') {
+                this.ticker.remove(this.animateFn.system.moveAs);
             } else {
                 this.ticker.remove(
                     this.animateFn.system[
@@ -533,6 +537,11 @@ export class AnimationBase {
             }
             if (type === 'move') {
                 const [x, y] = this.targetValue.system.move;
+                this.ox = x;
+                this.oy = y;
+                this.hook('moveend', 'end');
+            } else if (type === 'moveAs') {
+                const [x, y] = this.targetValue.system.moveAs;
                 this.ox = x;
                 this.oy = y;
                 this.hook('moveend', 'end');
