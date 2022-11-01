@@ -242,6 +242,7 @@ export class AnimationBase {
             this.sy = p * y;
         };
         this.ticker.add(fn);
+        this.animateFn.system.shake = fn;
         return this;
     }
 
@@ -270,11 +271,7 @@ export class AnimationBase {
             const now = this.game?.time ?? Date.now();
             const delta = now - start;
             if (delta > time) {
-                this.ticker.remove(fn);
-                this.animating.move = false;
-                this.ox = tx;
-                this.oy = ty;
-                this.hook('end', 'moveend');
+                this.end(true, 'moveAs');
                 return;
             }
             const rate = delta / time;
