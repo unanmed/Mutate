@@ -328,8 +328,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      */
     private keyup = (e: KeyboardEvent) => {
         this.chart.game.ac.sync();
-        const i = this.holdingKeys.findIndex(v => v === e.keyCode);
-        this.holdingKeys.splice(i, 1);
+        this.holdingKeys = this.holdingKeys.filter(v => v !== e.keyCode);
         const note = this.holding.find(v => (v.key as number) === e.keyCode);
         if (!has(note)) return;
         this.judgeHold(false, note, e.keyCode);
@@ -340,7 +339,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      */
     touchstart = (e: TouchEvent) => {
         this.chart.game.ac.sync();
-        this.touching++;
+        this.touching = e.touches.length;
         this.judge();
     };
 
@@ -349,7 +348,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      */
     touchend = (e: TouchEvent) => {
         this.chart.game.ac.sync();
-        this.touching--;
+        this.touching = e.touches.length;
         this.judgeHold(false);
     };
 }
