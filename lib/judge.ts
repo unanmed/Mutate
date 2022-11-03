@@ -71,7 +71,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
      */
     judge(key?: number): void {
         if (this.auto) return;
-        const note = this.toJudge.slice(0, 1)[0] as BaseNote<NoteType>;
+        const note = this.toJudge[0] as BaseNote<NoteType>;
         if (!has(note)) return;
         if (this.toJudge.length === 0) this.next();
 
@@ -199,7 +199,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
                             }
                         }
                     }
-                    if (this.chart.game.time > v.noteTime + v.missTime) {
+                    if (this.chart.game.time > v.noteTime + v.goodTime) {
                         v.miss('late');
                         this.late++;
                         this.miss++;
@@ -309,7 +309,9 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
 
         if (i === -1 || i === 0) i = all.length + 1;
         const to = all.splice(0, i);
-        this.toJudge = to.filter(v => has(v.noteTime));
+        this.toJudge = to
+            .filter(v => has(v.noteTime))
+            .sort((a, b) => (a.noteType === 'drag' ? 1 : -1));
     }
 
     /**
