@@ -130,12 +130,19 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             resume: [],
             end: []
         });
+        const s = window.devicePixelRatio;
         this.target = target;
         this.ctx = target.getContext('2d') as CanvasRenderingContext2D;
         this.ctx.save();
+        target.style.width = `${target.width}px`;
+        target.style.height = `${target.height}px`;
+        setTimeout(() => {
+            target.width *= s;
+            target.height *= s;
+        });
         this.width = target.width;
         this.height = target.height;
-        this.scale = Math.min(this.width / 1920, this.height / 1080);
+        this.scale = Math.min(this.width / 1920, this.height / 1080) * s;
         // 如果画布不是16:9，那么自动调整
         if (target.width / target.height !== parseFloat((16 / 9).toFixed(7))) {
             const ws = this.width / 1920;

@@ -121,7 +121,7 @@ export class Camera extends AnimationBase {
         ctx.translate(-x, -y);
         ctx.translate(dx, dy);
         ctx.rotate((this.angle * Math.PI) / 180);
-        ctx.scale(this.size, this.size);
+        ctx.scale(this.size * scale, this.size * scale);
         ctx.translate(-dx, -dy);
 
         ctx.shadowBlur = 4;
