@@ -46,11 +46,7 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
     }
 
     constructor(chart: Chart) {
-        super({
-            hit: [],
-            hold: [],
-            holdend: []
-        });
+        super();
         this.chart = chart;
         document.addEventListener('keydown', this.keydown);
         document.addEventListener('keyup', this.keyup);
@@ -299,11 +295,6 @@ export class Judger extends MutateEventTarget<JudgerEventMap> {
             if (v.noteTime > start?.noteTime! && v.noteType !== 'drag') {
                 i = ii;
                 break;
-            }
-            if (v.noteType === 'drag') {
-                if (v.noteTime > this.chart.game.time) {
-                    i = ii;
-                }
             }
         }
 

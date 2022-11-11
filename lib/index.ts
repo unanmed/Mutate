@@ -12,6 +12,7 @@ import * as audio from './audio';
 import * as judge from './judge';
 import * as utils from './utils';
 import * as event from './event';
+import * as editor from './editor';
 
 const create = core.create;
 const Mutate = core.Mutate;
@@ -41,6 +42,7 @@ export {
     judge,
     utils,
     event,
+    editor,
     create,
     Mutate,
     AnimiationBase,
@@ -53,4 +55,4 @@ export {
     Target as MutateEventTarget,
     Renderer,
     Ticker
-}
+};

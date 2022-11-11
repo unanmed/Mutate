@@ -53,10 +53,10 @@ export function isMTTFn(v: any): v is MTTMode<string> {
  * @param type 要判断的返回值类型
  * @param test 函数的参数
  */
-export function isReturnType<T extends keyof BaseType>(
-    fn: (...args: any) => any,
+export function isReturnType<T extends keyof BaseType, P extends any[]>(
+    fn: (...args: P) => any,
     type: T,
-    ...test: any[]
-): fn is (...args: any) => BaseType[T] {
+    ...test: P
+): fn is (...args: P) => BaseType[T] {
     return typeof fn(...test) === type;
 }

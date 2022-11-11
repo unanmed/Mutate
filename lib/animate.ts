@@ -3,7 +3,6 @@ import { TimingFn } from './timing';
 import { cloneDeep } from 'lodash';
 import { Ticker, TickerFn } from './ticker';
 import { Mutate } from './core';
-import { Base } from './base';
 
 export type AnimateFn = (e: AnimationBase, type: AnimateHook | 'all') => void;
 
@@ -62,6 +61,14 @@ const listener = {
 
 export async function sleep(time: number) {
     await new Promise(res => setTimeout(res, time));
+}
+
+export interface AnimationBaseLike {
+    x: number;
+    y: number;
+    size: number;
+    angle: number;
+    custom: Record<string, number>;
 }
 
 export class AnimationBase {
@@ -295,7 +302,7 @@ export class AnimationBase {
      * 等待所有的正在执行的动画操作执行完毕
      */
     async all(): Promise<void> {
-        if (Object.values(this.animating).every(v => v === true)) {
+        if (Object.values(this.animating).every(v => v === false)) {
             return this.error('There is no animates to be waited.');
         }
         await new Promise(res => {

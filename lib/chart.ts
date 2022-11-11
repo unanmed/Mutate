@@ -451,6 +451,7 @@ export class Chart {
         const f = (key: keyof ChartDataMap[T]) => {
             let last = -1;
             const d = data[key];
+            if (!has(d)) return; // 没有这个属性就忽略，这样可以大幅度减小谱面文件
             const sorted = this.sortMTT(d as { [time: number]: any });
             const exe = all[key as string];
 
