@@ -119,7 +119,7 @@ export class AudioExtractor {
         source.connect(gain);
         gain.connect(this.mainGain);
         this.mainGain.connect(this.ac.destination);
-        source.start();
+        source.start(0);
     }
 
     /**
