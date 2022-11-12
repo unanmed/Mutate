@@ -304,6 +304,8 @@ export class Chart {
         this.judger.miss = 0;
         this.judger.combo = 0;
         this.judger.maxCombo = 0;
+        this.judger.early = 0;
+        this.judger.late = 0;
         await sleep(1000);
         await this.extract(this.game.mtt);
     }
