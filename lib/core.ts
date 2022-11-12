@@ -91,7 +91,7 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
     /** 渲染器 */
     readonly renderer: Renderer = new Renderer(this);
     /** 编辑器 */
-    readonly editor: Editor = new Editor(this);
+    readonly editor: Editor;
     /** 游戏宽度 */
     readonly width: number;
     /** 游戏高度 */
@@ -212,6 +212,8 @@ export class Mutate extends MutateEventTarget<CoreEventMap> {
             t.opacity(v)
         );
         this.chart.registerExecute('camera', 'css', (v: string, t) => t.css(v));
+        // 初始化编辑器
+        this.editor = new Editor(this);
     }
 
     /**

@@ -26,9 +26,9 @@ export type MTTMode<T extends string> = {
     fnType: keyof TimingMode;
     fn: string;
     args: any[];
-    pathType: T extends 'moveAs' ? 'path' | 'pathG' : void;
-    pathFn: T extends 'moveAs' ? string : void;
-    pathArg: T extends 'moveAs' ? any[] : void;
+    pathType?: 'path' | 'pathG';
+    pathFn?: string;
+    pathArg?: any[];
 };
 
 /**
@@ -304,6 +304,8 @@ export class Chart {
         this.judger.miss = 0;
         this.judger.combo = 0;
         this.judger.maxCombo = 0;
+        this.judger.early = 0;
+        this.judger.late = 0;
         await sleep(1000);
         await this.extract(this.game.mtt);
     }
@@ -348,7 +350,7 @@ export class Chart {
      * 解析MTT文件的动画信息
      * @param data 动画信息
      */
-    private extractMTTAnimate<T extends string>(
+    extractMTTAnimate<T extends string>(
         data: AnimateInfo<T>
     ): ExtractedMTTAnimate<T extends 'moveAs' ? true : false, T> {
         // 主要目标是解析函数
@@ -363,7 +365,7 @@ export class Chart {
                 else return v;
             });
             const func = this.animate[type][fn] as TimingMode[T];
-            if (type === 'timing') return func as TimingFn;
+            if (type === 'timing' || type === 'path') return func as TimingFn;
             // @ts-ignore
             else return func.apply(this, res) as TimingFn | PathFn;
         };

@@ -53,11 +53,11 @@ export class AudioExtractor {
     /**
      * 播放音频
      */
-    play(): void {
+    play(time: number = 0): void {
         if (this.status === 'playing')
             throw new TypeError(`The game music is playing now.`);
 
-        this.startTime = this.ac.currentTime;
+        this.startTime = this.ac.currentTime - time;
         this.game.time = (this.ac.currentTime - this.startTime) * 1000;
         const gain = this.ac.createGain();
         const source = this.ac.createBufferSource();
@@ -67,7 +67,7 @@ export class AudioExtractor {
         gain.gain.value = this.musicVolume;
         gain.connect(this.mainGain);
         this.mainGain.connect(this.ac.destination);
-        source.start();
+        source.start(0, time);
         this.status = 'playing';
         this.startTime = this.ac.currentTime;
         source.addEventListener('ended', e => {
@@ -143,6 +143,13 @@ export class AudioExtractor {
             this.game.time =
                 (this.ac.currentTime - this.startTime) * 1000 + this.offset;
         }
+    }
+
+    /**
+     * 立即结束音乐的播放
+     */
+    stop(): void {
+        this.musicNode.stop();
     }
 
     /**

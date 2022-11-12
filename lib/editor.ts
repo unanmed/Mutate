@@ -2,11 +2,11 @@ import axios from 'axios';
 import { AnimationBaseLike } from './animate';
 import { Base } from './base';
 import { Camera } from './camera';
-import { MTTAnimate, MutateChart } from './chart';
+import { AnimateInfo, ChartMap, MTTAnimate, MutateChart } from './chart';
 import { Mutate } from './core';
 import { MutateEventTarget } from './event';
 import { BaseNote, NoteType } from './note';
-import { has } from './utils';
+import { has, radius } from './utils';
 
 // 编辑模式，只负责绘制，json的生成依然依靠游戏，而不是引擎
 
@@ -28,6 +28,7 @@ type EditorRenderer = {
     tap: (e: EditorObj<BaseNote<'tap'>>) => void;
     hold: (e: EditorObj<BaseNote<'hold'>>) => void;
     drag: (e: EditorObj<BaseNote<'drag'>>) => void;
+    camera: (e: EditorObj<Camera>) => void;
 };
 
 class EditorObj<T> extends MutateEventTarget<EditorObjEventMap> {
@@ -85,6 +86,10 @@ export class Editor {
     camera!: EditorObj<Camera>;
     /** 按id排列的基地 */
     basesDict: Record<string, EditorObj<Base>> = {};
+    /** 是否正在播放 */
+    playing: boolean = false;
+    /** 当前时刻 */
+    time: number = 0;
 
     /** 游戏实例 */
     readonly game: Mutate;
@@ -92,11 +97,15 @@ export class Editor {
         tap: this.renderTap,
         drag: this.renderDrag,
         hold: this.renderHold,
-        base: this.renderBase
+        base: this.renderBase,
+        camera: this.cameraEffect
     };
+    /** 画布context */
+    readonly ctx: CanvasRenderingContext2D;
 
     constructor(game: Mutate) {
         this.game = game;
+        this.ctx = game.ctx;
     }
 
     /**
@@ -116,7 +125,27 @@ export class Editor {
      * 绘制指定时间的内容
      * @param time 绘制的时间
      */
-    renderAt(time: number): void {}
+    renderAt(time: number): void {
+        // 摄像机
+        this.renderer.camera(this.camera);
+        // 基地
+        for (const base of this.bases) {
+            this.renderer.base(base);
+        }
+        // 音符
+        const toDraw = this.notes.filter(
+            v => !has(v.source.noteTime) || v.source.noteTime >= time
+        );
+        for (const note of toDraw) {
+            if (note.source.noteType === 'tap') {
+                this.renderer.tap(note as EditorObj<BaseNote<'tap'>>);
+            } else if (note.source.noteType === 'drag') {
+                this.renderer.drag(note as EditorObj<BaseNote<'drag'>>);
+            } else {
+                this.renderer.hold(note as EditorObj<BaseNote<'hold'>>);
+            }
+        }
+    }
 
     /**
      * 解析谱面文件，生成各种实例
@@ -245,11 +274,11 @@ export class Editor {
         const last = ani.findIndex(v => v.start > time);
         const computed: Record<string, boolean> = {};
         // 应该倒着找，找到最后一个是absolute的，再进行计算
-        for (let i = last - 1; i >= 0; i--) {
+        for (let i = last - 2; i >= 0; i--) {
             const a = ani[i];
             const type = a.type;
             if (a.relation === 'absolute' && !computed[type]) {
-                const n = this.calOneAnimate(type, ani, i, last);
+                const n = this.calOneAnimate(type, ani, i, last, time);
                 if (type === 'move' || type === 'moveAs') {
                     res.x = n.x;
                     res.y = n.y;
@@ -271,14 +300,17 @@ export class Editor {
         return res;
     }
 
+    setAttrExe<K extends keyof ChartMap>(type: K, obj: ChartMap[K]): void {}
+
     /**
      * 计算音符的位置（note自带的那个不能用了，那个有优化，不适用于编辑）
      * @param note 音符
+     * @returns x y 距离 旋转角度
      */
     private calNotePosition(
         note: BaseNote<NoteType>
-    ): [number, number, number] {
-        return [0, 0, 0];
+    ): [number, number, number, number] {
+        return [0, 0, 0, 0];
     }
 
     /**
@@ -294,9 +326,92 @@ export class Editor {
         type: string,
         ani: MTTAnimate,
         index: number,
-        last: number
+        last: number,
+        time: number
     ): any {
+        let res: any;
+        const b = ani[last - 1];
+        if (b.type === 'moveAs' && b.relation === 'absolute') {
+            // 如果最后一项是moveAs并且是绝对模式
+            const passed = time - b.start;
+            const rate = passed / b.time;
+            const { fn, path } = this.game.chart.extractMTTAnimate(
+                b as AnimateInfo<'moveAs'>
+            );
+            return path(fn(rate));
+        }
         // 计算动画属性的重点就在这了
+        const a = ani[index];
+        if (type === 'move') {
+            res = [a.x!, a.y!];
+        } else if (type === 'moveAs') {
+            const { path } = this.game.chart.extractMTTAnimate(
+                a as AnimateInfo<'moveAs'>
+            );
+            res = path(1);
+        } else {
+            res = a.n;
+        }
+
+        // 循环，计算动画属性的值，最后一次计算忽略，在下方处理
+        for (let i = index; i < last - 1; i++) {
+            const a = ani[i];
+            if (
+                (type === 'move' || type === 'moveAs') &&
+                (a.type === 'move' || a.type === 'moveAs')
+            ) {
+                if (a.type === 'move') {
+                    res[0] += a.x!;
+                    res[1] += a.y!;
+                } else {
+                    const { path } = this.game.chart.extractMTTAnimate(
+                        a as AnimateInfo<'moveAs'>
+                    );
+                    const [x, y] = path(1);
+                    res[0] += x;
+                    res[1] += y;
+                }
+            } else if (
+                (type === 'resize' || type === 'scale') &&
+                (a.type === 'resize' || a.type === 'scale')
+            ) {
+                res += a.n;
+            } else {
+                res += a.n;
+            }
+        }
+
+        // 还有最后一次的计算，动画可能未完成，所以需要计算进度，而且最后一次也可能是absolute
+        const passed = time - b.start;
+        const rate = passed / b.time;
+        const { fn, path } = this.game.chart.extractMTTAnimate(b);
+        if (b.relation === 'relative') {
+            if (b.type === 'moveAs') {
+                // @ts-ignore
+                const [x, y] = path(fn(rate));
+                res[0] += x;
+                res[1] += y;
+            } else if (b.type === 'move') {
+                const r = fn(rate);
+                res[0] += b.x! * r;
+                res[1] += b.y! * r;
+            } else {
+                res += b.n * fn(rate);
+            }
+        } else {
+            // 最后一项是absolute时
+            if (b.type === 'move') {
+                const dx = b.x! - res[0];
+                const dy = b.y! - res[1];
+                const r = fn(rate);
+                res[0] += dx * r;
+                res[1] += dy * r;
+            } else {
+                const d = b.n - res;
+                res += d * fn(rate);
+            }
+        }
+        return res;
     }
 
     private renderTap(note: EditorObj<BaseNote<'tap'>>): void {}
@@ -305,7 +420,70 @@ export class Editor {
 
     private renderHold(note: EditorObj<BaseNote<'hold'>>): void {}
 
-    private renderNonHold(note: EditorObj<BaseNote<NoteType>>): void {}
+    private renderNonHold(note: EditorObj<BaseNote<NoteType>>): void {
+        const [x, y, d, r] = this.calNotePosition(note.source);
+        if (isNaN(x)) return;
+        if (!this.inGame(x, y, this.game.drawWidth / 2)) return;
+
+        const n = this.playing
+            ? note.source
+            : this.getComputedAnimation(note.source, this.time);
+
+        const rad = r + (n.angle * Math.PI) / 180;
+        const ctx = this.game.ctx;
+        const hw = this.game.halfWidth;
+        const htw = this.game.halfTopWidth;
+        const hh = this.game.halfHeight;
+        const style = this.game.multiStroke;
+        const alpha = n.custom.opacity;
+
+        ctx.save();
+        ctx.translate(x * this.game.scale, y * this.game.scale);
+        ctx.rotate(rad + Math.PI / 2);
+        ctx.filter = note.source.ctxFilter;
+        // 绘制
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = fillColor;
+        ctx.lineWidth = 4 * this.game.drawScale;
+        if (note.source.multi) {
+            ctx.shadowColor = 'gold';
+            ctx.strokeStyle = style;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(-hw, 0);
+        ctx.lineTo(-htw, -hh);
+        ctx.lineTo(htw, -hh);
+        ctx.lineTo(hw, 0);
+        ctx.lineTo(htw, hh);
+        ctx.lineTo(-htw, hh);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // 恢复画布属性
+        ctx.restore();
+    }
 
     private renderBase(base: EditorObj<Base>): void {}
+
+    private cameraEffect(camera: EditorObj<Camera>): void {
+        const c = this.playing
+            ? camera.source
+            : this.getComputedAnimation(camera.source, this.time);
+
+        const ctx = this.ctx;
+        const scale = this.game.scale;
+        const dx = 960 * scale;
+        const dy = 540 * scale;
+        const x = c.x * scale;
+        const y = c.y * scale;
+        ctx.translate(-x, -y);
+        ctx.translate(dx, dy);
+        ctx.rotate((c.angle * Math.PI) / 180);
+        ctx.scale(c.size, c.size);
+        ctx.translate(-dx, -dy);
+
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = 'black';
+    }
 }
